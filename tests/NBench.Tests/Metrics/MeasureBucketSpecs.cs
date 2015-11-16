@@ -58,7 +58,7 @@ namespace NBench.Tests.Metrics
 
             var average = counterValues.Length == 0 ? 0 : counterValues.DistanceFromStart().Select(x => (double) x).Average();
             var report = measureBucket.ToReport();
-            Assert.Equal(average, report.Stats.Mean);
+            Assert.Equal(average, report.Stats.Average);
         }
     }
 }

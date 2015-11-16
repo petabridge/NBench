@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
@@ -21,13 +22,14 @@ namespace NBench.Runner
         /// C:\> NBench.Runner.exe [assembly name]
         /// 
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">The commandline arguments</param>
         static int Main(string[] args)
         {
             Output = new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput());
             Discovery = new ReflectionDiscovery(Output);
             string assemblyPath = Path.GetFullPath(args[0]);
 
+            // TODO: See issue https://github.com/petabridge/NBench/issues/3
             var assembly = AssemblyRuntimeLoader.LoadAssembly(assemblyPath);
 
             var benchmarks = Discovery.FindBenchmarks(assembly);
@@ -37,10 +39,13 @@ namespace NBench.Runner
                 Output.WriteStartingBenchmark(benchmark.BenchmarkName);
                 benchmark.Run();
                 benchmark.Finish();
-                anyAssertFailures = anyAssertFailures || benchmark.AllAssertsPassed;
+
+                // if one assert fails, all fail
+                anyAssertFailures = anyAssertFailures || !benchmark.AllAssertsPassed; 
             }
 
-            return anyAssertFailures ? 0 : -1;
+            Console.ReadLine();
+            return anyAssertFailures ? -1 : 0;
         }
     }
 }

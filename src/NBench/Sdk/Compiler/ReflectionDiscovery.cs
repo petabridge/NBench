@@ -15,7 +15,8 @@ namespace NBench.Sdk.Compiler
     /// </summary>
     public class ReflectionDiscovery : IDiscovery
     {
-        public static readonly Type PerformanceBenchmarkAttributeType = typeof (PerformanceBenchmarkAttribute);
+        public static readonly Type PerformanceBenchmarkAttributeType = typeof (PerfBenchmarkAttribute);
+        public static readonly Type MeasurementAttributeType = typeof (MeasurementAttribute);
         public static readonly Type BenchmarkContextType = typeof (BenchmarkContext);
 
         public ReflectionDiscovery(IBenchmarkOutput output)
@@ -25,6 +26,7 @@ namespace NBench.Sdk.Compiler
 
         public IBenchmarkOutput Output { get; }
 
+        //TODO: https://github.com/petabridge/NBench/issues/9
         public IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly)
         {
             var benchmarkMetaData = ClassesWithPerformanceBenchmarks(targetAssembly).SelectMany(CreateBenchmarksForClass).ToList();
@@ -56,8 +58,8 @@ namespace NBench.Sdk.Compiler
             var allBenchmarkMethodAttributes = benchmarkClass.Run.InvocationMethod.GetCustomAttributes().ToList();
 
             var performanceTestAttribute =
-                allBenchmarkMethodAttributes.Single(a => a is PerformanceBenchmarkAttribute) as
-                    PerformanceBenchmarkAttribute;
+                allBenchmarkMethodAttributes.Single(a => a is PerfBenchmarkAttribute) as
+                    PerfBenchmarkAttribute;
             Contract.Assert(performanceTestAttribute != null);
 
             var memorySettings =
@@ -132,21 +134,21 @@ namespace NBench.Sdk.Compiler
         }
 
         /// <summary>
-        ///     Finds all classes with at least one method decorated with a <see cref="PerformanceBenchmarkAttribute" />.
+        ///     Finds all classes with at least one method decorated with a <see cref="PerfBenchmarkAttribute" />.
         ///     inside <see cref="targetAssembly" />.
         /// </summary>
         /// <param name="targetAssembly">The assembly we're scanning for benchmarks.</param>
         /// <returns>
         ///     A list of all applicable types that contain at least one method with a
-        ///     <see cref="PerformanceBenchmarkAttribute" />.
+        ///     <see cref="PerfBenchmarkAttribute" />.
         /// </returns>
         public static IReadOnlyList<TypeInfo> ClassesWithPerformanceBenchmarks(Assembly targetAssembly)
         {
             Contract.Requires(targetAssembly != null);
+            
             return targetAssembly.DefinedTypes.Where(
                 x =>
-                    x.DeclaredMethods.Any(
-                        y => y.GetCustomAttributes(PerformanceBenchmarkAttributeType, true).Any())).ToList();
+                    x.DeclaredMethods.Any(MethodHasValidBenchmark)).ToList();
         }
 
         public static IReadOnlyList<BenchmarkClassMetadata> CreateBenchmarksForClass(Type classWithBenchmarks)
@@ -162,7 +164,7 @@ namespace NBench.Sdk.Compiler
 
             var allPerfMethods =
                 classWithBenchmarks.DeclaredMethods.Where(
-                    x => x.GetCustomAttributes(PerformanceBenchmarkAttributeType, true).Any()).ToList();
+                    MethodHasValidBenchmark).ToList();
 
             var benchmarks = new List<BenchmarkClassMetadata>(allPerfMethods.Count);
             foreach (var perfMethod in allPerfMethods)
@@ -174,6 +176,12 @@ namespace NBench.Sdk.Compiler
             return benchmarks;
         }
 
+        private static bool MethodHasValidBenchmark(MethodInfo x)
+        {
+            return x.GetCustomAttributes(PerformanceBenchmarkAttributeType, true).Any()
+                        && x.GetCustomAttributes(MeasurementAttributeType, true).Any();
+        }
+
         public static BenchmarkMethodMetadata GetSetupMethod(TypeInfo classWithBenchmarks)
         {
             Contract.Requires(classWithBenchmarks != null);
@@ -182,6 +190,7 @@ namespace NBench.Sdk.Compiler
                     y => y.GetCustomAttributes(typeof (PerfSetupAttribute), true).Any()))
                 return BenchmarkMethodMetadata.Empty;
 
+            //TODO: https://github.com/petabridge/NBench/issues/10
             var matchingMethod =
                 classWithBenchmarks.DeclaredMethods.Single(
                     x => x.GetCustomAttributes(typeof (PerfSetupAttribute), true).Any());
@@ -198,6 +207,7 @@ namespace NBench.Sdk.Compiler
                     y => y.GetCustomAttributes(typeof (PerfCleanupAttribute), true).Any()))
                 return BenchmarkMethodMetadata.Empty;
 
+            //TODO: https://github.com/petabridge/NBench/issues/10
             var matchingMethod =
                 classWithBenchmarks.DeclaredMethods.Single(
                     x => x.GetCustomAttributes(typeof (PerfCleanupAttribute), true).Any());

@@ -12,7 +12,7 @@ namespace NBench.Sdk
     /// </summary>
     public class BenchmarkSettings
     {
-        public BenchmarkSettings(TestType testMode, RunType runMode, int numberOfIterations, int runTime,
+        public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTime,
             IEnumerable<GcBenchmarkSetting> gcBenchmarks,
             IEnumerable<MemoryBenchmarkSetting> memoryBenchmarks,
             IEnumerable<CounterBenchmarkSetting> counterBenchmarks)
@@ -22,7 +22,7 @@ namespace NBench.Sdk
         {
         }
 
-        public BenchmarkSettings(TestType testMode, RunType runMode, int numberOfIterations, int runTimeMilliseconds,
+        public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTimeMilliseconds,
             IEnumerable<GcBenchmarkSetting> gcBenchmarks,
             IEnumerable<MemoryBenchmarkSetting> memoryBenchmarks,
             IEnumerable<CounterBenchmarkSetting> counterBenchmarks, string description, string skip)
@@ -54,12 +54,12 @@ namespace NBench.Sdk
         /// <summary>
         ///     The mode in which this performance test assertions will be tested.
         /// </summary>
-        public TestType TestMode { get; private set; }
+        public TestMode TestMode { get; private set; }
 
         /// <summary>
         ///     The mode in which the performance test will be executed.
         /// </summary>
-        public RunType RunMode { get; private set; }
+        public RunMode RunMode { get; private set; }
 
         /// <summary>
         ///     Number of times this test will be run
@@ -77,7 +77,6 @@ namespace NBench.Sdk
         public IReadOnlyList<GcBenchmarkSetting> GcBenchmarks { get; }
         public IReadOnlyList<MemoryBenchmarkSetting> MemoryBenchmarks { get; }
         public IReadOnlyList<CounterBenchmarkSetting> CounterBenchmarks { get; }
-
         internal IReadOnlyList<GcBenchmarkSetting> DistinctGcBenchmarks { get; }
         internal IReadOnlyList<MemoryBenchmarkSetting> DistinctMemoryBenchmarks { get; }
         internal IReadOnlyList<CounterBenchmarkSetting> DistinctCounterBenchmarks { get; }
@@ -98,4 +97,3 @@ namespace NBench.Sdk
         public string Skip { get; private set; }
     }
 }
-

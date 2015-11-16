@@ -13,14 +13,14 @@ using NBench.Util;
 namespace NBench.Sdk
 {
     /// <summary>
-    ///     Executor class for running a single <see cref="PerformanceBenchmarkAttribute" />
+    ///     Executor class for running a single <see cref="PerfBenchmarkAttribute" />
     ///     Exposes the <see cref="BenchmarkContext" />, which allows developers to register custom
     ///     metrics and counters for the use of their personal benchmarks.
     /// </summary>
     public class Benchmark
     {
         /// <summary>
-        ///     only use this for longer-running specs or <see cref="RunType.Throughput" />, where
+        ///     only use this for longer-running specs or <see cref="NBench.RunMode.Throughput" />, where
         ///     metrics collection occurs on a separate thread.
         /// </summary>
         private readonly ManualResetEventSlim _changeRuns = new ManualResetEventSlim();
@@ -32,7 +32,7 @@ namespace NBench.Sdk
         /// </summary>
         public readonly Stopwatch StopWatch = new Stopwatch();
 
-        private volatile BenchmarkRun _currentRun;
+        private BenchmarkRun _currentRun;
 
         /// <summary>
         ///     Indicates if we're in warm-up mode or not
@@ -52,7 +52,7 @@ namespace NBench.Sdk
             Builder = new BenchmarkBuilder(Settings);
         }
 
-        public RunType RunMode => Settings.RunMode;
+        public RunMode RunMode => Settings.RunMode;
         public Queue<BenchmarkRunReport> CompletedRuns { get; }
         public BenchmarkSettings Settings { get; }
         public bool ShutdownCalled { get; private set; }
@@ -71,7 +71,7 @@ namespace NBench.Sdk
             // in advance without having to allocate additional ones during the tests.
             var sampleCount = _currentRun.Measures[0].RawValues.Count;
 
-            // elapsed time in Nanoseconds
+            // elapsed time
             var runTime = StopWatch.Elapsed;
 
             WarmupData = new WarmupData(runTime, sampleCount);
@@ -124,7 +124,7 @@ namespace NBench.Sdk
             _changeRuns.Set();
         }
 
-        public void RunSingleBenchmark()
+        private void RunSingleBenchmark()
         {
             Allocate(); // allocate all collectors needed
             // reset the stopwatch before each run
@@ -163,13 +163,13 @@ namespace NBench.Sdk
         {
             switch (RunMode)
             {
-                case RunType.Iterations:
+                case RunMode.Iterations:
                     if (WarmupData.ElapsedTime <= BenchmarkConstants.SamplingPrecision)
                         RunIterationBenchmark();
                     else
                         RunThroughputBenchmark(true);
                     break;
-                case RunType.Throughput:
+                case RunMode.Throughput:
                 default:
                     RunThroughputBenchmark();
                     break;
@@ -211,6 +211,8 @@ namespace NBench.Sdk
         public void Finish()
         {
             var results = CompileResults();
+
+            //TODO: https://github.com/petabridge/NBench/issues/5
             var finalResults = AssertResults(results);
             AllAssertsPassed = finalResults.AssertionResults.Any(x => !x.Passed);
             Output.WriteBenchmark(finalResults);
@@ -242,7 +244,7 @@ namespace NBench.Sdk
 
         /// <summary>
         ///     Runs long-running benchmark and performs data collection in the background on a separate thread.
-        ///     Occurs when <see cref="RunType.Throughput" /> is enabled or the <see cref="NBench.Sdk.WarmupData.ElapsedTime" />
+        ///     Occurs when <see cref="NBench.RunMode.Throughput" /> is enabled or the <see cref="NBench.Sdk.WarmupData.ElapsedTime" />
         ///     is greater than <see cref="BenchmarkConstants.SamplingPrecision" />.
         /// </summary>
         /// <param name="isActuallyIteration">

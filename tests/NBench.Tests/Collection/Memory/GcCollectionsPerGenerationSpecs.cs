@@ -21,7 +21,7 @@ namespace NBench.Tests.Collection.Memory
             var gcGenerations = SysInfo.Instance.MaxGcGeneration;
             var gcSetting = new GcBenchmarkSetting(GcMetric.TotalCollections, GcGeneration.AllGc, AssertionType.Total,
                 Assertion.Empty);
-            var gcCollectors = gcCollectionsSelector.Create(RunType.Throughput, gcSetting).Cast<GcCollectionsPerGenerationCollector>().ToList();
+            var gcCollectors = gcCollectionsSelector.Create(RunMode.Throughput, gcSetting).Cast<GcCollectionsPerGenerationCollector>().ToList();
             Assert.Equal(gcGenerations + 1,gcCollectors.Count);
             Assert.Equal(gcGenerations, gcCollectors.Max(x => x.Generation));
         }

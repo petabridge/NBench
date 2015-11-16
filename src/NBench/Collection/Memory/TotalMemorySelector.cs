@@ -24,7 +24,7 @@ namespace NBench.Collection.Memory
         {
         }
 
-        public override IEnumerable<MetricCollector> Create(RunType runType, WarmupData warmup, IBenchmarkSetting setting)
+        public override IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup, IBenchmarkSetting setting)
         {
 
             if (warmup.ElapsedTime <= BenchmarkConstants.SamplingPrecision)

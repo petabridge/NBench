@@ -85,6 +85,7 @@
     <Compile Include="Collection\CounterSelector.cs" />
     <Compile Include="CounterMeasurementAttribute.cs" />
     <Compile Include="ByteConstants.cs" />
+    <Compile Include="MeasurementAttribute.cs" />
     <Compile Include="Metrics\CounterMetricName.cs" />
     <Compile Include="Metrics\GcMetricName.cs" />
     <Compile Include="Metrics\MemoryMetricName.cs" />

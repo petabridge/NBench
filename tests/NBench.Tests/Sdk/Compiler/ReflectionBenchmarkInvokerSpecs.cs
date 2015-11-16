@@ -30,7 +30,7 @@ namespace NBench.Tests.Sdk.Compiler
                 SetupContextSet = context != null;
             }
 
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run(BenchmarkContext context)
             {
@@ -52,7 +52,7 @@ namespace NBench.Tests.Sdk.Compiler
                 SetupContextSet = true;
             }
 
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
@@ -69,7 +69,7 @@ namespace NBench.Tests.Sdk.Compiler
         public class BenchmarkWithoutSetup
         {
 
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
@@ -91,7 +91,7 @@ namespace NBench.Tests.Sdk.Compiler
                 SetupContextSet = true;
             }
 
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
@@ -101,7 +101,7 @@ namespace NBench.Tests.Sdk.Compiler
 
         public class BenchmarkWithRunOnly
         {
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {

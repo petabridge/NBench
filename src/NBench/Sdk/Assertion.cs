@@ -25,7 +25,7 @@ namespace NBench.Sdk
     public class Assertion
     {
         /// <summary>
-        /// Empty assertion - used when in <see cref="TestType.Measurement"/>.
+        /// Empty assertion - used when in <see cref="TestMode.Measurement"/>.
         /// </summary>
         public static readonly Assertion Empty = new EmptyAssertion();
 

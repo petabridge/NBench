@@ -8,25 +8,26 @@ using NBench.Sdk.Compiler;
 namespace NBench.Sdk
 {
     /// <summary>
-    /// <see cref="IBenchmarkInvoker"/> implementaton that uses reflection to invoke setup / run / cleanup methods
-    /// found on classes decorated with the appropriate <see cref="PerformanceBenchmarkAttribute"/>s.
+    ///     <see cref="IBenchmarkInvoker" /> implementaton that uses reflection to invoke setup / run / cleanup methods
+    ///     found on classes decorated with the appropriate <see cref="PerfBenchmarkAttribute" />s.
     /// </summary>
     public class ReflectionBenchmarkInvoker : IBenchmarkInvoker
     {
         private readonly BenchmarkClassMetadata _metadata;
-        private object _testClassInstance;
-
         private Action<BenchmarkContext> _cleanupAction;
         private Action<BenchmarkContext> _runAction;
         private Action<BenchmarkContext> _setupAction;
+        private object _testClassInstance;
 
         public ReflectionBenchmarkInvoker(BenchmarkClassMetadata metadata)
         {
             _metadata = metadata;
+            //TODO: https://github.com/petabridge/NBench/issues/11
             BenchmarkName = metadata.BenchmarkClass.FullName;
         }
 
         public string BenchmarkName { get; }
+
         public void InvokePerfSetup(BenchmarkContext context)
         {
             _testClassInstance = Activator.CreateInstance(_metadata.BenchmarkClass);
@@ -68,8 +69,8 @@ namespace NBench.Sdk
         internal static Action<BenchmarkContext> CreateDelegateWithoutContext(object target, MethodInfo invocationMethod)
         {
             var del =
-               (Action)
-                   Delegate.CreateDelegate(typeof(Action), target, invocationMethod);
+                (Action)
+                    Delegate.CreateDelegate(typeof (Action), target, invocationMethod);
 
             Action<BenchmarkContext> wrappedDelegate = context => del();
             return wrappedDelegate;
@@ -79,8 +80,9 @@ namespace NBench.Sdk
         {
             if (metadata.Skip)
                 return ActionBenchmarkInvoker.NoOp;
-            return metadata.TakesBenchmarkContext ? CreateDelegateWithContext(_testClassInstance, metadata.InvocationMethod) : CreateDelegateWithoutContext(_testClassInstance, metadata.InvocationMethod);
+            return metadata.TakesBenchmarkContext
+                ? CreateDelegateWithContext(_testClassInstance, metadata.InvocationMethod)
+                : CreateDelegateWithoutContext(_testClassInstance, metadata.InvocationMethod);
         }
     }
 }
-

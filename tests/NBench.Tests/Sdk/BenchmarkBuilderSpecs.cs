@@ -14,7 +14,7 @@ namespace NBench.Tests.Sdk
         public void Should_build_when_exactly_one_metric_assigned()
         {
             var counterBenchmark = new CounterBenchmarkSetting("Test", AssertionType.Total, Assertion.Empty);
-            var settings = new BenchmarkSettings(TestType.Measurement, RunType.Iterations, 10, 1000,
+            var settings = new BenchmarkSettings(TestMode.Measurement, RunMode.Iterations, 10, 1000,
                 new GcBenchmarkSetting[0], new MemoryBenchmarkSetting[0], new CounterBenchmarkSetting[] { counterBenchmark});
 
             var builder = new BenchmarkBuilder(settings);
@@ -32,7 +32,7 @@ namespace NBench.Tests.Sdk
             var gcBenchmark = new GcBenchmarkSetting(GcMetric.TotalCollections, GcGeneration.AllGc, AssertionType.Total,
                 Assertion.Empty);
             var memoryBenchmark = new MemoryBenchmarkSetting(MemoryMetric.TotalBytesAllocated, Assertion.Empty);
-            var settings = new BenchmarkSettings(TestType.Measurement, RunType.Iterations, 10, 1000,
+            var settings = new BenchmarkSettings(TestMode.Measurement, RunMode.Iterations, 10, 1000,
                 new[] {gcBenchmark}, new[] { memoryBenchmark }, new[] { counterBenchmark });
 
             var builder = new BenchmarkBuilder(settings);

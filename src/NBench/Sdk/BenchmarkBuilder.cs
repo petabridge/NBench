@@ -19,7 +19,7 @@ namespace NBench.Sdk
         /// <summary>
         ///     All built-in memory metric selectors
         /// </summary>
-        public static Dictionary<MemoryMetric, MetricsCollectorSelector> MemorySelectors = new Dictionary
+        public static readonly Dictionary<MemoryMetric, MetricsCollectorSelector> MemorySelectors = new Dictionary
             <MemoryMetric, MetricsCollectorSelector>
         {
             {
@@ -27,7 +27,7 @@ namespace NBench.Sdk
             }
         };
 
-        public static Dictionary<GcMetric, MetricsCollectorSelector> GcSelectors = new Dictionary
+        public static readonly Dictionary<GcMetric, MetricsCollectorSelector> GcSelectors = new Dictionary
             <GcMetric, MetricsCollectorSelector>
         {
             {GcMetric.TotalCollections, new GcCollectionsSelector()}

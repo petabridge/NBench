@@ -26,7 +26,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{97444074
 		build.sh = build.sh
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.Performance", "tests\NBench.Tests.Performance\NBench.Tests.Performance.csproj", "{E3730D65-70AE-4055-A291-800044C48FDD}"
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -52,6 +57,10 @@ Global
 		{5C586501-4E91-4007-B23F-02E20014DA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C586501-4E91-4007-B23F-02E20014DA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C586501-4E91-4007-B23F-02E20014DA51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3730D65-70AE-4055-A291-800044C48FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3730D65-70AE-4055-A291-800044C48FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3730D65-70AE-4055-A291-800044C48FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3730D65-70AE-4055-A291-800044C48FDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,5 +69,6 @@ Global
 		{FDA04BAB-34FD-4E5D-91F4-0503090973A6} = {C8104500-2C0F-46A2-AE84-A3D74CC55697}
 		{5716EAF7-ABA1-434F-9AFA-51693A73C627} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
 		{B7F38539-67A1-42B8-A5E5-CB592B6E3233} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
+		{E3730D65-70AE-4055-A291-800044C48FDD} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
 	EndGlobalSection
 EndGlobal

@@ -18,10 +18,10 @@ namespace NBench
 
     /// <summary>
     ///     Issues a command to NBench to monitor various memory metrics allocated
-    ///     during the <see cref="PerformanceBenchmarkAttribute" />
+    ///     during the <see cref="PerfBenchmarkAttribute" />
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class MemoryMeasurementAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class MemoryMeasurementAttribute : MeasurementAttribute
     {
         public MemoryMeasurementAttribute(MemoryMetric metric)
         {

@@ -17,7 +17,7 @@ namespace NBench.Tests.Reporting
             var benchmarkStat = new BenchmarkStat(values);
             Assert.Equal(max, benchmarkStat.Max);
             Assert.Equal(min, benchmarkStat.Min);
-            Assert.Equal(average, benchmarkStat.Mean);
+            Assert.Equal(average, benchmarkStat.Average);
             Assert.Equal(stdDev, benchmarkStat.StandardDeviation);
         }
 
@@ -32,7 +32,7 @@ namespace NBench.Tests.Reporting
 
             Assert.Equal(max, perSecondBenchmarkStat.Max);
             Assert.Equal(min, perSecondBenchmarkStat.Min);
-            Assert.Equal(average, perSecondBenchmarkStat.Mean);
+            Assert.Equal(average, perSecondBenchmarkStat.Average);
             Assert.Equal(sum, perSecondBenchmarkStat.Sum);
         }
     }

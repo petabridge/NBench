@@ -13,7 +13,7 @@ namespace NBench.Reporting
             totalElapsedSeconds = totalElapsedSeconds.Equals(0.0) ? 1.0 : totalElapsedSeconds;
             Min = stat.Min/totalElapsedSeconds;
             Max = stat.Max/totalElapsedSeconds;
-            Mean = stat.Mean/totalElapsedSeconds;
+            Average = stat.Average/totalElapsedSeconds;
             Sum = stat.Sum/totalElapsedSeconds;
             StandardDeviation = stat.StandardDeviation/totalElapsedSeconds;
             StandardError = stat.StandardError/totalElapsedSeconds;
@@ -23,7 +23,7 @@ namespace NBench.Reporting
 
         public double Max { get; }
 
-        public double Mean { get; }
+        public double Average { get; }
 
         public double Sum { get; }
 

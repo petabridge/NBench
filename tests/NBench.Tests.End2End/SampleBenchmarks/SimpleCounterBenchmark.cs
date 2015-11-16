@@ -17,11 +17,11 @@ namespace NBench.Tests.End2End.SampleBenchmarks
         /// <summary>
         /// Run 3 tests, 1 second long each
         /// </summary>
-        [PerformanceBenchmark(Description = "Simple iteration collection test", RunMode = RunType.Iterations, TestMode = TestType.Test, RunTimeMilliseconds = 1000, NumberOfIterations = 30)]
+        [PerfBenchmark(Description = "Simple iteration collection test", RunMode = RunMode.Iterations, TestMode = TestMode.Test, RunTimeMilliseconds = 1000, NumberOfIterations = 30)]
         [CounterMeasurement(CounterName)]
         [MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
         [GcTotalAssertion(GcMetric.TotalCollections, GcGeneration.Gen2, MustBe.ExactlyEqualTo, 0d)]
-        public void Run()
+        public void Run(BenchmarkContext context)
         {
             _counter.Increment();
         }

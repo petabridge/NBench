@@ -15,8 +15,8 @@ using Xunit;
 namespace NBench.Tests.Sdk
 {
     /// <summary>
-    ///     Specs designed to test <see cref="Benchmark" />s with <see cref="RunType.Iterations" /> and SLOW run-times.
-    ///     Uses virtually the same execution mode as <see cref="RunType.Throughput"/>.
+    ///     Specs designed to test <see cref="Benchmark" />s with <see cref="RunMode.Iterations" /> and SLOW run-times.
+    ///     Uses virtually the same execution mode as <see cref="RunMode.Throughput"/>.
     /// </summary>
     public class BenchmarkSlowIterationSpecs
     {
@@ -65,7 +65,7 @@ namespace NBench.Tests.Sdk
                 Assertion.Empty);
             var memoryBenchmark = new MemoryBenchmarkSetting(MemoryMetric.TotalBytesAllocated, Assertion.Empty);
 
-            var settings = new BenchmarkSettings(TestType.Measurement, RunType.Iterations, iterationCount, 0,
+            var settings = new BenchmarkSettings(TestMode.Measurement, RunMode.Iterations, iterationCount, 0,
                new[] { gcBenchmark }, new MemoryBenchmarkSetting[0], new[] { counterBenchmark });
 
             var benchmark = new Benchmark(settings, _benchmarkMethods, assertionOutput);
