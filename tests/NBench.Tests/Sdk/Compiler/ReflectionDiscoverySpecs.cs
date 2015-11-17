@@ -20,7 +20,7 @@ namespace NBench.Tests.Sdk.Compiler
 
             }
 
-            [PerformanceBenchmark(TestMode = TestType.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             [MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
             public void Run1()
@@ -28,7 +28,7 @@ namespace NBench.Tests.Sdk.Compiler
 
             }
 
-            [PerformanceBenchmark(TestMode = TestType.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
             [CounterMeasurement("MyOtherCounter")]
             [CounterThroughputAssertion("MyCounter", MustBe.GreaterThan, 100.0d)]
             public void Run2()
@@ -49,7 +49,7 @@ namespace NBench.Tests.Sdk.Compiler
 
             }
 
-            [PerformanceBenchmark(TestMode = TestType.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
             [CounterMeasurement("MyCounter")]
             [CounterThroughputAssertion("MyCounter", MustBe.GreaterThan, 100.0d)]
             public void Run()
@@ -62,10 +62,25 @@ namespace NBench.Tests.Sdk.Compiler
             }
         }
 
+        public class BenchmarkWithoutMeasurements
+        {
+            /// <summary>
+            /// Should be a no-op
+            /// </summary>
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
+            public void Run()
+            {
+
+            }
+        }
+
         public static readonly TypeInfo ComplexBenchmarkTypeInfo =
             typeof (DefaultMemoryMeasurementBenchmark).GetTypeInfo();
 
         public static readonly TypeInfo SimpleBenchmarkTypeInfo = typeof (SimpleBenchmark).GetTypeInfo();
+
+        public static readonly TypeInfo BenchmarkWithoutMeasurementsTypeInfo =
+            typeof (BenchmarkWithoutMeasurements).GetTypeInfo();
 
         [Fact]
         public void ShouldFindSetupMethod()
@@ -131,12 +146,19 @@ namespace NBench.Tests.Sdk.Compiler
             var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(ComplexBenchmarkTypeInfo);
             var benchmarkSettings = ReflectionDiscovery.CreateSettingsForBenchmark(benchmarkMetaData.First());
 
-            Assert.Equal(TestType.Test, benchmarkSettings.TestMode);
-            Assert.Equal(PerformanceBenchmarkAttribute.DefaultRunType, benchmarkSettings.RunMode);
+            Assert.Equal(TestMode.Test, benchmarkSettings.TestMode);
+            Assert.Equal(PerfBenchmarkAttribute.DefaultRunType, benchmarkSettings.RunMode);
             Assert.Equal(0, benchmarkSettings.GcBenchmarks.Count);
             Assert.Equal(2, benchmarkSettings.MemoryBenchmarks.Count);
             Assert.Equal(1, benchmarkSettings.DistinctMemoryBenchmarks.Count);
             Assert.Equal(0, benchmarkSettings.CounterBenchmarks.Count);
+        }
+
+        [Fact]
+        public void ShouldNotCreateBenchmarkForClassWithNoDeclaredMeasurements()
+        {
+            var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(BenchmarkWithoutMeasurementsTypeInfo);
+            Assert.Equal(0, benchmarkMetaData.Count);
         }
     }
 }

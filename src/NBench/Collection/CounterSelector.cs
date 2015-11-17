@@ -20,7 +20,7 @@ namespace NBench.Collection
         {
         }
 
-        public override IEnumerable<MetricCollector> Create(RunType runType, WarmupData warmup, IBenchmarkSetting setting)
+        public override IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup, IBenchmarkSetting setting)
         {
             Contract.Assert(setting != null);
             Contract.Assert(setting is CreateCounterBenchmarkSetting);

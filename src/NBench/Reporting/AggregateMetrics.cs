@@ -23,6 +23,7 @@ namespace NBench.Reporting
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public AggregateMetrics(MetricName name, string unit, IReadOnlyList<MetricRunReport> runs)
         {
+            Contract.Requires(runs != null);
             Contract.Requires(name != null);
             Contract.Requires(!string.IsNullOrEmpty(unit));
             Name = name;
@@ -38,8 +39,8 @@ namespace NBench.Reporting
             PerSecondMins = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Min));
 
             // Averages
-            Averages = new BenchmarkStat(runs.Select(x => x.Stats.Mean));
-            PerSecondAverages = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Mean));
+            Averages = new BenchmarkStat(runs.Select(x => x.Stats.Average));
+            PerSecondAverages = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Average));
 
             // Sums
             Sums = new BenchmarkStat(runs.Select(x => x.Stats.Sum));

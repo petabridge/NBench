@@ -33,7 +33,7 @@ namespace NBench.Collection.Memory
             return new GcCollectionsPerGenerationCollector(new GcMetricName(GcMetricName.Metric, (GcGeneration)gcGeneration), gcGeneration);
         }
 
-        public override IEnumerable<MetricCollector> Create(RunType runType, WarmupData warmup,
+        public override IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup,
             IBenchmarkSetting setting)
         {
             Contract.Assert(setting != null);

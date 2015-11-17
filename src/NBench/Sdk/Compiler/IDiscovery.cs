@@ -20,7 +20,7 @@ namespace NBench.Sdk.Compiler
         IBenchmarkOutput Output { get; }
 
         /// <summary>
-        /// Uses reflection on the target assembly to discover <see cref="PerformanceBenchmarkAttribute"/>
+        /// Uses reflection on the target assembly to discover <see cref="PerfBenchmarkAttribute"/>
         /// instances.
         /// </summary>
         /// <param name="targetAssembly">The assembly we're going to scan for benchmarks.</param>
@@ -28,7 +28,7 @@ namespace NBench.Sdk.Compiler
         IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly);
 
         /// <summary>
-        /// Uses reflection on the target assembly to discover <see cref="PerformanceBenchmarkAttribute"/>
+        /// Uses reflection on the target assembly to discover <see cref="PerfBenchmarkAttribute"/>
         /// instances.
         /// </summary>
         /// <param name="targetType">The type we're going to scan for benchmarks.</param>

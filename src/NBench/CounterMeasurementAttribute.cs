@@ -7,10 +7,10 @@ namespace NBench
 {
     /// <summary>
     /// Creates a custom <see cref="Counter"/> to be used for tracking app-specific metrics
-    /// in combination with a <see cref="PerformanceBenchmarkAttribute"/>
+    /// in combination with a <see cref="PerfBenchmarkAttribute"/>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class CounterMeasurementAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class CounterMeasurementAttribute : MeasurementAttribute
     {
         public CounterMeasurementAttribute(string counterName)
         {
@@ -28,7 +28,7 @@ namespace NBench
     /// 
     /// This asserts the NUMBER OF OPERATIONS / SECOND values averaged over all runs of a benchmark.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class CounterThroughputAssertionAttribute : CounterMeasurementAttribute
     {
         public CounterThroughputAssertionAttribute(string counterName, MustBe condition, double averageOperationsPerSecond) : base(counterName)
@@ -60,7 +60,7 @@ namespace NBench
     /// 
     /// This asserts the TOTAL AVERAGE NUMBER OF OPERATIONS values averaged over all runs of a benchmark.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class CounterTotalAssertionAttribute : CounterMeasurementAttribute
     {
         public CounterTotalAssertionAttribute(string counterName, MustBe condition, double averageOperationsTotal) : base(counterName)

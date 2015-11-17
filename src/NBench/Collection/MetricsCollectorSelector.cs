@@ -39,28 +39,28 @@ namespace NBench.Collection
         /// <summary>
         ///     Creates an instance for all applicable <see cref="MetricCollector" />s for this metric type.
         /// </summary>
-        /// <param name="runType">
-        ///     The <see cref="RunType" /> for this benchmark. Influences the type of
+        /// <param name="runMode">
+        ///     The <see cref="RunMode" /> for this benchmark. Influences the type of
         ///     <see cref="MetricCollector" /> used in some instances.
         /// </param>
         /// <param name="setting">An implementation-specific <see cref="IBenchmarkSetting" /></param>
         /// <returns>At least one new <see cref="MetricCollector" /> instance. Each instance will be uniquely named.</returns>
-        public IEnumerable<MetricCollector> Create(RunType runType, IBenchmarkSetting setting)
+        public IEnumerable<MetricCollector> Create(RunMode runMode, IBenchmarkSetting setting)
         {
-            return Create(runType, WarmupData.Empty, setting);
+            return Create(runMode, WarmupData.Empty, setting);
         }
 
         /// <summary>
         ///     Creates an instance for all applicable <see cref="MetricCollector" />s for this metric type.
         /// </summary>
-        /// <param name="runType">
-        ///     The <see cref="RunType" /> for this benchmark. Influences the type of
+        /// <param name="runMode">
+        ///     The <see cref="RunMode" /> for this benchmark. Influences the type of
         ///     <see cref="MetricCollector" /> used in some instances.
         /// </param>
         /// <param name="warmup">Warmup data. Influences the type of <see cref="MetricCollector" /> used in some instances.</param>
         /// <param name="setting">An implementation-specific <see cref="IBenchmarkSetting" /></param>
         /// <returns>At least 1 new <see cref="MetricCollector"/> instance. Each instance will be uniquely named.</returns>
-        public abstract IEnumerable<MetricCollector> Create(RunType runType, WarmupData warmup,
+        public abstract IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup,
             IBenchmarkSetting setting);
     }
 }

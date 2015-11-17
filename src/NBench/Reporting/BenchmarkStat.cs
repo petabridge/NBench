@@ -27,11 +27,11 @@ namespace NBench.Reporting
                 values = SafeValues;
             Min = values.Min();
             Max = values.Max();
-            Mean = values.Average();
+            Average = values.Average();
             Sum = values.Sum();
             var n = values.Count;
-            var mean = Mean; // need a closure for Linq methods on members of a struct
-            StandardDeviation = n == 1 ? 0 : Math.Sqrt(values.Sum(x => Math.Pow(x - mean, 2))/(n - 1));
+            var average = Average; // need a closure for Linq methods on members of a struct
+            StandardDeviation = n == 1 ? 0 : Math.Sqrt(values.Sum(x => Math.Pow(x - average, 2))/(n - 1));
             StandardError = StandardDeviation/Math.Sqrt(n);
         }
 
@@ -39,7 +39,7 @@ namespace NBench.Reporting
 
         public double Max { get; }
 
-        public double Mean { get; }
+        public double Average { get; }
 
         public double Sum { get; }
 

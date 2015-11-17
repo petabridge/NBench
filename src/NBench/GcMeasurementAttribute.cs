@@ -6,7 +6,7 @@ namespace NBench
 {
 
     /// <summary>
-    /// Specifies the CLR Garbage Collection generation to track during a <see cref="PerformanceBenchmarkAttribute"/>
+    /// Specifies the CLR Garbage Collection generation to track during a <see cref="PerfBenchmarkAttribute"/>
     /// </summary>
     public enum GcGeneration
     {
@@ -29,10 +29,10 @@ namespace NBench
     }
 
     /// <summary>
-    /// Issues a command to NBench to monitor system GC metrics that occur during the <see cref="PerformanceBenchmarkAttribute"/>.
+    /// Issues a command to NBench to monitor system GC metrics that occur during the <see cref="PerfBenchmarkAttribute"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
-    public class GcMeasurementAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class GcMeasurementAttribute : MeasurementAttribute
     {
         public GcMeasurementAttribute(GcMetric metric, GcGeneration generation)
         {
@@ -56,7 +56,7 @@ namespace NBench
     /// 
     /// This asserts the NUMBER OF OPERATIONS / SECOND values averaged over all runs of a benchmark.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class GcThroughputAssertionAttribute : GcMeasurementAttribute
     {
         public GcThroughputAssertionAttribute(GcMetric metric, GcGeneration generations,
@@ -89,7 +89,7 @@ namespace NBench
     /// 
     /// This asserts the TOTAL AVERAGE NUMBER OF OPERATIONS values averaged over all runs of a benchmark.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class GcTotalAssertionAttribute : GcMeasurementAttribute
     {
         public GcTotalAssertionAttribute(GcMetric metric, GcGeneration generations, 

@@ -12,7 +12,7 @@ using Xunit;
 namespace NBench.Tests.Sdk
 {
     /// <summary>
-    ///     Specs designed to test <see cref="Benchmark" />s with <see cref="RunType.Throughput"/>.
+    ///     Specs designed to test <see cref="Benchmark" />s with <see cref="RunMode.Throughput"/>.
     /// </summary>
     public class BenchmarkThroughputSpecs
     {
@@ -65,7 +65,7 @@ namespace NBench.Tests.Sdk
                 Assertion.Empty);
             var memoryBenchmark = new MemoryBenchmarkSetting(MemoryMetric.TotalBytesAllocated, Assertion.Empty);
 
-            var settings = new BenchmarkSettings(TestType.Measurement, RunType.Throughput, iterationCount, millisecondRuntime,
+            var settings = new BenchmarkSettings(TestMode.Measurement, RunMode.Throughput, iterationCount, millisecondRuntime,
                new[] { gcBenchmark }, new[] { memoryBenchmark }, new[] { counterBenchmark });
 
             var benchmark = new Benchmark(settings, _benchmarkMethods, assertionOutput);

@@ -21,7 +21,7 @@ namespace NBench.Microbenchmarks.SDK
                 
             }
 
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run(BenchmarkContext context)
             {
@@ -43,7 +43,7 @@ namespace NBench.Microbenchmarks.SDK
 
             }
 
-            [PerformanceBenchmark]
+            [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {

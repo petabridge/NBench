@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using NBench.Reporting;
 
@@ -12,8 +13,11 @@ namespace NBench.Sdk
     /// </summary>
     public static class AssertionRunner
     {
+
+        //TODO: need to respect TestMode https://github.com/petabridge/NBench/issues/6
         public static IReadOnlyList<AssertionResult> RunAssertions(BenchmarkSettings settings, BenchmarkResults results)
         {
+            Contract.Requires(settings != null);
             var assertionResults = new List<AssertionResult>();
 
             // collect all benchmark settings with non-empty assertions
@@ -28,11 +32,11 @@ namespace NBench.Sdk
                 double valueToBeTested;
                 if (setting.AssertionType == AssertionType.Throughput)
                 {
-                    valueToBeTested = stats.PerSecondMaxes.Mean;
+                    valueToBeTested = stats.PerSecondAverages.Average;
                 }
                 else
                 {
-                    valueToBeTested = stats.Maxes.Mean;
+                    valueToBeTested = stats.Averages.Average;
                 }
                 var assertionResult = AssertionResult.CreateResult(setting.MetricName, stats.Unit, valueToBeTested,
                     setting.Assertion);

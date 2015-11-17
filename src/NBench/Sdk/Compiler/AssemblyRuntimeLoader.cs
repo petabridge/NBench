@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace NBench.Sdk.Compiler
 {
+    // TODO: See issue https://github.com/petabridge/NBench/issues/3
     /// <summary>
     /// Utility class for loading assemblies with benchmarks at runtime
     /// </summary>

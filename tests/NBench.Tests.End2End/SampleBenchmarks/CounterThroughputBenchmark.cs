@@ -17,7 +17,7 @@ namespace NBench.Tests.End2End.SampleBenchmarks
         /// <summary>
         /// Run 3 tests, 1 second long each
         /// </summary>
-        [PerformanceBenchmark(Description = "Counter iteration speed test", RunMode = RunType.Throughput, TestMode = TestType.Test, RunTimeMilliseconds = 1000, NumberOfIterations = 3)]
+        [PerfBenchmark(Description = "Counter iteration speed test", RunMode = RunMode.Throughput, TestMode = TestMode.Test, RunTimeMilliseconds = 1000, NumberOfIterations = 3)]
         [CounterThroughputAssertion(CounterName, MustBe.GreaterThan, 1000000.0d)]
         public void Run()
         {

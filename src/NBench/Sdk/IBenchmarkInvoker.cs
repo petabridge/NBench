@@ -5,7 +5,7 @@ namespace NBench.Sdk
 {
     /// <summary>
     ///     Used to invoke the benchmark methods on the user-defined
-    ///     objects that have methods marked with <see cref="PerformanceBenchmarkAttribute" />.
+    ///     objects that have methods marked with <see cref="PerfBenchmarkAttribute" />.
     /// </summary>
     public interface IBenchmarkInvoker
     {

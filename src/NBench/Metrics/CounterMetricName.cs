@@ -17,6 +17,7 @@ namespace NBench.Metrics
 
         protected bool Equals(CounterMetricName other)
         {
+            Contract.Requires(other != null);
             return string.Equals(CounterName, other.CounterName);
         }
 
