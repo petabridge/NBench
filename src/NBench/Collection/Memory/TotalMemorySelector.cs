@@ -27,9 +27,9 @@ namespace NBench.Collection.Memory
         public override IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup, IBenchmarkSetting setting)
         {
 
-            if (warmup.ElapsedTime <= BenchmarkConstants.SamplingPrecision)
+            //if (warmup.ElapsedTicks <= BenchmarkConstants.SamplingPrecisionTicks)
                 return new[] {new GcTotalMemoryCollector(MemoryMetricName)};
-            return new[] {new PerformanceCounterTotalMemoryCollector(MemoryMetricName)};
+            //return new[] {new PerformanceCounterTotalMemoryCollector(MemoryMetricName)};
         }
     }
 }

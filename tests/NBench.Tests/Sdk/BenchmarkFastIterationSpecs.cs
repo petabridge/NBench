@@ -13,7 +13,7 @@ namespace NBench.Tests.Sdk
     /// <summary>
     ///     Specs designed to test <see cref="Benchmark" />s with <see cref="RunMode.Iterations" /> and fast run-times.
     ///     These specs use a very different execution mode than <see cref="RunMode.Throughput" /> or iteration specs
-    ///     with runtimes longer than <see cref="BenchmarkConstants.SamplingPrecision" />.
+    ///     with runtimes longer than <see cref="BenchmarkConstants.SamplingPrecisionTicks" />.
     /// </summary>
     public class BenchmarkFastIterationSpecs
     {
@@ -49,10 +49,10 @@ namespace NBench.Tests.Sdk
             var assertionOutput = new ActionBenchmarkOutput(report =>
             {
                 var counterResults = report.Metrics[CounterName];
-                Assert.Equal(1, counterResults.Stats.Max);
+                Assert.Equal(1, counterResults.MetricValue);
             }, results =>
             {
-                var counterResults = results.Data.StatsByMetric[CounterName].Maxes.Sum;
+                var counterResults = results.Data.StatsByMetric[CounterName].Stats.Max;
                 Assert.Equal(iterationCount, counterResults);
             });
 

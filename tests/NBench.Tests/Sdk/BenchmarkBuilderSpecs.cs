@@ -18,7 +18,7 @@ namespace NBench.Tests.Sdk
                 new GcBenchmarkSetting[0], new MemoryBenchmarkSetting[0], new CounterBenchmarkSetting[] { counterBenchmark});
 
             var builder = new BenchmarkBuilder(settings);
-            var run = builder.NewRun(WarmupData.Empty);
+            var run = builder.NewRun(WarmupData.PreWarmup);
 
             Assert.Equal(1, run.MeasureCount);
             Assert.Equal(1, run.Counters.Count);
@@ -36,7 +36,7 @@ namespace NBench.Tests.Sdk
                 new[] {gcBenchmark}, new[] { memoryBenchmark }, new[] { counterBenchmark });
 
             var builder = new BenchmarkBuilder(settings);
-            var run = builder.NewRun(WarmupData.Empty);
+            var run = builder.NewRun(WarmupData.PreWarmup);
 
             Assert.Equal(2 + (SysInfo.Instance.MaxGcGeneration + 1), run.MeasureCount);
             Assert.Equal(1, run.Counters.Count);

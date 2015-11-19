@@ -2,11 +2,9 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using NBench.Metrics;
-using NBench.Util;
 
 namespace NBench.Reporting
 {
@@ -15,20 +13,18 @@ namespace NBench.Reporting
     /// </summary>
     public struct MetricRunReport
     {
-        internal static readonly IDictionary<TimeSpan, long> SafeRawValues = new Dictionary<TimeSpan, long>() { { TimeSpan.Zero, 0L } };
-
-        public MetricRunReport(MetricName name, string unit, IDictionary<TimeSpan, long> rawValues)
+        public MetricRunReport(MetricName name, string unit, double metricReading, long ticks)
         {
             Contract.Requires(name != null);
             Contract.Requires(!string.IsNullOrEmpty(unit));
-            Contract.Requires(rawValues != null);
+            Ticks = Math.Max(ticks, 1);
             Name = name;
             Unit = unit;
-            RawValues = rawValues.Count == 0 ? SafeRawValues : rawValues;
-            var deltas = RawValues.DistanceFromStart();
-            Stats = new BenchmarkStat(deltas.Values);
-            Elapsed = deltas.Keys.Max();
-            PerSecondStats = new PerSecondBenchmarkStat(Stats, Elapsed.TotalSeconds);
+            MetricValue = metricReading;
+            ElapsedNanos = Ticks/(double) Stopwatch.Frequency*1000000000;
+            ElapsedSeconds = ElapsedNanos/1000000000;
+            NanosPerMetricValue = ElapsedNanos/Math.Max(MetricValue,1);
+            MetricValuePerSecond = MetricValue/ElapsedSeconds;
         }
 
         /// <summary>
@@ -41,25 +37,20 @@ namespace NBench.Reporting
         /// </summary>
         public string Unit { get; private set; }
 
+        public long Ticks { get; private set; }
+
         /// <summary>
         /// The raw values of the <see cref="MeasureBucket"/>
         /// </summary>
-        public IDictionary<TimeSpan, long> RawValues { get; }
+        public double MetricValue { get; private set; }
 
-        /// <summary>
-        /// Aggregate statistics for this run.
-        /// </summary>
-        public BenchmarkStat Stats { get; }
+        public double MetricValuePerSecond { get; private set; }
 
-        /// <summary>
-        /// The total amount of elapsed time
-        /// </summary>
-        public TimeSpan Elapsed { get; }
+        public double NanosPerMetricValue { get; private set; }
 
-        /// <summary>
-        /// Total value per second for this stat
-        /// </summary>
-        public PerSecondBenchmarkStat PerSecondStats { get; private set; }
+        public double ElapsedNanos { get; private set; }
+
+        public double ElapsedSeconds { get; private set; }
     }
 }
 

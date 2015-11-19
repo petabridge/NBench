@@ -64,7 +64,7 @@ namespace NBench.Sdk
                 var setting = Settings.DistinctMemoryBenchmarks[i];
                 var collectors = MemorySelectors[setting.Metric].Create(Settings.RunMode, warmupData, setting);
                 foreach (var collector in collectors)
-                    measurements.Add(new MeasureBucket(collector, warmupData.NumberOfObservedSamples));
+                    measurements.Add(new MeasureBucket(collector));
             }
 
             for (var i = 0; i < Settings.DistinctGcBenchmarks.Count; i++)
@@ -72,7 +72,7 @@ namespace NBench.Sdk
                 var setting = Settings.DistinctGcBenchmarks[i];
                 var collectors = GcSelectors[setting.Metric].Create(Settings.RunMode, warmupData, setting);
                 foreach (var collector in collectors)
-                    measurements.Add(new MeasureBucket(collector, warmupData.NumberOfObservedSamples));
+                    measurements.Add(new MeasureBucket(collector));
             }
 
             for (var i = 0; i < Settings.DistinctCounterBenchmarks.Count; i++)
@@ -83,7 +83,7 @@ namespace NBench.Sdk
                 var collectors = CounterSelector.Create(Settings.RunMode, warmupData, createCounterBenchmark);
                 foreach (var collector in collectors)
                 {
-                    measurements.Add(new MeasureBucket(collector, warmupData.NumberOfObservedSamples));
+                    measurements.Add(new MeasureBucket(collector));
                     counters.Add(new Counter(atomicCounter, setting.CounterName));
                 }
             }

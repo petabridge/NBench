@@ -47,7 +47,7 @@ namespace NBench.Collection
         /// <returns>At least one new <see cref="MetricCollector" /> instance. Each instance will be uniquely named.</returns>
         public IEnumerable<MetricCollector> Create(RunMode runMode, IBenchmarkSetting setting)
         {
-            return Create(runMode, WarmupData.Empty, setting);
+            return Create(runMode, WarmupData.PreWarmup, setting);
         }
 
         /// <summary>

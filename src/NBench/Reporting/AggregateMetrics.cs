@@ -17,7 +17,7 @@ namespace NBench.Reporting
     {
         private static IReadOnlyList<MetricRunReport> GetSafeRuns(MetricName name, string unit)
         {
-            return new[] {new MetricRunReport(name, unit, MetricRunReport.SafeRawValues)};
+            return new[] {new MetricRunReport(name, unit, 0.0d,0)};
         }
 
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
@@ -30,26 +30,8 @@ namespace NBench.Reporting
             Unit = unit;
             Runs = runs == null || runs.Count == 0 ? GetSafeRuns(name, unit) : runs;
 
-            // Maxes
-            Maxes = new BenchmarkStat(runs.Select(x => x.Stats.Max));
-            PerSecondMaxes = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Max));
-
-            // Mins
-            Mins = new BenchmarkStat(runs.Select(x => x.Stats.Min));
-            PerSecondMins = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Min));
-
-            // Averages
-            Averages = new BenchmarkStat(runs.Select(x => x.Stats.Average));
-            PerSecondAverages = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Average));
-
-            // Sums
-            Sums = new BenchmarkStat(runs.Select(x => x.Stats.Sum));
-            PerSecondSums = new BenchmarkStat(runs.Select(x => x.PerSecondStats.Sum));
-
-            // StdDev
-            StandardDeviations = new BenchmarkStat(runs.Select(x => x.Stats.StandardDeviation));
-            PerSecondStandardDeviations = new BenchmarkStat(runs.Select(x => x.PerSecondStats.StandardDeviation));
-    
+            Stats = new BenchmarkStat(runs.Select(x => x.MetricValue));
+            PerSecondStats = new BenchmarkStat(runs.Select(x => x.MetricValuePerSecond));
         }
 
         /// <summary>
@@ -64,24 +46,9 @@ namespace NBench.Reporting
 
         public IReadOnlyList<MetricRunReport> Runs { get; private set; }
 
-        public BenchmarkStat Maxes { get; private set; }
+        public BenchmarkStat Stats { get; private set; }
 
-        public BenchmarkStat PerSecondMaxes { get; private set; }
-
-        public BenchmarkStat Mins { get; private set; }
-
-        public BenchmarkStat PerSecondMins { get; private set; }
-
-        public BenchmarkStat Averages { get; private set; }
-
-        public BenchmarkStat PerSecondAverages { get; private set; }
-
-        public BenchmarkStat Sums { get; private set; }
-
-        public BenchmarkStat PerSecondSums { get; private set; }
-        public BenchmarkStat StandardDeviations { get; set; }
-
-        public BenchmarkStat PerSecondStandardDeviations { get; set; }
+        public BenchmarkStat PerSecondStats { get; private set; }
     }
 }
 

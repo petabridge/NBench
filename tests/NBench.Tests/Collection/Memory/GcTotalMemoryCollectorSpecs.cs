@@ -18,7 +18,7 @@ namespace NBench.Tests.Collection.Memory
 
         public const double Accuracy = 0.1;
 
-        [Theory]
+        [Theory(Skip = "not accurate within 1 process")]
         [InlineData(1 << 13, Accuracy)]
         [InlineData(1 << 14, Accuracy)]
         [InlineData(1 << 18, Accuracy)]

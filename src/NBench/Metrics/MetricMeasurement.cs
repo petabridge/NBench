@@ -10,19 +10,19 @@ namespace NBench.Metrics
     /// </summary>
     public struct MetricMeasurement
     {
-        public MetricMeasurement(TimeSpan elapsed, long metricValue)
+        public MetricMeasurement(long elapsedTicks, long metricValue)
         {
-            Elapsed = elapsed;
+            ElapsedTicks = elapsedTicks;
             MetricValue = metricValue;
         }
 
-        public TimeSpan Elapsed { get; }
+        public long ElapsedTicks { get; }
 
         public long MetricValue { get; }
 
         public bool Equals(MetricMeasurement other)
         {
-            return Elapsed == other.Elapsed && MetricValue == other.MetricValue;
+            return ElapsedTicks == other.ElapsedTicks && MetricValue == other.MetricValue;
         }
 
         public override bool Equals(object obj)
@@ -35,7 +35,7 @@ namespace NBench.Metrics
         {
             unchecked
             {
-                return (Elapsed.GetHashCode()*397) ^ MetricValue.GetHashCode();
+                return (ElapsedTicks.GetHashCode()*397) ^ MetricValue.GetHashCode();
             }
         }
 

@@ -53,10 +53,10 @@ namespace NBench.Tests.Sdk
             var assertionOutput = new ActionBenchmarkOutput(report =>
             {
                 var counterResults = report.Metrics[CounterName];
-                Assert.Equal(1, counterResults.Stats.Max);
+                Assert.Equal(1, counterResults.MetricValue);
             }, results =>
             {
-                var counterResults = results.Data.StatsByMetric[CounterName].Maxes.Sum;
+                var counterResults = results.Data.StatsByMetric[CounterName].Stats.Max;
                 Assert.Equal(iterationCount, counterResults);
             });
 

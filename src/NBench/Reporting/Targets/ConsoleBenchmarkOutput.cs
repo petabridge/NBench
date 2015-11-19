@@ -29,11 +29,7 @@ namespace NBench.Reporting.Targets
             Console.WriteLine("Elapsed: {0}", report.Elapsed);
             foreach (var metric in report.Metrics.Values)
             {
-                Console.WriteLine("{0}: Max: {2} {1}, Average: {3} {1}, Min: {4} {1}, StdDev: {5} {1}", metric.Name,
-                    metric.Unit, metric.Stats.Max, metric.Stats.Average, metric.Stats.Min, metric.Stats.StandardDeviation);
-
-                Console.WriteLine("{0}: Max /s: {2} {1}, Average /s: {3} {1}, Min /s: {4} {1}, StdDev /s: {5} {1}", metric.Name,
-                    metric.Unit, metric.PerSecondStats.Max, metric.PerSecondStats.Average, metric.PerSecondStats.Min, metric.PerSecondStats.StandardDeviation);
+                Console.WriteLine("{0} - {1}: {2} ,{1}: /s {3} , ns / {1}: {4}", metric.Name, metric.Unit, metric.MetricValue, metric.MetricValuePerSecond, metric.NanosPerMetricValue);
             }
                 
            
@@ -55,10 +51,10 @@ namespace NBench.Reporting.Targets
             foreach (var metric in results.Data.StatsByMetric.Values)
             {
                 Console.WriteLine("{0}: Max: {2} {1}, Average: {3} {1}, Min: {4} {1}, StdDev: {5} {1}", metric.Name,
-                    metric.Unit, metric.Maxes.Max, metric.Averages.Average, metric.Mins.Min, metric.StandardDeviations.StandardDeviation);
+                    metric.Unit, metric.Stats.Max, metric.Stats.Average, metric.Stats.Min, metric.Stats.StandardDeviation);
 
                 Console.WriteLine("{0}: Max / s: {2} {1}, Average / s: {3} {1}, Min / s: {4} {1}, StdDev / s: {5} {1}", metric.Name,
-                    metric.Unit, metric.PerSecondMaxes.Max, metric.PerSecondAverages.Average, metric.PerSecondMins.Min, metric.PerSecondStandardDeviations.StandardDeviation);
+                    metric.Unit, metric.PerSecondStats.Max, metric.PerSecondStats.Average, metric.PerSecondStats.Min, metric.PerSecondStats.StandardDeviation);
                 Console.WriteLine();
             }
 

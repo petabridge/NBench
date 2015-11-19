@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using NBench.Metrics;
@@ -19,12 +20,6 @@ namespace NBench.Sdk
     /// </summary>
     public class Benchmark
     {
-        /// <summary>
-        ///     only use this for longer-running specs or <see cref="NBench.RunMode.Throughput" />, where
-        ///     metrics collection occurs on a separate thread.
-        /// </summary>
-        private readonly ManualResetEventSlim _changeRuns = new ManualResetEventSlim();
-
         protected readonly BenchmarkBuilder Builder;
 
         /// <summary>
@@ -40,7 +35,7 @@ namespace NBench.Sdk
         private bool _isWarmup = true;
 
         private int _pendingIterations;
-        protected WarmupData WarmupData = WarmupData.Empty;
+        protected WarmupData WarmupData = WarmupData.PreWarmup;
 
         public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer)
         {
@@ -64,17 +59,30 @@ namespace NBench.Sdk
         /// </summary>
         private void WarmUp()
         {
+            var warmupStopWatch = new Stopwatch();
+            var targetTime = Settings.RunTime;
+            Contract.Assert(targetTime != TimeSpan.Zero);
+            var runCount = 0L;
+
+            /* Pre-Warmup */
             RunSingleBenchmark();
 
-            // number of samples collected during the warmup.
-            // serves as a rough estimate so we can pre-allocate all of our measures
-            // in advance without having to allocate additional ones during the tests.
-            var sampleCount = _currentRun.Measures[0].RawValues.Count;
+            /* Warmup */
+            Allocate(); // allocate all collectors needed
+            PreRun();
+            warmupStopWatch.Start();
+            while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+            {
+                Invoker.InvokeRun(_currentRun.Context);
+                runCount++;
+            }
+            warmupStopWatch.Stop();
+            PostRun();
 
             // elapsed time
-            var runTime = StopWatch.Elapsed;
+            var runTime = warmupStopWatch.ElapsedTicks;
 
-            WarmupData = new WarmupData(runTime, sampleCount);
+            WarmupData = new WarmupData(runTime, runCount);
         }
 
         /// <summary>
@@ -112,7 +120,7 @@ namespace NBench.Sdk
             // disable further warmups
             _isWarmup = false;
 
-            while (_pendingIterations > 0 && !ShutdownCalled)
+            while (_pendingIterations > 0)
             {
                 RunSingleBenchmark();
             }
@@ -121,7 +129,6 @@ namespace NBench.Sdk
         public void Shutdown()
         {
             ShutdownCalled = true;
-            _changeRuns.Set();
         }
 
         private void RunSingleBenchmark()
@@ -164,10 +171,7 @@ namespace NBench.Sdk
             switch (RunMode)
             {
                 case RunMode.Iterations:
-                    if (WarmupData.ElapsedTime <= BenchmarkConstants.SamplingPrecision)
-                        RunIterationBenchmark();
-                    else
-                        RunThroughputBenchmark(true);
+                    RunIterationBenchmark();
                     break;
                 case RunMode.Throughput:
                 default:
@@ -185,9 +189,6 @@ namespace NBench.Sdk
         {
             // Invoke user-defined cleanup method, if any
             Invoker.InvokePerfCleanup(_currentRun.Context);
-
-            // Reset the ManualResetEvent
-            _changeRuns.Reset();
         }
 
         /// <summary>
@@ -233,19 +234,17 @@ namespace NBench.Sdk
 
         private void RunIterationBenchmark()
         {
-            _currentRun.Sample(StopWatch.Elapsed);
+            _currentRun.Sample(StopWatch.ElapsedTicks);
             StopWatch.Start();
             Invoker.InvokeRun(_currentRun.Context);
             StopWatch.Stop();
-
-            //TODO: fixme
-            _currentRun.Sample(StopWatch.Elapsed + TimeSpan.FromTicks(1L)); //add a tick just to ensure no collision
+            _currentRun.Sample(StopWatch.ElapsedTicks); //add a tick just to ensure no collision
         }
 
         /// <summary>
         ///     Runs long-running benchmark and performs data collection in the background on a separate thread.
         ///     Occurs when <see cref="NBench.RunMode.Throughput" /> is enabled or the <see cref="NBench.Sdk.WarmupData.ElapsedTime" />
-        ///     is greater than <see cref="BenchmarkConstants.SamplingPrecision" />.
+        ///     is greater than <see cref="BenchmarkConstants.SamplingPrecisionTicks" />.
         /// </summary>
         /// <param name="isActuallyIteration">
         ///     When set to <c>true</c>, means that we run until the benchmark is finished and
@@ -256,62 +255,27 @@ namespace NBench.Sdk
         /// </param>
         private void RunThroughputBenchmark(bool isActuallyIteration = false)
         {
-            var runTime = Settings.RunTime;
             var currentContext = _currentRun.Context;
-            var currentRun = _currentRun;
 
-            // TODO: timeout mechanism for really long running runs
-            // NOTE: will probably require a third "monitoring" thread
 
-            // Foreground thread for running the benchmark
-            var runThread = new Thread(_ =>
-            {
-                if (isActuallyIteration)
-                    Invoker.InvokeRun(currentContext);
-                else // don't loop if we're in Iteration mode
-                {
-                    while (StopWatch.Elapsed < runTime && !ShutdownCalled)
-                    {
-                        Invoker.InvokeRun(currentContext);
-                    }
-                }
-               
-                _changeRuns.Set();
-            })
-            { IsBackground = false };
-
-            // Background thread for collecting samples on a fixed interval
-            var sampleThread = new Thread(_ =>
-            {
-                while (true)
-                {
-                    currentRun.Sample(StopWatch.Elapsed);
-                    Thread.Sleep(BenchmarkConstants.SamplingPrecision);
-                    if (_changeRuns.IsSet)
-                        return;
-                }
-            })
-            { IsBackground = true };
-
-            // GC anything that got created prior during the thread setup
-            GC.Collect();
-
-            // Take the first sample
-            _currentRun.Sample(StopWatch.Elapsed);
+            var runCount = WarmupData.EstimatedRunsPerSecond;
+            _currentRun.Sample(StopWatch.ElapsedTicks);
 
             // Start!
             StopWatch.Start();
-            runThread.Start();
-            sampleThread.Start();
 
-            //Wait
-            _changeRuns.Wait();
+            while (true)
+            {
+                Invoker.InvokeRun(currentContext);
+                if (runCount-- == 0)
+                    break;
+            }
 
             //Stop
             StopWatch.Stop();
 
             //Final collection
-            _currentRun.Sample(StopWatch.Elapsed);
+            _currentRun.Sample(StopWatch.ElapsedTicks);
 
             // Release collectors
             _currentRun.Dispose();

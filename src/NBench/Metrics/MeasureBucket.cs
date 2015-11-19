@@ -2,12 +2,10 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using NBench.Collection;
 using NBench.Reporting;
-using NBench.Util;
 
 namespace NBench.Metrics
 {
@@ -17,18 +15,19 @@ namespace NBench.Metrics
     /// </summary>
     public class MeasureBucket : IDisposable
     {
-        protected readonly Queue<MetricMeasurement> Measurements;
+        protected readonly MetricMeasurement[] Measurements;
+        protected int CurrentCount = 0;
+        private const int MaxMeasures = 2;
 
         private MetricCollector _collector;
 
-        public MeasureBucket(MetricCollector collector, int initialSize)
+        public MeasureBucket(MetricCollector collector)
         {
-            Contract.Requires(initialSize >= 0);
             Contract.Requires(collector != null);
             Name = collector.Name;
             Unit = collector.UnitName;
             _collector = collector;
-            Measurements = new Queue<MetricMeasurement>(initialSize);
+            Measurements = new MetricMeasurement[MaxMeasures];
         }
 
         public bool WasDisposed { get; private set; }
@@ -43,33 +42,28 @@ namespace NBench.Metrics
         /// </summary>
         public string Unit { get; }
 
-        public void Collect(TimeSpan elapsedNanos)
+        public void Collect(long elapsedTicks)
         {
-            if(!WasDisposed)
-                Measurements.Enqueue(new MetricMeasurement(elapsedNanos, _collector.Collect()));
+            if (!WasDisposed)
+            {
+                Measurements[CurrentCount] = new MetricMeasurement(elapsedTicks, _collector.Collect());
+                CurrentCount = CurrentCount + 1 < MaxMeasures ?  CurrentCount + 1 : CurrentCount; //WRAP
+            }
+                
         }
 
         /// <summary>
         /// Converts the data collected within this <see cref="MeasureBucket"/>
         /// into a <see cref="MetricRunReport"/>.
         /// </summary>
-        /// <returns>A metric run report containing all of the <see cref="RawValues"/> for this measure bucket.</returns>
+        /// <returns>A metric run report containing all of the delta for this measure bucket.</returns>
         public MetricRunReport ToReport()
         {
-            return new MetricRunReport(Name, Unit, RawValues);
+            var front = Measurements.First();
+            var last = Measurements.Last();
+            return new MetricRunReport(Name, Unit, last.MetricValue - front.MetricValue, last.ElapsedTicks);
         }
-        
-        /// <summary>
-        /// All of the raw, uncalculated values
-        /// </summary>
-        public IDictionary<TimeSpan, long> RawValues
-            => Measurements.ToDictionary(key => key.Elapsed, value => value.MetricValue);
-
-        /// <summary>
-        /// Returns a sorted list of tuples with the following data:
-        /// * Elapsed Nanoseconds / Delta from Start
-        /// </summary>
-        public IDictionary<TimeSpan,double> Deltas => Measurements.DistanceFromStart();
+ 
 
         public void Dispose()
         {
