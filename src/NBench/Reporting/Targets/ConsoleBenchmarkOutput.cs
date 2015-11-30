@@ -12,9 +12,31 @@ namespace NBench.Reporting.Targets
     /// </summary>
     public class ConsoleBenchmarkOutput : IBenchmarkOutput
     {
-        public void WriteStartingBenchmark(string benchmarkName)
+        public void WriteLine(string message)
         {
-            Console.WriteLine("--------------- STARTING {0} ---------------", benchmarkName);
+            Console.WriteLine("--------------- STARTING {0} ---------------", message);
+        }
+
+        public void Warning(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("WARNING: " + message);
+            Console.ResetColor();
+        }
+
+        public void Error(Exception ex, string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("ERROR: " + message);
+            Console.WriteLine(ex);
+            Console.ResetColor();
+        }
+
+        public void Error(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("ERROR: " + message);
+            Console.ResetColor();
         }
 
         public void WriteRun(BenchmarkRunReport report, bool isWarmup = false)
@@ -29,7 +51,7 @@ namespace NBench.Reporting.Targets
             Console.WriteLine("Elapsed: {0}", report.Elapsed);
             foreach (var metric in report.Metrics.Values)
             {
-                Console.WriteLine("{0} - {1}: {2} ,{1}: /s {3} , ns / {1}: {4}", metric.Name, metric.Unit, metric.MetricValue, metric.MetricValuePerSecond, metric.NanosPerMetricValue);
+                Console.WriteLine("{0} - {1}: {2:n} ,{1}: /s {3:n} , ns / {1}: {4:n}", metric.Name, metric.Unit, metric.MetricValue, metric.MetricValuePerSecond, metric.NanosPerMetricValue);
             }
                 
            
@@ -50,17 +72,21 @@ namespace NBench.Reporting.Targets
             Console.WriteLine("--------------- DATA ---------------");
             foreach (var metric in results.Data.StatsByMetric.Values)
             {
-                Console.WriteLine("{0}: Max: {2} {1}, Average: {3} {1}, Min: {4} {1}, StdDev: {5} {1}", metric.Name,
+                Console.WriteLine("{0}: Max: {2:n} {1}, Average: {3:n} {1}, Min: {4:n} {1}, StdDev: {5:n} {1}", metric.Name,
                     metric.Unit, metric.Stats.Max, metric.Stats.Average, metric.Stats.Min, metric.Stats.StandardDeviation);
 
-                Console.WriteLine("{0}: Max / s: {2} {1}, Average / s: {3} {1}, Min / s: {4} {1}, StdDev / s: {5} {1}", metric.Name,
+                Console.WriteLine("{0}: Max / s: {2:n} {1}, Average / s: {3:n} {1}, Min / s: {4:n} {1}, StdDev / s: {5:n} {1}", metric.Name,
                     metric.Unit, metric.PerSecondStats.Max, metric.PerSecondStats.Average, metric.PerSecondStats.Min, metric.PerSecondStats.StandardDeviation);
                 Console.WriteLine();
             }
 
             Console.WriteLine("--------------- ASSERTIONS ---------------");
-            foreach(var assertion in results.AssertionResults)
+            foreach (var assertion in results.AssertionResults)
+            {
+                Console.ForegroundColor = assertion.Passed ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed;
                 Console.WriteLine(assertion.Message);
+            }
+                
 
             Console.WriteLine();
         }

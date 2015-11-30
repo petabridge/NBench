@@ -26,7 +26,7 @@ namespace NBench.Sdk
         {
             var passed = assertion.Test(value);
             var passedString = passed ? "[PASS]" : "[FAIL]";
-            var message = $"{passedString} Expected {name} to {assertion} {unitName}; actual value was {value} {unitName}.";
+            var message = $"{passedString} Expected {name} to {assertion} {unitName}; actual value was {value:n} {unitName}.";
             return new AssertionResult(name, message, passed);
         }
     }

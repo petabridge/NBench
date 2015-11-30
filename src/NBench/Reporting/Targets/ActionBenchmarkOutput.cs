@@ -19,7 +19,22 @@ namespace NBench.Reporting.Targets
             _benchmarkAction = benchmarkAction;
         }
 
-        public void WriteStartingBenchmark(string benchmarkName)
+        public void WriteLine(string message)
+        {
+            //no-op
+        }
+
+        public void Warning(string message)
+        {
+            //no-op
+        }
+
+        public void Error(Exception ex, string message)
+        {
+            //no-op
+        }
+
+        public void Error(string message)
         {
             //no-op
         }

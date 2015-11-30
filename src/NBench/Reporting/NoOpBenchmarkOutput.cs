@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace NBench.Reporting
 {
     /// <summary>
@@ -12,7 +14,22 @@ namespace NBench.Reporting
 
         public static readonly NoOpBenchmarkOutput Instance = new NoOpBenchmarkOutput();
 
-        public void WriteStartingBenchmark(string benchmarkName)
+        public void WriteLine(string message)
+        {
+            //no-op
+        }
+
+        public void Warning(string message)
+        {
+            //no-op
+        }
+
+        public void Error(Exception ex, string message)
+        {
+            //no-op
+        }
+
+        public void Error(string message)
         {
             //no-op
         }
