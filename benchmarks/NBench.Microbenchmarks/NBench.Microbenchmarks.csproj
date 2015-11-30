@@ -50,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SDK\Sdk_ActionBenchmarkInvoker.cs" />
     <Compile Include="SDK\Sdk_ReflectionBenchmarkInvoker.cs" />
+    <Compile Include="SDK\Sdk_ReflectionBenchmarkInvokerWithRealWork.cs" />
     <Compile Include="Util\Util_AtomicCounters.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -20,10 +20,10 @@ namespace NBench.Tests.Sdk
         public void ShouldDisposeAllCounters()
         {
             var testCollector1 = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket1 = new MeasureBucket(testCollector1, 0);
+            var measureBucket1 = new MeasureBucket(testCollector1);
 
             var testCollector2 = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket2 = new MeasureBucket(testCollector2, 0);
+            var measureBucket2 = new MeasureBucket(testCollector2);
             var benchmarkRun = new BenchmarkRun(new List<MeasureBucket>(new[] {measureBucket1, measureBucket2}),
                 new List<Counter>());
 
@@ -34,33 +34,6 @@ namespace NBench.Tests.Sdk
 
             Assert.True(testCollector1.WasDisposed);
             Assert.True(testCollector2.WasDisposed);
-        }
-
-        [Theory]
-        [InlineData(new[] { 0L, 10L, 20L, 30L, 40L }, new[] { 1000L, 1001L, 1003L, 1010L, 1012L }, new[] { 0L, 1L, 2L, 3L, 4L })]
-        public void ShouldCollectMetricsOnAllCounters(long[] msValues, long[] counterValues1, long[] counterValues2)
-        {
-            var testCollector1 = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket1 = new MeasureBucket(testCollector1, 0);
-
-            var testCollector2 = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket2 = new MeasureBucket(testCollector2, 0);
-            var benchmarkRun = new BenchmarkRun(new List<MeasureBucket>(new[] { measureBucket1, measureBucket2 }),
-                new List<Counter>());
-
-            var length = msValues.Length;
-            var timeSpans = msValues.Select(x => TimeSpan.FromMilliseconds(x)).ToList();
-            for (var i = 0; i < length; i++)
-            {
-                testCollector1.CollectorValue = counterValues1[i];
-                testCollector2.CollectorValue = counterValues2[i];
-                benchmarkRun.Sample(timeSpans[i]);
-            }
-
-            Assert.Equal(counterValues1, benchmarkRun.Measures[0].RawValues.Values.Select(x => (long)x));
-            Assert.Equal(timeSpans, benchmarkRun.Measures[0].RawValues.Keys.ToArray());
-            Assert.Equal(counterValues2, benchmarkRun.Measures[1].RawValues.Values.Select(x => (long)x));
-            Assert.Equal(timeSpans, benchmarkRun.Measures[1].RawValues.Keys.ToArray());
         }
     }
 }

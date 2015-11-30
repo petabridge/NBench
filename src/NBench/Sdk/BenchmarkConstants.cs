@@ -13,7 +13,7 @@ namespace NBench.Sdk
         /// <summary>
         /// For long-running tests, sample metrics at 10ms intervals
         /// </summary>
-        public static readonly TimeSpan SamplingPrecision = TimeSpan.FromMilliseconds(10);
+        public static readonly long SamplingPrecisionTicks = TimeSpan.FromMilliseconds(10).Ticks;
     }
 }
 

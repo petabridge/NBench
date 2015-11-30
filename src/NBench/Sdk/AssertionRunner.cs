@@ -32,11 +32,11 @@ namespace NBench.Sdk
                 double valueToBeTested;
                 if (setting.AssertionType == AssertionType.Throughput)
                 {
-                    valueToBeTested = stats.PerSecondAverages.Average;
+                    valueToBeTested = stats.PerSecondStats.Average;
                 }
                 else
                 {
-                    valueToBeTested = stats.Averages.Average;
+                    valueToBeTested = stats.Stats.Average;
                 }
                 var assertionResult = AssertionResult.CreateResult(setting.MetricName, stats.Unit, valueToBeTested,
                     setting.Assertion);

@@ -39,10 +39,10 @@ namespace NBench.Metrics
         /// <summary>
         ///     Sample all actively used benchmarks in this run
         /// </summary>
-        public void Sample(TimeSpan elapsed)
+        public void Sample(long elapsedTicks)
         {
             for (var i = 0; i < MeasureCount; i++)
-                Measures[i].Collect(elapsed);
+                Measures[i].Collect(elapsedTicks);
         }
 
         /// <summary>

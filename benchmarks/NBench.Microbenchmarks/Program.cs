@@ -15,7 +15,8 @@ namespace NBench.Microbenchmarks
             {
                 typeof(Util_AtomicCounters), 
                 typeof(Sdk_ActionBenchmarkInvoker),
-                typeof(Sdk_ReflectionBenchmarkInvoker)
+                typeof(Sdk_ReflectionBenchmarkInvoker),
+                typeof(Sdk_ReflectionBenchmarkInvokerWithRealWork)
             });
 
             competitionSwitch.Run(args);;

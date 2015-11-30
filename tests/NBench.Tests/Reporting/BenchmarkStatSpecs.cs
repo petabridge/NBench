@@ -20,21 +20,6 @@ namespace NBench.Tests.Reporting
             Assert.Equal(average, benchmarkStat.Average);
             Assert.Equal(stdDev, benchmarkStat.StandardDeviation);
         }
-
-        [Theory]
-        [InlineData(new[] { 0L }, 0.0, 0.0, 0.0, 0.0, 0.0)]
-        [InlineData(new long[] { }, 0.0, 0.0, 0.0, 0.0, 0.0)]
-        [InlineData(new[] { 1L, 2L, 3L }, 6.0, 2.0, 4.0, 12.0, 0.5)]
-        public void ShouldComputePerSecondBenchmarkStat(long[] values, double max, double min, double average, double sum, double elapsed)
-        {
-            var benchmarkStat = new BenchmarkStat(values);
-            var perSecondBenchmarkStat = new PerSecondBenchmarkStat(benchmarkStat, elapsed);
-
-            Assert.Equal(max, perSecondBenchmarkStat.Max);
-            Assert.Equal(min, perSecondBenchmarkStat.Min);
-            Assert.Equal(average, perSecondBenchmarkStat.Average);
-            Assert.Equal(sum, perSecondBenchmarkStat.Sum);
-        }
     }
 }
 

@@ -76,32 +76,6 @@ namespace NBench.Util
 
             return deltas;
         }
-
-        /// <summary>
-        /// The algorithm here is as follows
-        /// 
-        /// Head of queue == metric taken at time 0
-        /// Every other item in queue == metric taken after 0
-        /// 
-        /// We want to compute the value relative to time 0
-        /// </summary>
-        /// <param name="metrics">The raw data</param>
-        /// <returns>An <see cref="IDictionary{TKey,TValue}"/> where the key is the time of the sample and value is the delta</returns>
-        public static IDictionary<TimeSpan, double> DistanceFromStart(this Queue<MetricMeasurement> metrics)
-        {
-            Contract.Requires(metrics != null);
-            Contract.Requires(metrics.Count >= 2, "need at least 1 head value and 1 tail value");
-            Dictionary<TimeSpan, double> returnValue = new Dictionary<TimeSpan, double>(metrics.Count);
-            MetricMeasurement head = metrics.Peek();
-            var remaining = metrics.Count;
-            for (var i = 0; i < remaining; i++)
-            {
-                var next = metrics.Dequeue();
-                double delta = next.MetricValue - head.MetricValue;
-                returnValue.Add(next.Elapsed, delta);
-            }
-            return returnValue;
-        }
     }
 }
 

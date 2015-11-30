@@ -105,7 +105,6 @@
     <Compile Include="Reporting\IBenchmarkOutput.cs" />
     <Compile Include="Reporting\MetricRunReport.cs" />
     <Compile Include="Reporting\NoOpBenchmarkOutput.cs" />
-    <Compile Include="Reporting\PerSecondBenchmarkStat.cs" />
     <Compile Include="Reporting\Targets\ActionBenchmarkOutput.cs" />
     <Compile Include="Reporting\Targets\ConsoleBenchmarkOutput.cs" />
     <Compile Include="Sdk\Assertion.cs" />

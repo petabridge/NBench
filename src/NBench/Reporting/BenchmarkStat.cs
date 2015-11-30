@@ -28,7 +28,6 @@ namespace NBench.Reporting
             Min = values.Min();
             Max = values.Max();
             Average = values.Average();
-            Sum = values.Sum();
             var n = values.Count;
             var average = Average; // need a closure for Linq methods on members of a struct
             StandardDeviation = n == 1 ? 0 : Math.Sqrt(values.Sum(x => Math.Pow(x - average, 2))/(n - 1));
@@ -40,8 +39,6 @@ namespace NBench.Reporting
         public double Max { get; }
 
         public double Average { get; }
-
-        public double Sum { get; }
 
         public double StandardDeviation { get; }
 

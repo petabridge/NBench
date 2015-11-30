@@ -111,7 +111,6 @@
     <Compile Include="Sdk\BenchmarkBuilderSpecs.cs" />
     <Compile Include="Sdk\BenchmarkRunSpecs.cs" />
     <Compile Include="Sdk\Compiler\ReflectionDiscoverySpecs.cs" />
-    <Compile Include="Util\DeltaCalculatorSpecs.cs" />
     <Compile Include="Util\EnumerableExtensionsSpecs.cs" />
   </ItemGroup>
   <ItemGroup>

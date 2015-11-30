@@ -12,6 +12,8 @@ namespace NBench.Sdk
     /// </summary>
     public class BenchmarkSettings
     {
+        public const long DefaultRuntimeMilliseconds = 1000;
+
         public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTime,
             IEnumerable<GcBenchmarkSetting> gcBenchmarks,
             IEnumerable<MemoryBenchmarkSetting> memoryBenchmarks,
@@ -30,7 +32,7 @@ namespace NBench.Sdk
             TestMode = testMode;
             RunMode = runMode;
             NumberOfIterations = numberOfIterations;
-            RunTime = TimeSpan.FromMilliseconds(runTimeMilliseconds);
+            RunTime = TimeSpan.FromMilliseconds(runTimeMilliseconds == 0 ? DefaultRuntimeMilliseconds : runTimeMilliseconds);
             Description = description;
             Skip = skip;
 

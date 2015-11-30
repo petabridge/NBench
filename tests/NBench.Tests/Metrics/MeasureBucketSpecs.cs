@@ -15,7 +15,7 @@ namespace NBench.Tests.Metrics
         public void MeasureBucketShouldDisposeCollector()
         {
             var testCollector = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket = new MeasureBucket(testCollector, 0);
+            var measureBucket = new MeasureBucket(testCollector);
             Assert.False(measureBucket.WasDisposed);
             Assert.False(testCollector.WasDisposed);
             measureBucket.Dispose();
@@ -25,40 +25,22 @@ namespace NBench.Tests.Metrics
 
         [Theory]
         [InlineData(new[] {0L, 10L, 20L, 30L, 40L}, new[] {1000L, 1001L, 1003L, 1010L, 1012L})]
-        public void MeasureBucketShouldCollectMetricsAtSpecifiedInterval(long[] msValues, long[] counterValues)
-        {
-            var testCollector = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket = new MeasureBucket(testCollector, 0);
-            var length = msValues.Length;
-            var timeSpans = msValues.Select(x => TimeSpan.FromMilliseconds(x)).ToList();
-            for (var i = 0; i < length; i++)
-            {
-                testCollector.CollectorValue = counterValues[i];
-                measureBucket.Collect(timeSpans[i]);
-            }
-
-            Assert.Equal(counterValues, measureBucket.RawValues.Values.Select(x => x));
-            Assert.Equal(timeSpans, measureBucket.RawValues.Keys.ToArray());
-        }
-
-        [Theory]
-        [InlineData(new[] {0L, 10L, 20L, 30L, 40L}, new[] {1000L, 1001L, 1003L, 1010L, 1012L})]
         [InlineData(new long[] {}, new long[] {})] // no collections
         public void MeasureBucketShouldProduceReport(long[] msValues, long[] counterValues)
         {
             var testCollector = new TestMetricCollector(new CounterMetricName("foo"), "bar");
-            var measureBucket = new MeasureBucket(testCollector, 0);
+            var measureBucket = new MeasureBucket(testCollector);
             var length = msValues.Length;
-            var timeSpans = msValues.Select(x => TimeSpan.FromMilliseconds(x)).ToList();
+            var timeSpans = msValues.Select(x => TimeSpan.FromMilliseconds(x).Ticks).ToList();
             for (var i = 0; i < length; i++)
             {
                 testCollector.CollectorValue = counterValues[i];
                 measureBucket.Collect(timeSpans[i]);
             }
 
-            var average = counterValues.Length == 0 ? 0 : counterValues.DistanceFromStart().Select(x => (double) x).Average();
+            var delta = counterValues.LastOrDefault() - counterValues.FirstOrDefault();
             var report = measureBucket.ToReport();
-            Assert.Equal(average, report.Stats.Average);
+            Assert.Equal(delta, report.MetricValue);
         }
     }
 }
