@@ -24,10 +24,28 @@ namespace NBench.Reporting
             _outputs = outputs;
         }
 
-        public void WriteStartingBenchmark(string benchmarkName)
+        public void WriteLine(string message)
         {
             foreach(var o in _outputs)
-                o.WriteStartingBenchmark(benchmarkName);
+                o.WriteLine(message);
+        }
+
+        public void Warning(string message)
+        {
+            foreach(var o in _outputs)
+                o.Warning(message);
+        }
+
+        public void Error(Exception ex, string message)
+        {
+            foreach (var o in _outputs)
+                o.Error(ex, message);
+        }
+
+        public void Error(string message)
+        {
+            foreach (var o in _outputs)
+                o.Error(message);
         }
 
         public void WriteRun(BenchmarkRunReport report, bool isWarmup = false)

@@ -36,15 +36,13 @@ namespace NBench.Runner
             bool anyAssertFailures = false;
             foreach (var benchmark in benchmarks)
             {
-                Output.WriteStartingBenchmark(benchmark.BenchmarkName);
+                Output.WriteLine(benchmark.BenchmarkName);
                 benchmark.Run();
                 benchmark.Finish();
 
                 // if one assert fails, all fail
                 anyAssertFailures = anyAssertFailures || !benchmark.AllAssertsPassed; 
             }
-
-            Console.ReadLine();
             return anyAssertFailures ? -1 : 0;
         }
     }
