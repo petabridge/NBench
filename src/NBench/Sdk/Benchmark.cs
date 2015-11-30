@@ -6,10 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Threading;
 using NBench.Metrics;
 using NBench.Reporting;
-using NBench.Util;
 
 namespace NBench.Sdk
 {
@@ -67,6 +65,21 @@ namespace NBench.Sdk
             /* Pre-Warmup */
             RunSingleBenchmark();
 
+            // check to see if pre-warmup threw an exception
+            var faulted = _currentRun.IsFaulted;
+
+            if (faulted)
+            {
+                /*
+                 * Normally we don't ever queue up the warmup into the final stats, but we do it
+                 * in failure cases so we can capture the exception thrown during warmup into
+                 * the final report we're going to deliver to the end-user.
+                 */
+                CompletedRuns.Enqueue(_currentRun.ToReport(TimeSpan.Zero));
+
+                return;
+            }
+
             /* Warmup */
             Allocate(); // allocate all collectors needed
             PreRun();
@@ -120,10 +133,17 @@ namespace NBench.Sdk
             // disable further warmups
             _isWarmup = false;
 
-            while (_pendingIterations > 0)
+            while (_pendingIterations > 0 && !_currentRun.IsFaulted)
             {
                 RunSingleBenchmark();
             }
+
+            // Bailing out if the benchmark was faulted
+            if (_currentRun.IsFaulted)
+            {
+                Output.Warning($"Error during previous run of {BenchmarkName}. Aborting run...");
+            }
+            
         }
 
         public void Shutdown()
@@ -137,17 +157,38 @@ namespace NBench.Sdk
             // reset the stopwatch before each run
             StopWatch.Reset();
             PreRun();
-            RunBenchmark();
+            try
+            {
+                RunBenchmark();
+            }
+            catch (Exception ex)
+            {
+                HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} RUN.");
+            }
             PostRun();
             Complete(); // release previous collectors
         }
 
         protected void PreRun()
         {
-            // Invoke user-defined setup method, if any
-            Invoker.InvokePerfSetup(_currentRun.Context);
+            try
+            {
+                // Invoke user-defined setup method, if any
+                Invoker.InvokePerfSetup(_currentRun.Context);
 
-            PrepareForRun();
+                PrepareForRun();
+            }
+            catch (Exception ex)
+            {
+                HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} SETUP.");
+            }
+        }
+
+        private void HandleBenchmarkRunExecption(Exception ex, string formatMsg)
+        {
+            var nbe = new NBenchException(formatMsg, ex);
+            _currentRun.WithException(nbe);
+            Output.Error(ex, nbe.Message);
         }
 
 
@@ -187,8 +228,15 @@ namespace NBench.Sdk
         /// </summary>
         protected void PostRun()
         {
-            // Invoke user-defined cleanup method, if any
-            Invoker.InvokePerfCleanup(_currentRun.Context);
+            try
+            {
+                // Invoke user-defined cleanup method, if any
+                Invoker.InvokePerfCleanup(_currentRun.Context);
+            }
+            catch (Exception ex)
+            {
+                HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} CLEANUP.");
+            }
         }
 
         /// <summary>
@@ -213,7 +261,6 @@ namespace NBench.Sdk
         {
             var results = CompileResults();
 
-            //TODO: https://github.com/petabridge/NBench/issues/5
             var finalResults = AssertResults(results);
             AllAssertsPassed = finalResults.AssertionResults.Any(x => !x.Passed);
             Output.WriteBenchmark(finalResults);
@@ -246,14 +293,7 @@ namespace NBench.Sdk
         ///     Occurs when <see cref="NBench.RunMode.Throughput" /> is enabled or the <see cref="NBench.Sdk.WarmupData.ElapsedTime" />
         ///     is greater than <see cref="BenchmarkConstants.SamplingPrecisionTicks" />.
         /// </summary>
-        /// <param name="isActuallyIteration">
-        ///     When set to <c>true</c>, means that we run until the benchmark is finished and
-        ///     only treat <see cref="BenchmarkSettings.RunTime" /> as a timeout rather than a duration. This
-        ///     is designed for long-running benchmarks. 
-        /// 
-        ///     Default is <c>false</c>.
-        /// </param>
-        private void RunThroughputBenchmark(bool isActuallyIteration = false)
+        private void RunThroughputBenchmark()
         {
             var currentContext = _currentRun.Context;
 
@@ -276,9 +316,6 @@ namespace NBench.Sdk
 
             //Final collection
             _currentRun.Sample(StopWatch.ElapsedTicks);
-
-            // Release collectors
-            _currentRun.Dispose();
         }
 
         #endregion

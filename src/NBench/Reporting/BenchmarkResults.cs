@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -20,8 +21,8 @@ namespace NBench.Reporting
             BenchmarkName = typeName;
             Settings = settings;
             StatsByMetric = new Dictionary<MetricName, AggregateMetrics>();
-
             StatsByMetric = Aggregate(runs);
+            Exceptions = runs.SelectMany(r => r.Exceptions).ToList();
         }
 
         /// <summary>
@@ -33,6 +34,16 @@ namespace NBench.Reporting
         ///     The settings for this <see cref="Benchmark" />
         /// </summary>
         public BenchmarkSettings Settings { get; private set; }
+
+        /// <summary>
+        /// The set of <see cref="Exception"/>s that may have occurred during a benchmark.
+        /// </summary>
+        public IReadOnlyList<Exception> Exceptions { get; private set; }
+
+        /// <summary>
+        /// Returns <c>true</c> if any <see cref="Exception"/>s were thrown during this run.
+        /// </summary>
+        public bool IsFaulted => Exceptions.Count > 0;
 
         /// <summary>
         ///     Per-metric aggregate statistics

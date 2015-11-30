@@ -28,6 +28,14 @@ namespace NBench.Metrics
         public int MeasureCount { get; }
         public IReadOnlyList<MeasureBucket> Measures { get; }
         public IReadOnlyDictionary<CounterMetricName, Counter> Counters { get; }
+        private readonly List<Exception> _exceptions = new List<Exception>();
+        public IReadOnlyList<Exception> Exceptions => _exceptions;
+
+        /// <summary>
+        /// Returns <c>true</c> if any <see cref="Exception"/>s were thrown during this run.
+        /// </summary>
+        public bool IsFaulted => Exceptions.Count > 0;
+
         public BenchmarkContext Context { get; }
 
         public void Dispose()
@@ -46,12 +54,21 @@ namespace NBench.Metrics
         }
 
         /// <summary>
+        /// Adds an <see cref="Exception"/> to this <see cref="BenchmarkRun"/>.
+        /// </summary>
+        /// <param name="ex">The <see cref="Exception"/> thrown while running the benchmark.</param>
+        public void WithException(Exception ex)
+        {
+            _exceptions.Add(ex);
+        }
+
+        /// <summary>
         /// Collect a final report for this <see cref="BenchmarkRun"/>
         /// </summary>
         /// <returns>A compiled report for all of the underlying <see cref="MeasureBucket"/>s.</returns>
         public BenchmarkRunReport ToReport(TimeSpan elapsedTime)
         {
-            return new BenchmarkRunReport(elapsedTime, Measures.Select(x => x.ToReport()));
+            return new BenchmarkRunReport(elapsedTime, Measures.Select(x => x.ToReport()), Exceptions);
         }
 
         private void Dispose(bool isDisposing)
