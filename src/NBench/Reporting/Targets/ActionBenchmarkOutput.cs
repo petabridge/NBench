@@ -10,10 +10,15 @@ namespace NBench.Reporting.Targets
     /// </summary>
     public sealed class ActionBenchmarkOutput : IBenchmarkOutput
     {
-        private readonly Action<BenchmarkRunReport> _runAction;
+        private readonly Action<BenchmarkRunReport, bool> _runAction;
         private readonly Action<BenchmarkFinalResults> _benchmarkAction;
 
         public ActionBenchmarkOutput(Action<BenchmarkRunReport> runAction, Action<BenchmarkFinalResults> benchmarkAction)
+            : this((report, b) => runAction(report), benchmarkAction)
+        {
+        }
+
+        public ActionBenchmarkOutput(Action<BenchmarkRunReport, bool> runAction, Action<BenchmarkFinalResults> benchmarkAction)
         {
             _runAction = runAction;
             _benchmarkAction = benchmarkAction;
@@ -41,10 +46,7 @@ namespace NBench.Reporting.Targets
 
         public void WriteRun(BenchmarkRunReport report, bool isWarmup = false)
         {
-            if (!isWarmup)
-            {
-                _runAction(report);
-            }
+            _runAction(report, isWarmup);
         }
 
         public void WriteBenchmark(BenchmarkFinalResults results)
