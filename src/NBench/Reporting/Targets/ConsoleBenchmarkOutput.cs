@@ -80,11 +80,14 @@ namespace NBench.Reporting.Targets
                 Console.WriteLine();
             }
 
-            Console.WriteLine("--------------- ASSERTIONS ---------------");
-            foreach (var assertion in results.AssertionResults)
+            if (results.AssertionResults.Count > 0)
             {
-                Console.ForegroundColor = assertion.Passed ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed;
-                Console.WriteLine(assertion.Message);
+                Console.WriteLine("--------------- ASSERTIONS ---------------");
+                foreach (var assertion in results.AssertionResults)
+                {
+                    Console.ForegroundColor = assertion.Passed ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed;
+                    Console.WriteLine(assertion.Message);
+                }
             }
                 
 
