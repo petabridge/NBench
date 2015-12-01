@@ -107,6 +107,7 @@
     <Compile Include="Reporting\NoOpBenchmarkOutput.cs" />
     <Compile Include="Reporting\Targets\ActionBenchmarkOutput.cs" />
     <Compile Include="Reporting\Targets\ConsoleBenchmarkOutput.cs" />
+    <Compile Include="Reporting\Targets\MarkdownBenchmarkOutput.cs" />
     <Compile Include="Sdk\Assertion.cs" />
     <Compile Include="Sdk\AssertionResult.cs" />
     <Compile Include="Sdk\AssertionRunner.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="Sys\SysInfo.cs" />
     <Compile Include="Util\AtomicCounter.cs" />
     <Compile Include="Util\DeltaCalculator.cs" />
+    <Compile Include="Util\FileNameGenerator.cs" />
     <Compile Include="Util\IEnumerableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -25,7 +25,7 @@ namespace NBench.Runner
         /// <param name="args">The commandline arguments</param>
         static int Main(string[] args)
         {
-            Output = new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput());
+            Output = new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput());
             Discovery = new ReflectionDiscovery(Output);
             string assemblyPath = Path.GetFullPath(args[0]);
 

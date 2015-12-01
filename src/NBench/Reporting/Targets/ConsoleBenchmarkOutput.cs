@@ -5,8 +5,6 @@ using System;
 
 namespace NBench.Reporting.Targets
 {
-
-    //TODO: https://github.com/petabridge/NBench/issues/4
     /// <summary>
     /// Output writer to the console for NBench
     /// </summary>

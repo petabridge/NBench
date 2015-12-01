@@ -130,8 +130,8 @@ namespace NBench.Sdk
         public override string ToString()
         {
             if(Condition != MustBe.Between)
-                return MustBeToString(Condition) + " " + Value.ToString("N0");
-            return MustBeToString(Condition) + " " + Value.ToString("N0") + " and " + MaxValue?.ToString("N0");
+                return MustBeToString(Condition) + " " + Value.ToString("N");
+            return MustBeToString(Condition) + " " + Value.ToString("N") + " and " + MaxValue?.ToString("N");
         }
     }
 }
