@@ -18,6 +18,13 @@ namespace NBench.Reporting.Targets
         public const int MaxColumnSize = 18;
         public const string MarkdownTableColumnEnd = " |";
 
+        private readonly string _outputDirectory = null;
+
+        public MarkdownBenchmarkOutput(string outputDirectory)
+        {
+            _outputDirectory = outputDirectory;
+        }
+
         public void WriteLine(string message)
         {
             // no-op
@@ -45,7 +52,7 @@ namespace NBench.Reporting.Targets
 
         public void WriteBenchmark(BenchmarkFinalResults results)
         {
-            var filePath = FileNameGenerator.GenerateFileName(results.BenchmarkName, MarkdownFileExtension);
+            var filePath = FileNameGenerator.GenerateFileName(_outputDirectory, results.BenchmarkName, MarkdownFileExtension, DateTime.UtcNow);
             var sysInfo = SysInfo.Instance;
             var sb = new StringBuilder();
             sb.AppendLine($"# {results.BenchmarkName}");

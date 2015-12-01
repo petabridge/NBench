@@ -1,2 +1,2 @@
 # NBench
-Performance benchmarking and testing framework for .NET applications
+Cross-platform performance benchmarking and testing framework for .NET applications

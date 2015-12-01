@@ -32,6 +32,9 @@ bld/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+# NBench
+[Pp]erf[Rr]esult*/
+
 # NUNIT
 *.VisualState.xml
 TestResult.xml
