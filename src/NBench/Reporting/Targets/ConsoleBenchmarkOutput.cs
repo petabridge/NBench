@@ -12,7 +12,7 @@ namespace NBench.Reporting.Targets
     {
         public void WriteLine(string message)
         {
-            Console.WriteLine("--------------- STARTING {0} ---------------", message);
+            Console.WriteLine(message);
         }
 
         public void Warning(string message)

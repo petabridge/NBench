@@ -274,7 +274,7 @@ namespace NBench.Sdk
             var results = CompileResults();
 
             var finalResults = AssertResults(results);
-            AllAssertsPassed = finalResults.AssertionResults.Any(x => !x.Passed);
+            AllAssertsPassed = finalResults.AssertionResults.All(x => x.Passed) && !finalResults.Data.IsFaulted;
             Output.WriteBenchmark(finalResults);
         }
 

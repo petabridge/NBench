@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.IO;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
-using NBench.Sdk;
 using NBench.Sdk.Compiler;
 
 namespace NBench.Runner
@@ -19,13 +17,13 @@ namespace NBench.Runner
         /// <summary>
         /// NBench Runner takes the following <see cref="args"/>
         /// 
-        /// C:\> NBench.Runner.exe [assembly name]
+        /// C:\> NBench.Runner.exe [assembly name] [output-directory={dir-path}]
         /// 
         /// </summary>
         /// <param name="args">The commandline arguments</param>
         static int Main(string[] args)
         {
-            Output = new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput());
+            Output = new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput(CommandLine.GetProperty("output-directory")));
             Discovery = new ReflectionDiscovery(Output);
             string assemblyPath = Path.GetFullPath(args[0]);
 
@@ -36,12 +34,13 @@ namespace NBench.Runner
             bool anyAssertFailures = false;
             foreach (var benchmark in benchmarks)
             {
-                Output.WriteLine(benchmark.BenchmarkName);
+                Output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
                 benchmark.Run();
                 benchmark.Finish();
 
                 // if one assert fails, all fail
-                anyAssertFailures = anyAssertFailures || !benchmark.AllAssertsPassed; 
+                anyAssertFailures = anyAssertFailures || !benchmark.AllAssertsPassed;
+                Output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
             }
             return anyAssertFailures ? -1 : 0;
         }
