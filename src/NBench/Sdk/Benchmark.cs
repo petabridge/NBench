@@ -70,13 +70,25 @@ namespace NBench.Sdk
             /* Warmup */
             Allocate(); // allocate all collectors needed
             PreRun();
-            warmupStopWatch.Start();
-            while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+           
+            if (Settings.RunMode == RunMode.Throughput)
             {
+                warmupStopWatch.Start();
+                while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+                {
+                    Invoker.InvokeRun(_currentRun.Context);
+                    runCount++;
+                }
+                warmupStopWatch.Stop();
+            }
+            else
+            {
+                warmupStopWatch.Start();
                 Invoker.InvokeRun(_currentRun.Context);
                 runCount++;
+                warmupStopWatch.Stop();
             }
-            warmupStopWatch.Stop();
+           
             PostRun();
 
             // elapsed time
