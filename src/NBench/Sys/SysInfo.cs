@@ -20,7 +20,10 @@ namespace NBench.Sys
             IsMono = isMono;
             ClrVersion = clrVersion;
             MaxGcGeneration = maxGcGeneration;
+            NBenchAssemblyVersion = this.GetType().Assembly.FullName;
         }
+
+        public string NBenchAssemblyVersion { get; private set; }
 
         /// <summary>
         /// Current version of the OS
