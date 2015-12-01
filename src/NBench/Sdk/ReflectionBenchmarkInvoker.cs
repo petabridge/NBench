@@ -22,8 +22,7 @@ namespace NBench.Sdk
         public ReflectionBenchmarkInvoker(BenchmarkClassMetadata metadata)
         {
             _metadata = metadata;
-            //TODO: https://github.com/petabridge/NBench/issues/11
-            BenchmarkName = metadata.BenchmarkClass.FullName;
+            BenchmarkName = $"{metadata.BenchmarkClass.FullName}+{metadata.Run.InvocationMethod.Name}";
         }
 
         public string BenchmarkName { get; }
