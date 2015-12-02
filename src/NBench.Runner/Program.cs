@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk.Compiler;
@@ -29,6 +32,20 @@ namespace NBench.Runner
 
             // TODO: See issue https://github.com/petabridge/NBench/issues/3
             var assembly = AssemblyRuntimeLoader.LoadAssembly(assemblyPath);
+
+
+            /*
+             * Set processor affinity
+             */
+            Process Proc = Process.GetCurrentProcess();
+            Proc.ProcessorAffinity = new IntPtr(2); // either of the first two processors
+
+            /*
+             * Set priority
+             */
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+
 
             var benchmarks = Discovery.FindBenchmarks(assembly);
             bool anyAssertFailures = false;

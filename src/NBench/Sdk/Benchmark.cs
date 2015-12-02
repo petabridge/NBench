@@ -18,6 +18,7 @@ namespace NBench.Sdk
     /// </summary>
     public class Benchmark
     {
+        public const int WarmupCount = 13;
         protected readonly BenchmarkBuilder Builder;
 
         /// <summary>
@@ -53,6 +54,17 @@ namespace NBench.Sdk
         protected IBenchmarkOutput Output { get; }
 
         /// <summary>
+        /// Returns <c>true</c> if <see cref="Finish"/> was called and all assertions passed,
+        /// or if it was never called.
+        /// </summary>
+        public bool AllAssertsPassed { get; private set; }
+
+        /// <summary>
+        /// The name of this benchmark
+        /// </summary>
+        public string BenchmarkName => Invoker.BenchmarkName;
+
+        /// <summary>
         ///     Warmup phase
         /// </summary>
         private void WarmUp()
@@ -80,7 +92,7 @@ namespace NBench.Sdk
                 return;
             }
 
-            /* Warmup */
+            /* Esimate */
             Allocate(); // allocate all collectors needed
             PreRun();
            
@@ -108,6 +120,15 @@ namespace NBench.Sdk
             var runTime = warmupStopWatch.ElapsedTicks;
 
             WarmupData = new WarmupData(runTime, runCount);
+
+            var i = WarmupCount;
+
+            /* Warmup to force CPU caching */
+            while (i > 0 && !_currentRun.IsFaulted)
+            {
+                RunSingleBenchmark();
+                i--;
+            }
         }
 
         /// <summary>
@@ -116,27 +137,6 @@ namespace NBench.Sdk
         private void Allocate()
         {
             _currentRun = Builder.NewRun(WarmupData);
-        }
-
-        /// <summary>
-        /// Complete the current run
-        /// </summary>
-        private void Complete()
-        {
-            _currentRun.Dispose();
-
-            var report = _currentRun.ToReport(StopWatch.Elapsed);
-            Output.WriteRun(report, _isWarmup);
-
-            // Change runs, but not on warmup
-            if (!_isWarmup)
-            {
-                // Decrease the number of pending iterations
-                _pendingIterations--;
-
-                
-                CompletedRuns.Enqueue(report);
-            }
         }
 
         public void Run()
@@ -185,8 +185,18 @@ namespace NBench.Sdk
         {
             try
             {
-                // Invoke user-defined setup method, if any
-                Invoker.InvokePerfSetup(_currentRun.Context);
+                if (RunMode == RunMode.Throughput)
+                {
+                    // Need to pass in the # of estimated runs per second in order to compile
+                    // the invoker with an inlined loop
+                    Invoker.InvokePerfSetup(WarmupData.EstimatedRunsPerSecond, _currentRun.Context);
+                }
+                    else
+                {
+                    // Invoke user-defined setup method, if any
+                    Invoker.InvokePerfSetup(_currentRun.Context);
+                }
+                
 
                 PrepareForRun();
             }
@@ -202,7 +212,6 @@ namespace NBench.Sdk
             _currentRun.WithException(nbe);
             Output.Error(ex, nbe.Message);
         }
-
 
         /// <summary>
         /// Performs any final GC needed before we start a test run
@@ -221,16 +230,11 @@ namespace NBench.Sdk
 
         protected void RunBenchmark()
         {
-            switch (RunMode)
-            {
-                case RunMode.Iterations:
-                    RunIterationBenchmark();
-                    break;
-                case RunMode.Throughput:
-                default:
-                    RunThroughputBenchmark();
-                    break;
-            }
+            _currentRun.Sample(StopWatch.ElapsedTicks);
+            StopWatch.Start();
+            Invoker.InvokeRun(_currentRun.Context);
+            StopWatch.Stop();
+            _currentRun.Sample(StopWatch.ElapsedTicks); //add a tick just to ensure no collision
         }
 
         /// <summary>
@@ -248,6 +252,27 @@ namespace NBench.Sdk
             catch (Exception ex)
             {
                 HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} CLEANUP.");
+            }
+        }
+
+        /// <summary>
+        /// Complete the current run
+        /// </summary>
+        private void Complete()
+        {
+            _currentRun.Dispose();
+
+            var report = _currentRun.ToReport(StopWatch.Elapsed);
+            Output.WriteRun(report, _isWarmup);
+
+            // Change runs, but not on warmup
+            if (!_isWarmup)
+            {
+                // Decrease the number of pending iterations
+                _pendingIterations--;
+
+
+                CompletedRuns.Enqueue(report);
             }
         }
 
@@ -277,60 +302,6 @@ namespace NBench.Sdk
             AllAssertsPassed = finalResults.AssertionResults.All(x => x.Passed) && !finalResults.Data.IsFaulted;
             Output.WriteBenchmark(finalResults);
         }
-
-        /// <summary>
-        /// Returns <c>true</c> if <see cref="Finish"/> was called and all assertions passed,
-        /// or if it was never called.
-        /// </summary>
-        public bool AllAssertsPassed { get; private set; }
-
-        /// <summary>
-        /// The name of this benchmark
-        /// </summary>
-        public string BenchmarkName => Invoker.BenchmarkName;
-
-        #region RunModes
-
-        private void RunIterationBenchmark()
-        {
-            _currentRun.Sample(StopWatch.ElapsedTicks);
-            StopWatch.Start();
-            Invoker.InvokeRun(_currentRun.Context);
-            StopWatch.Stop();
-            _currentRun.Sample(StopWatch.ElapsedTicks); //add a tick just to ensure no collision
-        }
-
-        /// <summary>
-        ///     Runs long-running benchmark and performs data collection in the background on a separate thread.
-        ///     Occurs when <see cref="NBench.RunMode.Throughput" /> is enabled or the <see cref="NBench.Sdk.WarmupData.ElapsedTime" />
-        ///     is greater than <see cref="BenchmarkConstants.SamplingPrecisionTicks" />.
-        /// </summary>
-        private void RunThroughputBenchmark()
-        {
-            var currentContext = _currentRun.Context;
-
-
-            var runCount = WarmupData.EstimatedRunsPerSecond;
-            _currentRun.Sample(StopWatch.ElapsedTicks);
-
-            // Start!
-            StopWatch.Start();
-
-            while (true)
-            {
-                Invoker.InvokeRun(currentContext);
-                if (runCount-- == 0)
-                    break;
-            }
-
-            //Stop
-            StopWatch.Stop();
-
-            //Final collection
-            _currentRun.Sample(StopWatch.ElapsedTicks);
-        }
-
-        #endregion
     }
 }
 
