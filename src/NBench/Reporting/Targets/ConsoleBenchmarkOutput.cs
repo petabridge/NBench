@@ -66,7 +66,13 @@ namespace NBench.Reporting.Targets
         public void WriteBenchmark(BenchmarkFinalResults results)
         {
             Console.WriteLine("--------------- RESULTS: {0} ---------------", results.BenchmarkName);
-
+            if (!string.IsNullOrEmpty(results.Data.Settings.Description))
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine(results.Data.Settings.Description);
+                Console.ResetColor();
+            }
+            
             Console.WriteLine("--------------- DATA ---------------");
             foreach (var metric in results.Data.StatsByMetric.Values)
             {

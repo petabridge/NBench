@@ -59,6 +59,10 @@ namespace NBench.Reporting.Targets
             var sysInfo = SysInfo.Instance;
             var sb = new StringBuilder();
             sb.AppendLine($"# {results.BenchmarkName}");
+            if (!string.IsNullOrEmpty(results.Data.Settings.Description))
+            {
+                sb.AppendLine($"__{results.Data.Settings.Description}__");
+            }
             sb.AppendLine($"_{DateTime.UtcNow}_");
             sb.AppendLine("### System Info");
             sb.AppendLine("```ini");
