@@ -384,6 +384,7 @@ Target "All" DoNothing
 
 // tests dependencies
 "CleanTests" ==> "RunTests"
+"BuildRelease" ==> "RunTests"
 
 
 // perf dependencies
