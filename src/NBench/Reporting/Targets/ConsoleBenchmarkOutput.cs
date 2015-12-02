@@ -85,6 +85,7 @@ namespace NBench.Reporting.Targets
                 {
                     Console.ForegroundColor = assertion.Passed ? ConsoleColor.DarkGreen : ConsoleColor.DarkRed;
                     Console.WriteLine(assertion.Message);
+                    Console.ResetColor();
                 }
             }
 
@@ -93,8 +94,9 @@ namespace NBench.Reporting.Targets
                 Console.WriteLine("--------------- EXCEPTIONS ---------------");
                 foreach (var exception in results.Data.Exceptions)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(exception);
+                    Console.ResetColor();
                 }
             }
                 
