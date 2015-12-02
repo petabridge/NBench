@@ -18,11 +18,13 @@ namespace NBench.Reporting
         public BenchmarkResults(string typeName, BenchmarkSettings settings, IReadOnlyList<BenchmarkRunReport> runs)
         {
             Contract.Requires(!string.IsNullOrEmpty(typeName));
+            Contract.Requires(runs != null);
             BenchmarkName = typeName;
             Settings = settings;
+            Runs = runs;
             StatsByMetric = new Dictionary<MetricName, AggregateMetrics>();
-            StatsByMetric = Aggregate(runs);
-            Exceptions = runs.SelectMany(r => r.Exceptions).ToList();
+            StatsByMetric = Aggregate(Runs);
+            Exceptions = Runs.SelectMany(r => r.Exceptions).ToList();
         }
 
         /// <summary>
@@ -44,6 +46,11 @@ namespace NBench.Reporting
         /// Returns <c>true</c> if any <see cref="Exception"/>s were thrown during this run.
         /// </summary>
         public bool IsFaulted => Exceptions.Count > 0;
+
+        /// <summary>
+        /// The list of raw data available for each run of the benchmark
+        /// </summary>
+        public IReadOnlyList<BenchmarkRunReport> Runs { get; }
 
         /// <summary>
         ///     Per-metric aggregate statistics
