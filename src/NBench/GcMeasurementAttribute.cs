@@ -13,7 +13,6 @@ namespace NBench
         Gen0 = 0,
         Gen1 = 1,
         Gen2 = 2,
-        Gen3 = 3,
         AllGc = -1,
     }
 

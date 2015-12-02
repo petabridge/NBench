@@ -35,7 +35,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CounterPerfSpecs.cs" />
+    <Compile Include="CombinedPerfSpecs.cs" />
+    <Compile Include="CounterPerfSpec.cs" />
+    <Compile Include="IterationModeMeasurementSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
