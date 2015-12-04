@@ -4,24 +4,25 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using NBench.Metrics;
 using NBench.Sys;
 using NBench.Util;
 
 namespace NBench.Reporting.Targets
 {
     /// <summary>
-    /// <see cref="IBenchmarkOutput"/> implementation that writes output for each
-    /// completed benchmark to a markdown file. Uses <see cref="FileNameGenerator"/>
-    /// to generate a file name unique to each test AND the time it was run.
+    ///     <see cref="IBenchmarkOutput" /> implementation that writes output for each
+    ///     completed benchmark to a markdown file. Uses <see cref="FileNameGenerator" />
+    ///     to generate a file name unique to each test AND the time it was run.
     /// </summary>
     public class MarkdownBenchmarkOutput : IBenchmarkOutput
     {
         public const string MarkdownFileExtension = ".md";
         public const int MaxColumnSize = 18;
         public const string MarkdownTableColumnEnd = " |";
-
-        private readonly string _outputDirectory = null;
+        private readonly string _outputDirectory;
 
         public MarkdownBenchmarkOutput(string outputDirectory)
         {
@@ -55,7 +56,8 @@ namespace NBench.Reporting.Targets
 
         public void WriteBenchmark(BenchmarkFinalResults results)
         {
-            var filePath = FileNameGenerator.GenerateFileName(_outputDirectory, results.BenchmarkName, MarkdownFileExtension, DateTime.UtcNow);
+            var filePath = FileNameGenerator.GenerateFileName(_outputDirectory, results.BenchmarkName,
+                MarkdownFileExtension, DateTime.UtcNow);
             var sysInfo = SysInfo.Instance;
             var sb = new StringBuilder();
             sb.AppendLine($"# {results.BenchmarkName}");
@@ -77,7 +79,8 @@ namespace NBench.Reporting.Targets
             sb.AppendLine("### NBench Settings");
             sb.AppendLine("```ini");
             sb.AppendLine($"RunMode={results.Data.Settings.RunMode}, TestMode={results.Data.Settings.TestMode}");
-            sb.AppendLine($"NumberOfIterations={results.Data.Settings.NumberOfIterations}, MaximumRunTime={results.Data.Settings.RunTime}");
+            sb.AppendLine(
+                $"NumberOfIterations={results.Data.Settings.NumberOfIterations}, MaximumRunTime={results.Data.Settings.RunTime}");
             sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("## Data");
@@ -89,6 +92,8 @@ namespace NBench.Reporting.Targets
             sb.AppendLine("### Per-second Totals");
             sb.AppendFormat(BuildPerSecondsStatTable(results.Data.StatsByMetric.Values));
             sb.AppendLine();
+            sb.AppendLine("### Raw Data");
+            sb.AppendFormat(BuildRunTable(results.Data.Runs));
             if (results.AssertionResults.Count > 0)
             {
                 sb.AppendLine("## Assertions");
@@ -102,7 +107,6 @@ namespace NBench.Reporting.Targets
 
             if (results.Data.IsFaulted)
             {
-
                 Console.WriteLine("## Exceptions");
                 foreach (var exception in results.Data.Exceptions)
                 {
@@ -117,24 +121,17 @@ namespace NBench.Reporting.Targets
             File.WriteAllText(filePath, report, Encoding.UTF8);
         }
 
-        public static string BuildStatTable(IEnumerable<AggregateMetrics> metrics, int columnWidth = MaxColumnSize)
+        private static string BuildStatTable(IEnumerable<AggregateMetrics> metrics, int columnWidth = MaxColumnSize)
         {
             var sb = new StringBuilder();
-            sb.Append(("Metric"+MarkdownTableColumnEnd).PadLeft(columnWidth))
+            sb.Append(("Metric" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Units" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Max" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Average" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Min" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("StdDev" + MarkdownTableColumnEnd).PadLeft(columnWidth));
             sb.AppendLine();
-            sb.Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'));
-            sb.AppendLine();
+            AddMarkdownTableHeaderRow(sb, columnWidth);
             foreach (var metric in metrics)
             {
                 sb.Append((metric.Name + MarkdownTableColumnEnd).PadLeft(columnWidth));
@@ -149,7 +146,8 @@ namespace NBench.Reporting.Targets
             return sb.ToString();
         }
 
-        public static string BuildPerSecondsStatTable(IEnumerable<AggregateMetrics> metrics, int columnWidth = MaxColumnSize)
+        private static string BuildPerSecondsStatTable(IEnumerable<AggregateMetrics> metrics,
+            int columnWidth = MaxColumnSize)
         {
             var sb = new StringBuilder();
             sb.Append(("Metric" + MarkdownTableColumnEnd).PadLeft(columnWidth))
@@ -159,14 +157,7 @@ namespace NBench.Reporting.Targets
                 .Append(("Min / s" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("StdDev / s" + MarkdownTableColumnEnd).PadLeft(columnWidth));
             sb.AppendLine();
-            sb.Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'))
-                .Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'));
-            sb.AppendLine();
+            AddMarkdownTableHeaderRow(sb, columnWidth);
             foreach (var metric in metrics)
             {
                 sb.Append((metric.Name + MarkdownTableColumnEnd).PadLeft(columnWidth));
@@ -174,12 +165,87 @@ namespace NBench.Reporting.Targets
                 sb.Append((metric.PerSecondStats.Max.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.PerSecondStats.Average.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.PerSecondStats.Min.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
-                sb.Append((metric.PerSecondStats.StandardDeviation.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
+                sb.Append(
+                    (metric.PerSecondStats.StandardDeviation.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.AppendLine();
             }
 
             return sb.ToString();
         }
+
+        private static string BuildRunTable(IReadOnlyList<BenchmarkRunReport> runs, int columnWidth = MaxColumnSize)
+        {
+            var sb = new StringBuilder();
+
+            var groupByMetrics = new Dictionary<MetricName, List<MetricRunReport>>();
+            var runNumber = 0;
+
+            /*
+             * Organize runs by metric
+             */
+            foreach (var run in runs)
+            {
+                foreach (var metric in run.Metrics)
+                {
+                    if (!groupByMetrics.ContainsKey(metric.Key))
+                    {
+                        groupByMetrics[metric.Key] = new List<MetricRunReport>(runs.Count);
+                    }
+                    groupByMetrics[metric.Key].Add(metric.Value);
+                }
+                ++runNumber;
+            }
+
+            /*
+             * Print runs by metric
+             */
+            foreach (var metric in groupByMetrics)
+            {
+                sb.AppendLine($"#### {metric.Key}");
+                if (metric.Value.Count == 0)
+                {
+                    sb.AppendLine("_No values recorded._");
+                    continue;
+                }
+
+                var unitOfMeasure = metric.Value.First().Unit;
+
+                sb.Append(("Run #" + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                    .Append((unitOfMeasure + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                    .Append(($"{unitOfMeasure} / s" + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                    .Append(($"ns / {unitOfMeasure}" + MarkdownTableColumnEnd).PadLeft(columnWidth));
+                sb.AppendLine();
+                AddMarkdownTableHeaderRow(sb, columnWidth, 4);
+                var i = 1;
+                foreach (var record in metric.Value)
+                {
+                    sb.Append((i + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                        .Append(
+                            ($"{record.MetricValue:n}" + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                        .Append(
+                            ($"{record.MetricValuePerSecond:n}" + MarkdownTableColumnEnd).PadLeft(
+                                columnWidth))
+                        .Append(
+                            ($"{record.NanosPerMetricValue:n}" + MarkdownTableColumnEnd).PadLeft(
+                                columnWidth));
+                    sb.AppendLine();
+                    i++;
+                }
+                sb.AppendLine();
+            }
+
+            sb.AppendLine();
+
+            return sb.ToString();
+        }
+
+        private static void AddMarkdownTableHeaderRow(StringBuilder sb, int columnWidth = MaxColumnSize, int columns = 6)
+        {
+            for (var i = 0; i < columns; i++)
+            {
+                sb.Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'));
+            }
+            sb.AppendLine();
+        }
     }
 }
-
