@@ -1,4 +1,7 @@
-﻿namespace NBench.Tests.Performance
+﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
+// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+
+namespace NBench.Tests.Performance
 {
     public class ThroughputLoopPerformanceSpec_Int64
     {
@@ -76,3 +79,4 @@
         }
     }
 }
+
