@@ -37,6 +37,22 @@ namespace NBench.Sdk
             _setupAction(context);
         }
 
+        public void InvokePerfSetup(long runCount, BenchmarkContext context)
+        {
+            InvokePerfSetup(context);
+
+            var previousRunAction = _runAction;
+
+            _runAction = ctx =>
+            {
+                for (long i = runCount; i != 0;)
+                {
+                    previousRunAction(ctx);
+                    --i;
+                }
+            };
+        }
+
         public void InvokeRun(BenchmarkContext context)
         {
             _runAction(context);

@@ -55,7 +55,7 @@ namespace NBench.Tests.Sdk
                 var projectedThroughput = 1000/(double)IterationSpeedMs; // roughly the max value of this counter
                 var observedDifference =
                     Math.Abs(projectedThroughput - counterResults.MetricValuePerSecond);
-                Assert.True(observedDifference <= 1.5d, $"delta between expected value and actual measured value should be <= 1.5, was {observedDifference} [{counterResults.MetricValuePerSecond} op /s]");
+                Assert.True(observedDifference <= 1.5d, $"delta between expected value and actual measured value should be <= 1.5, was {observedDifference} [{counterResults.MetricValuePerSecond} op /s]. Expected [{projectedThroughput} op /s]");
             }, results =>
             {
                 var counterResults = results.Data.StatsByMetric[CounterName].Stats.Max;

@@ -18,6 +18,7 @@ namespace NBench.Sdk
         private readonly Action<BenchmarkContext> _cleanupAction;
         private readonly Action<BenchmarkContext> _runAction;
         private readonly Action<BenchmarkContext> _setupAction;
+        private Action<BenchmarkContext> _actualRunAction;
 
         public ActionBenchmarkInvoker(string benchmarkName, Action<BenchmarkContext> runAction)
             : this(benchmarkName, NoOp, runAction, NoOp)
@@ -31,7 +32,7 @@ namespace NBench.Sdk
         {
             BenchmarkName = benchmarkName;
             _setupAction = setupAction;
-            _runAction = runAction;
+            _actualRunAction = _runAction = runAction;
             _cleanupAction = cleanupAction;
         }
 
@@ -42,9 +43,22 @@ namespace NBench.Sdk
             _setupAction(context);
         }
 
+        public void InvokePerfSetup(long runCount, BenchmarkContext context)
+        {
+            _actualRunAction = benchmarkContext =>
+            {
+                for (var i = runCount; i != 0;)
+                {
+                    _runAction(context);
+                    --i;
+                }
+            };
+            InvokePerfSetup(context);
+        }
+
         public void InvokeRun(BenchmarkContext context)
         {
-            _runAction(context);
+           _actualRunAction(context);
         }
 
         public void InvokePerfCleanup(BenchmarkContext context)
