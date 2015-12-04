@@ -22,12 +22,18 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+# FAKE output
+.fake/
+
 # Visual Studo 2015 cache/options directory
 .vs/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+
+# NBench
+[Pp]erf[Rr]esult*/
 
 # NUNIT
 *.VisualState.xml
@@ -194,3 +200,6 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+# NuGet 
+nuget.exe
