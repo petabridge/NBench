@@ -170,8 +170,7 @@ module Nuget =
      // add NBench dependency for other projects
     let getDependencies project =
         match project with
-        | "NBench" -> []
-        | _ -> ["NBench", release.NugetVersion]
+        | _ -> []
 
      // used to add -pre suffix to pre-release packages
     let getProjectVersion project =
@@ -200,6 +199,21 @@ let createNugetPackages _ =
 
     let getDirName workingDir dirCount =
         workingDir + dirCount.ToString()
+
+    let getReleaseFiles project releaseDir =
+        match project with
+        | "NBench.Runner" -> 
+            !! (releaseDir @@ project + ".dll")
+            ++ (releaseDir @@ "NBench.dll")
+            ++ (releaseDir @@ project + ".exe")
+            ++ (releaseDir @@ project + ".pdb")
+            ++ (releaseDir @@ "NBench.pdb")
+            ++ (releaseDir @@ project + ".xml")
+        | _ ->
+            !! (releaseDir @@ project + ".dll")
+            ++ (releaseDir @@ project + ".exe")
+            ++ (releaseDir @@ project + ".pdb")
+            ++ (releaseDir @@ project + ".xml")
 
     CleanDir workingDir
 
@@ -239,10 +253,7 @@ let createNugetPackages _ =
         printfn "Creating output directory %s" libDir
         ensureDirectory libDir
         CleanDir libDir
-        !! (releaseDir @@ project + ".dll")
-        ++ (releaseDir @@ project + ".exe")
-        ++ (releaseDir @@ project + ".pdb")
-        ++ (releaseDir @@ project + ".xml")
+        getReleaseFiles project releaseDir
         |> CopyFiles libDir
 
         // Copy all src-files (.cs and .fs files) to workingDir/src
@@ -294,12 +305,18 @@ let publishNugetPackages _ =
                 !! (nugetDir @@ "*.nupkg") 
                 -- (nugetDir @@ "*.symbols.nupkg") |> Seq.sortBy(fun x -> x.ToLower())
             for package in normalPackages do
-                publishPackage (getBuildParamOrDefault "nugetpublishurl" "") (getBuildParam "nugetkey") 3 package
+                try
+                    publishPackage (getBuildParamOrDefault "nugetpublishurl" "") (getBuildParam "nugetkey") 3 package
+                with exn ->
+                    printfn "%s" exn.Message
 
         if shouldPushSymbolsPackages then
             let symbolPackages= !! (nugetDir @@ "*.symbols.nupkg") |> Seq.sortBy(fun x -> x.ToLower())
             for package in symbolPackages do
-                publishPackage (getBuildParam "symbolspublishurl") (getBuildParam "symbolskey") 3 package
+                try
+                    publishPackage (getBuildParam "symbolspublishurl") (getBuildParam "symbolskey") 3 package
+                with exn ->
+                    printfn "%s" exn.Message
 
 Target "Nuget" <| fun _ -> 
     createNugetPackages()
@@ -384,7 +401,6 @@ Target "All" DoNothing
 
 // tests dependencies
 "CleanTests" ==> "RunTests"
-"BuildRelease" ==> "RunTests"
 
 
 // perf dependencies

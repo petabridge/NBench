@@ -1,3 +1,6 @@
+#### 0.1.1 December 5 2015
+Bugfix for `NBench.Runner` NuGet package, which [didn't work properly out of the box due to a .dll dependency issue](https://github.com/petabridge/NBench/issues/41). This has been resolved!
+
 #### 0.1.0 December 3 2015
 First "production-ready" release of NBench.
 
