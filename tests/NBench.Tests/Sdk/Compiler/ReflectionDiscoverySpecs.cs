@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Linq;
 using System.Reflection;
 using NBench.Reporting;
@@ -12,6 +13,68 @@ namespace NBench.Tests.Sdk.Compiler
 {
     public class ReflectionDiscoverySpecs
     {
+        public interface IInterfaceBenchmark
+        {
+            [PerfSetup]
+            void Setup(BenchmarkContext context);
+
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
+            [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+            [MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
+            void Run1();
+
+            [PerfCleanup]
+            void Cleanup();
+        }
+
+        public class ConreteBenchmarkImpl : IInterfaceBenchmark {
+            public void Setup(BenchmarkContext context)
+            {
+                
+            }
+
+            public void Run1()
+            {
+                
+            }
+
+            public void Cleanup()
+            {
+                
+            }
+        }
+
+        public abstract class AbstractBenchmark
+        {
+            [PerfSetup]
+            public void Setup(BenchmarkContext context)
+            {
+
+            }
+
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000)]
+            [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+            [MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
+            public void Run1()
+            {
+                ConcreteBenchmarkMethod();
+            }
+
+            protected abstract void ConcreteBenchmarkMethod();
+
+            [PerfCleanup]
+            public void Cleanup()
+            {
+            }
+        }
+
+        public class InheritedBenchmark : AbstractBenchmark {
+            protected override void ConcreteBenchmarkMethod()
+            {
+                
+            }
+        }
+
         public class DefaultMemoryMeasurementBenchmark
         {
             [PerfSetup]
@@ -160,6 +223,23 @@ namespace NBench.Tests.Sdk.Compiler
             var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(BenchmarkWithoutMeasurementsTypeInfo);
             Assert.Equal(0, benchmarkMetaData.Count);
         }
+
+        [Theory]
+        [InlineData(typeof(AbstractBenchmark), 0, false, false)]
+        [InlineData(typeof(IInterfaceBenchmark), 0, false, false)]
+        [InlineData(typeof(InheritedBenchmark), 1, true, true)]
+        //[InlineData(typeof(ConreteBenchmarkImpl), 1, true, true)] // Unsupported case right now
+        public void ShouldCreateBenchmark(Type benchmarkType, int numberOfBenchmarks, bool hasSetup, bool hasCleanup)
+        {
+            var typeInfo = benchmarkType.GetTypeInfo();
+            var setupMethod = ReflectionDiscovery.GetSetupMethod(typeInfo);
+            var cleanupMethod = ReflectionDiscovery.GetCleanupMethod(typeInfo);
+            var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(typeInfo);
+            Assert.Equal(!hasSetup, setupMethod.Skip);
+            Assert.Equal(!hasCleanup, cleanupMethod.Skip);
+            Assert.Equal(numberOfBenchmarks, benchmarkMetaData.Count);
+        }
+
     }
 }
 
