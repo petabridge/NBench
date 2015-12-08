@@ -156,7 +156,7 @@ namespace NBench.Sdk.Compiler
             
             return targetAssembly.DefinedTypes.Where(
                 x =>
-                    x.DeclaredMethods.Any(MethodHasValidBenchmark)).ToList();
+                    x.GetMethods().Any(MethodHasValidBenchmark) && !x.IsAbstract && x.IsClass).ToList();
         }
 
         public static IReadOnlyList<BenchmarkClassMetadata> CreateBenchmarksForClass(Type classWithBenchmarks)
@@ -167,11 +167,15 @@ namespace NBench.Sdk.Compiler
         public static IReadOnlyList<BenchmarkClassMetadata> CreateBenchmarksForClass(TypeInfo classWithBenchmarks)
         {
             Contract.Requires(classWithBenchmarks != null);
+
+            if(IsTypeInvalidForBenchmarks(classWithBenchmarks))
+                return new List<BenchmarkClassMetadata>();
+
             var setupMethod = GetSetupMethod(classWithBenchmarks);
             var cleanupMethod = GetCleanupMethod(classWithBenchmarks);
 
             var allPerfMethods =
-                classWithBenchmarks.DeclaredMethods.Where(
+                classWithBenchmarks.GetMethods().Where(
                     MethodHasValidBenchmark).ToList();
 
             var benchmarks = new List<BenchmarkClassMetadata>(allPerfMethods.Count);
@@ -186,8 +190,18 @@ namespace NBench.Sdk.Compiler
 
         private static bool MethodHasValidBenchmark(MethodInfo x)
         {
-            var hasPerformanceBenchmarkAttribute = x.GetCustomAttributes(PerformanceBenchmarkAttributeType, true).Any();
-            var hasAtLeastOneMeasurementAttribute = x.GetCustomAttributes(MeasurementAttributeType, true).Any();
+            var hasPerformanceBenchmarkAttribute = x.IsDefined(PerformanceBenchmarkAttributeType, true);
+            var hasAtLeastOneMeasurementAttribute = x.IsDefined(MeasurementAttributeType, true);
+
+            // code below is for adding interface support
+            //var bla =
+            //   (from @interface in x.DeclaringType.GetInterfaces()
+            //    let map = x.DeclaringType.GetInterfaceMap(@interface)
+            //    let index = Array.IndexOf(map.TargetMethods, x)
+            //    where index >= 0
+            //    select map.InterfaceMethods[index]).FirstOrDefault();
+            //var hasPerformanceBenchmarkAttributeOnInterface = bla.IsDefined(PerformanceBenchmarkAttributeType), true);
+
 
             /*
              * If user defined a PerformanceBenchmark attribute but never added on any Measurement
@@ -204,9 +218,9 @@ namespace NBench.Sdk.Compiler
         public static BenchmarkMethodMetadata GetSetupMethod(TypeInfo classWithBenchmarks)
         {
             Contract.Requires(classWithBenchmarks != null);
-            var setupMethods = classWithBenchmarks.DeclaredMethods.Where(
-                y => y.GetCustomAttributes(typeof (PerfSetupAttribute), true).Any()).ToList();
-            if (!setupMethods.Any())
+            var setupMethods = classWithBenchmarks.GetMethods().Where(
+                y => y.IsDefined(typeof (PerfSetupAttribute), true)).ToList();
+            if (!setupMethods.Any() || IsTypeInvalidForBenchmarks(classWithBenchmarks))
                 return BenchmarkMethodMetadata.Empty;
 
             // Need to log and throw an error here for benchmarks that have multiple setups declared
@@ -219,9 +233,7 @@ namespace NBench.Sdk.Compiler
                 throw ex;
             }
 
-            var matchingMethod =
-                classWithBenchmarks.DeclaredMethods.Single(
-                    x => x.GetCustomAttributes(typeof (PerfSetupAttribute), true).Any());
+            var matchingMethod = setupMethods.Single();
 
             var takesContext = MethodTakesBenchmarkContext(matchingMethod);
             return new BenchmarkMethodMetadata(matchingMethod, takesContext, false);
@@ -230,9 +242,9 @@ namespace NBench.Sdk.Compiler
         public static BenchmarkMethodMetadata GetCleanupMethod(TypeInfo classWithBenchmarks)
         {
             Contract.Requires(classWithBenchmarks != null);
-            var cleanupMethods = classWithBenchmarks.DeclaredMethods.Where(
-               y => y.GetCustomAttributes(typeof(PerfCleanupAttribute), true).Any()).ToList();
-            if (!cleanupMethods.Any())
+            var cleanupMethods = classWithBenchmarks.GetMethods().Where(
+               y => y.IsDefined(typeof(PerfCleanupAttribute), true)).ToList();
+            if (!cleanupMethods.Any() || IsTypeInvalidForBenchmarks(classWithBenchmarks))
                 return BenchmarkMethodMetadata.Empty;
 
             // Need to log and throw an error here for benchmarks that have multiple setups declared
@@ -245,12 +257,16 @@ namespace NBench.Sdk.Compiler
                 throw ex;
             }
 
-            var matchingMethod =
-                classWithBenchmarks.DeclaredMethods.Single(
-                    x => x.GetCustomAttributes(typeof (PerfCleanupAttribute), true).Any());
+            var matchingMethod = cleanupMethods.Single();
 
             var takesContext = MethodTakesBenchmarkContext(matchingMethod);
             return new BenchmarkMethodMetadata(matchingMethod, takesContext, false);
+        }
+
+        public static bool IsTypeInvalidForBenchmarks(TypeInfo info)
+        {
+            Contract.Requires(info != null);
+            return info.IsAbstract || info.IsInterface;
         }
 
         public static bool MethodTakesBenchmarkContext(MethodInfo info)
