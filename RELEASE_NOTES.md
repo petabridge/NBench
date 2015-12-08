@@ -1,3 +1,6 @@
+#### 0.1.4 December 8 2015
+*Placeholder for next release*
+
 #### 0.1.3 December 8 2015
 Resolves the following two issues from 0.1.3:
 
