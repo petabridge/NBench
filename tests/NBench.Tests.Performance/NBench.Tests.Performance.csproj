@@ -35,6 +35,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BenchmarkMemoryAllocationSpec.cs" />
+    <Compile Include="MemoryAllocationSpec.cs" />
     <Compile Include="CombinedPerfSpecs.cs" />
     <Compile Include="CounterPerfSpec.cs" />
     <Compile Include="IterationModeMeasurementSpec.cs" />

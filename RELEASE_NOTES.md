@@ -1,3 +1,6 @@
+#### 0.1.2 December 8 2015
+Bugfix for NBench 0.1.1 where pre-warmup phase of the `Benchmark` could potentially leak memory.
+
 #### 0.1.1 December 5 2015
 Bugfix for `NBench.Runner` NuGet package, which [didn't work properly out of the box due to a .dll dependency issue](https://github.com/petabridge/NBench/issues/41). This has been resolved!
 
