@@ -50,10 +50,14 @@ namespace NBench.Tests.Sdk
         [InlineData(25)] // keep the values small since there's a real delay involved
         public void ShouldComputeMetricsCorrectly(int iterationCount)
         {
-            var assertionOutput = new ActionBenchmarkOutput(report =>
+            var assertionOutput = new ActionBenchmarkOutput((report, warmup) =>
             {
-                var counterResults = report.Metrics[CounterName];
-                Assert.Equal(1, counterResults.MetricValue);
+                if (!warmup)
+                {
+                    var counterResults = report.Metrics[CounterName];
+                    Assert.Equal(1, counterResults.MetricValue);
+                }
+               
             }, results =>
             {
                 var counterResults = results.Data.StatsByMetric[CounterName].Stats.Max;

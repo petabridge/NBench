@@ -49,8 +49,9 @@ namespace NBench.Tests.Sdk
         [InlineData(2, 300)] // keep the values small since there's a real delay involved
         public void ShouldComputeMetricsCorrectly(int iterationCount, int millisecondRuntime)
         {
-            var assertionOutput = new ActionBenchmarkOutput(report =>
+            var assertionOutput = new ActionBenchmarkOutput((report, warmup) =>
             {
+                if (warmup) return;
                 var counterResults = report.Metrics[CounterName];
                 var projectedThroughput = 1000/(double)IterationSpeedMs; // roughly the max value of this counter
                 var observedDifference =
