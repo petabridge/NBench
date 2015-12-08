@@ -115,6 +115,7 @@ namespace NBench.Sdk
             }
            
             PostRun();
+            Complete();
 
             // elapsed time
             var runTime = warmupStopWatch.ElapsedTicks;
