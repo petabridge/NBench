@@ -193,6 +193,16 @@ namespace NBench.Sdk.Compiler
             var hasPerformanceBenchmarkAttribute = x.IsDefined(PerformanceBenchmarkAttributeType, true);
             var hasAtLeastOneMeasurementAttribute = x.IsDefined(MeasurementAttributeType, true);
 
+            // code below is for adding interface support
+            //var bla =
+            //   (from @interface in x.DeclaringType.GetInterfaces()
+            //    let map = x.DeclaringType.GetInterfaceMap(@interface)
+            //    let index = Array.IndexOf(map.TargetMethods, x)
+            //    where index >= 0
+            //    select map.InterfaceMethods[index]).FirstOrDefault();
+            //var hasPerformanceBenchmarkAttributeOnInterface = bla.IsDefined(PerformanceBenchmarkAttributeType), true);
+
+
             /*
              * If user defined a PerformanceBenchmark attribute but never added on any Measurement
              * attributes, then we need to log a warning here.
