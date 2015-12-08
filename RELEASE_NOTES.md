@@ -1,3 +1,6 @@
+#### 0.1.3 December 9 2015
+*Placeholder for next release*
+
 #### 0.1.2 December 8 2015
 Bugfix for NBench 0.1.1 where pre-warmup phase of the `Benchmark` could potentially leak memory.
 
