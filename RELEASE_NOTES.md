@@ -1,5 +1,5 @@
 #### 0.1.5 December 11 2015
-*Placeholder for next release*
+Reverted changes to 0.1.4 due to memory profiling issues.
 
 #### 0.1.4 December 10 2015
 Resolves the following issue from 0.1.4:
