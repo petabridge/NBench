@@ -1,5 +1,9 @@
-#### 0.1.4 December 8 2015
+#### 0.1.5 December 11 2015
 *Placeholder for next release*
+
+#### 0.1.4 December 10 2015
+Resolves the following issue from 0.1.4:
+* [Need to ship NBench.Runner.exe.config as part of NuGet.exe](https://github.com/petabridge/NBench/issues/54)
 
 #### 0.1.3 December 8 2015
 Resolves the following two issues from 0.1.3:
