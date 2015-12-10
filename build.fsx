@@ -206,7 +206,6 @@ let createNugetPackages _ =
             !! (releaseDir @@ project + ".dll")
             ++ (releaseDir @@ "NBench.dll")
             ++ (releaseDir @@ project + ".exe")
-            ++ (releaseDir @@ project + ".exe.config")
             ++ (releaseDir @@ project + ".pdb")
             ++ (releaseDir @@ "NBench.pdb")
             ++ (releaseDir @@ project + ".xml")
