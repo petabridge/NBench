@@ -8,10 +8,10 @@ namespace NBench
     /// </summary>
     public static class ByteConstants
     {
-        public const long EightKb = 1 << 12;
-        public const long SixteenKb = 1 << 13;
-        public const long ThirtyTwoKb = 1 << 14;
-        public const long SixtyFourKb = 1 << 15;
+        public const long EightKb = 1 << 13;
+        public const long SixteenKb = 1 << 14;
+        public const long ThirtyTwoKb = 1 << 15;
+        public const long SixtyFourKb = 1 << 16;
     }
 }
 
