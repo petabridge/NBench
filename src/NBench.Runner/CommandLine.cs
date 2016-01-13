@@ -2,7 +2,9 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 
 namespace NBench.Runner
 {
@@ -29,6 +31,28 @@ namespace NBench.Runner
             }
             return dictionary;
         });
+
+        /// <summary>
+        /// Retrieve file names from the command line
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetFiles()
+        {
+            List<string> files = new List<string>();
+
+            foreach (var arg in Environment.GetCommandLineArgs())
+            {
+                // stop at options
+                if (arg.Contains("="))
+                    break;
+
+                var ext = Path.GetExtension(arg);
+                if (ext.Equals(".dll", StringComparison.OrdinalIgnoreCase) || ext.Equals(".exe", StringComparison.OrdinalIgnoreCase))
+                    files.Add(arg);
+            }
+
+            return files;
+        }
 
         public static string GetProperty(string key)
         {

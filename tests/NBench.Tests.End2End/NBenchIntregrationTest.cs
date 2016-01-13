@@ -35,6 +35,14 @@ namespace NBench.Tests.End2End
                 benchmarks[i].Finish();
             }
         }
+
+        [Fact]
+        public void LoadAssemblyCorrect()
+        {
+            var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Debug\NBench.Tests.Assembly.dll");
+
+            Assert.True(TestRunner.Run(package));
+        }
     }
 }
 
