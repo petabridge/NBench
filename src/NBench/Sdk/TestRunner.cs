@@ -88,7 +88,7 @@ namespace NBench.Sdk
         {
             SetProcessPriority();
 
-            var output = new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput(_package.OutputDirectory));
+            IBenchmarkOutput output = CreateOutput();
             var discovery = new ReflectionDiscovery(output);
             bool allTestsPassed = true;
 
@@ -120,6 +120,18 @@ namespace NBench.Sdk
         {
             // Live forever
             return null;
+        }
+
+        /// <summary>
+        /// Creates the benchmark output writer
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IBenchmarkOutput CreateOutput()
+        {
+            if (string.IsNullOrEmpty(_package.OutputDirectory))
+                return new ConsoleBenchmarkOutput();
+            else
+                return new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput(_package.OutputDirectory));
         }
     }
 }

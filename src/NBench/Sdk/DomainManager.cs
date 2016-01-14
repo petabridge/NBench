@@ -44,8 +44,8 @@ namespace NBench.Sdk
         {
             AppDomainSetup setup = new AppDomainSetup();
 
-            // For parallel tests, we need to use distinct application name
-            setup.ApplicationName = "Tests" + "_" + Environment.TickCount;
+            // We need to use distinct application name, when runnin tests in parallel
+            setup.ApplicationName = string.Format("Tests_{0}", Environment.TickCount);
      
             setup.ApplicationBase = package.GetBasePath();
             setup.ConfigurationFile = package.ConfigurationFile;
