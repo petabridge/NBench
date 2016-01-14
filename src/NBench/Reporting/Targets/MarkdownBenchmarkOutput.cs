@@ -118,6 +118,12 @@ namespace NBench.Reporting.Targets
             }
             var report = sb.ToString();
 
+			// ensure directory exists
+			var directoryPath = Path.GetDirectoryName(filePath);
+
+			if (!Directory.Exists(directoryPath))
+				Directory.CreateDirectory(directoryPath);
+
             File.WriteAllText(filePath, report, Encoding.UTF8);
         }
 

@@ -36,11 +36,11 @@ namespace NBench.Runner
         /// Retrieve file names from the command line
         /// </summary>
         /// <returns></returns>
-        public static List<string> GetFiles()
+        public static List<string> GetFiles(string[] args)
         {
             List<string> files = new List<string>();
 
-            foreach (var arg in Environment.GetCommandLineArgs())
+            foreach (var arg in args)
             {
                 // stop at options
                 if (arg.Contains("="))
@@ -58,6 +58,16 @@ namespace NBench.Runner
         {
             return Values.Value[key];
         }
+
+		/// <summary>
+		/// Determines whether a property was written in the command line
+		/// </summary>
+		/// <param name="key">Name of the property</param>
+		/// <returns></returns>
+		public static bool HasProperty(string key)
+		{
+			return Values.Value.ContainsKey(key);
+		}
 
         public static int GetInt32(string key)
         {

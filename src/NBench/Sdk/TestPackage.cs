@@ -30,10 +30,10 @@ namespace NBench.Sdk
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// Gets the file names of the assemblies containing tests
-        /// </summary>
-        public IEnumerable<string> Files
+		/// <summary>
+		/// Gets the file names of the assemblies containing tests
+		/// </summary>
+		public IEnumerable<string> Files
         {
             get { return _testfiles; }
         }
@@ -43,32 +43,30 @@ namespace NBench.Sdk
         /// </summary>
         /// <param name="filePath">The path to a test file.</param>
         public TestPackage(string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-                throw new ArgumentNullException("filePath");
+		{
+			if (string.IsNullOrEmpty(filePath))
+				throw new ArgumentNullException("filePath");
 
-            _testfiles.Add(Path.GetFullPath(filePath));
+			AddSingleFile(filePath);
+		}		
 
-            // use config file of the given assembly if available
-            var configFile = _testfiles[0] + ".config";
-
-            if (File.Exists(configFile))
-                ConfigurationFile = configFile;
-
-            Name = Path.GetFileNameWithoutExtension(filePath);
-        }
-
-        /// <summary>
-        /// Initializes a new package with multiple test files.
-        /// </summary>
-        /// <param name="files">A list of test files.</param>
-        public TestPackage(IEnumerable<string> files)
+		/// <summary>
+		/// Initializes a new package with multiple test files.
+		/// </summary>
+		/// <param name="files">A list of test files.</param>
+		public TestPackage(IEnumerable<string> files)
         {
             if (files == null || !files.Any())
                 throw new ArgumentException("Please provide at least one test file." ,"files");
 
-            foreach (var file in files)
-                _testfiles.Add(Path.GetFullPath(file));            
+			// if only one file is given use same common logic
+			if (files.Count() == 1)
+				AddSingleFile(files.ElementAt(0));
+			else
+			{
+				foreach (var file in files)
+					_testfiles.Add(Path.GetFullPath(file));
+			}
         }
 
         /// <summary>
@@ -102,5 +100,22 @@ namespace NBench.Sdk
         {
             return Path.GetDirectoryName(_testfiles[0]);
         }
-    }
+
+		/// <summary>
+		/// Adds a single file to the package
+		/// </summary>
+		/// <param name="filePath">The path to a test file.</param>
+		private void AddSingleFile(string filePath)
+		{
+			_testfiles.Add(Path.GetFullPath(filePath));
+
+			// use config file of the given assembly if available
+			var configFile = _testfiles[0] + ".config";
+
+			if (File.Exists(configFile))
+				ConfigurationFile = configFile;
+
+			Name = Path.GetFileNameWithoutExtension(filePath);
+		}
+	}	
 }

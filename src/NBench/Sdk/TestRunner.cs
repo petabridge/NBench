@@ -92,23 +92,30 @@ namespace NBench.Sdk
             var discovery = new ReflectionDiscovery(output);
             bool allTestsPassed = true;
 
-            foreach (var testFile in _package.Files)
-            {
-                var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
+			try
+			{
+				foreach (var testFile in _package.Files)
+				{
+					var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
 
-                var benchmarks = discovery.FindBenchmarks(assembly);
+					var benchmarks = discovery.FindBenchmarks(assembly);
 
-                foreach (var benchmark in benchmarks)
-                {
-                    output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
-                    benchmark.Run();
-                    benchmark.Finish();
+					foreach (var benchmark in benchmarks)
+					{
+						output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
+						benchmark.Run();
+						benchmark.Finish();
 
-                    // if one assert fails, all fail
-                    allTestsPassed = allTestsPassed && benchmark.AllAssertsPassed;
-                    output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
-                }
-            }
+						// if one assert fails, all fail
+						allTestsPassed = allTestsPassed && benchmark.AllAssertsPassed;
+						output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
+					}
+				}
+			} catch(Exception ex)
+			{
+				output.Error(ex, "Error while executing the tests.");
+				allTestsPassed = false;
+			}
 
             return allTestsPassed;
         }
