@@ -39,7 +39,11 @@ namespace NBench.Tests.End2End
         [Fact]
         public void LoadAssemblyCorrect()
         {
-            var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Debug\NBench.Tests.Assembly.dll");
+#if DEBUG
+	var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Debug\NBench.Tests.Assembly.dll");
+#else
+    var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Release\NBench.Tests.Assembly.dll"); 
+#endif
 
 			package.Validate();
 
