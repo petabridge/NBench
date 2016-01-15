@@ -41,7 +41,9 @@ namespace NBench.Tests.End2End
         {
             var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Debug\NBench.Tests.Assembly.dll");
 
-            Assert.True(TestRunner.Run(package));
+			package.Validate();
+
+			Assert.True(TestRunner.Run(package));
         }
     }
 }

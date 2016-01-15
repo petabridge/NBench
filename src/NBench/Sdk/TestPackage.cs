@@ -11,7 +11,7 @@ namespace NBench.Sdk
     /// A TestPackage contains one or more test files. It also holds settings how the tests should be loaded. 
     /// </summary>
     [Serializable]
-    public class TestPackage
+    public class TestPackage : MarshalByRefObject
     {
         private List<string> _testfiles = new List<string>();
         
@@ -100,6 +100,15 @@ namespace NBench.Sdk
         {
             return Path.GetDirectoryName(_testfiles[0]);
         }
+
+		/// <summary>
+		/// Control the lifetime policy for this instance
+		/// </summary>
+		public override object InitializeLifetimeService()
+		{
+			// Live forever
+			return null;
+		}
 
 		/// <summary>
 		/// Adds a single file to the package
