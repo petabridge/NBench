@@ -33,9 +33,9 @@ namespace NBench.Runner
 
 			package.Validate();
 
-            bool anyAssertFailures = TestRunner.Run(package);
+            bool allTestsPassed = TestRunner.Run(package);
        
-            return anyAssertFailures ? -1 : 0;
+            return allTestsPassed ? 0 : -1;
         }
     }
 }
