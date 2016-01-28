@@ -16,6 +16,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests", "tests\NBench.Tests\NBench.Tests.csproj", "{5716EAF7-ABA1-434F-9AFA-51693A73C627}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.End2End", "tests\NBench.Tests.End2End\NBench.Tests.End2End.csproj", "{B7F38539-67A1-42B8-A5E5-CB592B6E3233}"
+	ProjectSection(ProjectDependencies) = postProject
+		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C} = {96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Runner", "src\NBench.Runner\NBench.Runner.csproj", "{5C586501-4E91-4007-B23F-02E20014DA51}"
 EndProject
@@ -27,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{97444074
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.Performance", "tests\NBench.Tests.Performance\NBench.Tests.Performance.csproj", "{E3730D65-70AE-4055-A291-800044C48FDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.Assembly", "tests\NBench.Tests.Assembly\NBench.Tests.Assembly.csproj", "{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +63,10 @@ Global
 		{E3730D65-70AE-4055-A291-800044C48FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3730D65-70AE-4055-A291-800044C48FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3730D65-70AE-4055-A291-800044C48FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,5 +76,6 @@ Global
 		{5716EAF7-ABA1-434F-9AFA-51693A73C627} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
 		{B7F38539-67A1-42B8-A5E5-CB592B6E3233} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
 		{E3730D65-70AE-4055-A291-800044C48FDD} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
+		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C} = {1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}
 	EndGlobalSection
 EndGlobal
