@@ -137,12 +137,15 @@
     <Compile Include="Sdk\Compiler\ReflectionDiscovery.cs" />
     <Compile Include="Sdk\CounterBenchmarkSetting.cs" />
     <Compile Include="Sdk\CreateCounterBenchmarkSetting.cs" />
+    <Compile Include="Sdk\DomainManager.cs" />
     <Compile Include="Sdk\GcBenchmarkSetting.cs" />
     <Compile Include="Sdk\IBenchmarkInvoker.cs" />
     <Compile Include="Sdk\IBenchmarkSetting.cs" />
     <Compile Include="Sdk\ActionBenchmarkInvoker.cs" />
     <Compile Include="Sdk\MemoryBenchmarkSetting.cs" />
     <Compile Include="Sdk\ReflectionBenchmarkInvoker.cs" />
+    <Compile Include="Sdk\TestPackage.cs" />
+    <Compile Include="Sdk\TestRunner.cs" />
     <Compile Include="Sdk\WarmupData.cs" />
     <Compile Include="Sys\SysInfo.cs" />
     <Compile Include="Util\AtomicCounter.cs" />

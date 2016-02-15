@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Sdk;
 using static NBench.Sdk.Compiler.ReflectionDiscovery;
@@ -22,25 +24,27 @@ namespace NBench.Tests.Sdk.Compiler
         public static bool RunContextSet;
         public static bool CleanupContextSet;
 
+        #region Synchronous benchmark classes (no TPL)
+
         public class BenchmarkWithContext
         {
             [PerfSetup]
             public void Setup(BenchmarkContext context)
             {
-                SetupContextSet = context != null;
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = context != null;
             }
 
             [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run(BenchmarkContext context)
             {
-                RunContextSet = context != null;
+                ReflectionBenchmarkInvokerSpecs.RunContextSet = context != null;
             }
 
             [PerfCleanup]
             public void Cleanup(BenchmarkContext context)
             {
-                CleanupContextSet = context != null;
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = context != null;
             }
         }
 
@@ -49,20 +53,20 @@ namespace NBench.Tests.Sdk.Compiler
             [PerfSetup]
             public void Setup()
             {
-                SetupContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = true;
             }
 
             [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
-                RunContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.RunContextSet = true;
             }
 
             [PerfCleanup]
             public void Cleanup()
             {
-                CleanupContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = true;
             }
         }
 
@@ -73,13 +77,13 @@ namespace NBench.Tests.Sdk.Compiler
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
-                RunContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.RunContextSet = true;
             }
 
             [PerfCleanup]
             public void Cleanup()
             {
-                CleanupContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = true;
             }
         }
 
@@ -88,14 +92,14 @@ namespace NBench.Tests.Sdk.Compiler
             [PerfSetup]
             public void Setup()
             {
-                SetupContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = true;
             }
 
             [PerfBenchmark]
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
-                RunContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.RunContextSet = true;
             }
         }
 
@@ -105,16 +109,147 @@ namespace NBench.Tests.Sdk.Compiler
             [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
             public void Run()
             {
-                RunContextSet = true;
+                ReflectionBenchmarkInvokerSpecs.RunContextSet = true;
             }
         }
 
+        #endregion
+
+        #region Benchmarks with TPL Tasks
+
+        /// <summary>
+        /// Hogs the thread for a second before moving on
+        /// </summary>
+        private static readonly Action RealWorkMethod = () =>
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+        };
+
+        /// <summary>
+        /// Doesn't do anything
+        /// </summary>
+        private static readonly Action NoWorkMethod = () => { };
+
+        /// <summary>
+        /// Blocks on <see cref="Setup"/> and <see cref="Cleanup"/>
+        /// </summary>
+        public class BenchmarkWithContextAndRealAsyncWork
+        {
+            [PerfSetup]
+            public void Setup(BenchmarkContext context)
+            {
+                Task.Run(RealWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = context != null;
+            }
+
+            [PerfBenchmark]
+            [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+            public void Run(BenchmarkContext context)
+            {
+                RunContextSet = SetupContextSet && !CleanupContextSet;
+            }
+
+            [PerfCleanup]
+            public void Cleanup(BenchmarkContext context)
+            {
+                Task.Run(RealWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = context != null;
+            }
+        }
+
+        /// <summary>
+        /// Blocks on <see cref="Setup"/> and <see cref="Cleanup"/>
+        /// </summary>
+        public class BenchmarkWithContextAndNoAsyncWork
+        {
+            [PerfSetup]
+            public void Setup(BenchmarkContext context)
+            {
+                Task.Run(NoWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = context != null;
+            }
+
+            [PerfBenchmark]
+            [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+            public void Run(BenchmarkContext context)
+            {
+                RunContextSet = SetupContextSet && !CleanupContextSet;
+            }
+
+            [PerfCleanup]
+            public void Cleanup(BenchmarkContext context)
+            {
+                Task.Run(NoWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = context != null;
+            }
+        }
+
+        /// <summary>
+        /// Blocks on <see cref="Setup"/> and <see cref="Cleanup"/>
+        /// </summary>
+        public class BenchmarkWithoutContextAndRealAsyncWork
+        {
+            [PerfSetup]
+            public void Setup()
+            {
+                Task.Run(RealWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = true;
+            }
+
+            [PerfBenchmark]
+            [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+            public void Run()
+            {
+                RunContextSet = SetupContextSet && !CleanupContextSet;
+            }
+
+            [PerfCleanup]
+            public void Cleanup()
+            {
+                Task.Run(RealWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Blocks on <see cref="Setup"/> and <see cref="Cleanup"/>
+        /// </summary>
+        public class BenchmarkWithoutContextAndNoAsyncWork
+        {
+            [PerfSetup]
+            public void Setup()
+            {
+                Task.Run(NoWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.SetupContextSet = true;
+            }
+
+            [PerfBenchmark]
+            [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+            public void Run()
+            {
+                RunContextSet = SetupContextSet && !CleanupContextSet;
+            }
+
+            [PerfCleanup]
+            public void Cleanup()
+            {
+                Task.Run(NoWorkMethod).Wait();
+                ReflectionBenchmarkInvokerSpecs.CleanupContextSet = true;
+            }
+        }
+
+        #endregion
+
         [Theory]
-        [InlineData(typeof(BenchmarkWithContext), true, true, true)]
-        [InlineData(typeof(BenchmarkWithoutContext), true, true, true)]
-        [InlineData(typeof(BenchmarkWithoutSetup), false, true, true)]
-        [InlineData(typeof(BenchmarkWithoutCleanup), true, true, false)]
-        [InlineData(typeof(BenchmarkWithRunOnly), false, true, false)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithContext), true, true, true)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithoutContext), true, true, true)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithoutSetup), false, true, true)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithoutCleanup), true, true, false)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithRunOnly), false, true, false)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithContextAndRealAsyncWork), true, true, true)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithContextAndNoAsyncWork), true, true, true)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithoutContextAndRealAsyncWork), true, true, true)]
+        [InlineData(typeof(ReflectionBenchmarkInvokerSpecs.BenchmarkWithoutContextAndNoAsyncWork), true, true, true)]
         public void ShouldInvokeAllMethodsCorrectly(Type benchmarkType, bool setupHit, bool runHit, bool cleanupHit)
         {
             AssertAllContextFalse();

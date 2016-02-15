@@ -1,4 +1,8 @@
-#### 0.1.5 December 11 2015
+#### 0.1.6 February 15 2016
+Includes following features:
+* [Support for config files](https://github.com/petabridge/NBench/issues/70)
+
+#### 0.1.5 December 10 2015
 Reverted changes to 0.1.4 due to memory profiling issues.
 
 #### 0.1.4 December 10 2015
