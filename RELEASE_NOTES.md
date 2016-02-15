@@ -1,3 +1,6 @@
+#### 0.1.7 February 15 2016
+Placeholder for vnext
+
 #### 0.1.6 February 15 2016
 Includes following features:
 * [Support for config files](https://github.com/petabridge/NBench/issues/70)
