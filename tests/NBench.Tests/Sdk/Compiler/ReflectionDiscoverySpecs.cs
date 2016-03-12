@@ -137,6 +137,20 @@ namespace NBench.Tests.Sdk.Compiler
             }
         }
 
+        public class BenchmarkWithOnlySkippedMethods
+        {
+            /// <summary>
+            /// Should be skipped
+            /// </summary>
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000, Skip = "SKIP")]
+            [CounterMeasurement("MyCounter")]
+            [CounterThroughputAssertion("MyCounter", MustBe.GreaterThan, 100.0d)]
+            public void Run()
+            {
+
+            }
+        }
+
         public static readonly TypeInfo ComplexBenchmarkTypeInfo =
             typeof (DefaultMemoryMeasurementBenchmark).GetTypeInfo();
 
@@ -144,6 +158,9 @@ namespace NBench.Tests.Sdk.Compiler
 
         public static readonly TypeInfo BenchmarkWithoutMeasurementsTypeInfo =
             typeof (BenchmarkWithoutMeasurements).GetTypeInfo();
+
+        public static readonly TypeInfo SkippedBenchmarksTypeInfo =
+            typeof (BenchmarkWithOnlySkippedMethods).GetTypeInfo();
 
         [Fact]
         public void ShouldFindSetupMethod()
@@ -221,6 +238,13 @@ namespace NBench.Tests.Sdk.Compiler
         public void ShouldNotCreateBenchmarkForClassWithNoDeclaredMeasurements()
         {
             var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(BenchmarkWithoutMeasurementsTypeInfo);
+            Assert.Equal(0, benchmarkMetaData.Count);
+        }
+
+        [Fact]
+        public void ShouldNotCreateBenchmarkForClassWithOnlySkippedBenchmarkMethods()
+        {
+            var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(SkippedBenchmarksTypeInfo);
             Assert.Equal(0, benchmarkMetaData.Count);
         }
 

@@ -192,6 +192,10 @@ namespace NBench.Sdk.Compiler
         {
             var hasPerformanceBenchmarkAttribute = x.IsDefined(PerformanceBenchmarkAttributeType, true);
             var hasAtLeastOneMeasurementAttribute = x.IsDefined(MeasurementAttributeType, true);
+            var skipReason = (x.GetCustomAttribute(PerformanceBenchmarkAttributeType) as
+                                                        PerfBenchmarkAttribute)?.Skip;
+            var benchmarkIsSkipped = hasPerformanceBenchmarkAttribute &&
+                                    !string.IsNullOrEmpty(skipReason);
 
             // code below is for adding interface support
             //var bla =
@@ -211,8 +215,12 @@ namespace NBench.Sdk.Compiler
             {
                 _reflectionOutput.Warning($"{x.DeclaringType?.Name}+{x.Name} has a declared PerformanceBenchmarkAttribute but no declared measurements. Skipping...");
             }
+            else if (benchmarkIsSkipped)
+            {
+                _reflectionOutput.WriteLine($"Skipping {x.DeclaringType?.Name}+{x.Name}. Reason: {skipReason}.");
+            }
 
-            return hasPerformanceBenchmarkAttribute && hasAtLeastOneMeasurementAttribute;
+            return hasPerformanceBenchmarkAttribute && hasAtLeastOneMeasurementAttribute && !benchmarkIsSkipped;
         }
 
         public static BenchmarkMethodMetadata GetSetupMethod(TypeInfo classWithBenchmarks)
