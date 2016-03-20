@@ -141,21 +141,25 @@ Target "NBench" <| fun _ ->
     let nbenchTestAssemblies = !! testSearchPath
     printfn "Using NBench.Runner: %s" nbenchTestPath
 
-    let runNBench assembly =
+    let rec runNBench assembly trialsLeft =
         let spec = getBuildParam "spec"
 
         let args = new StringBuilder()
                 |> append assembly
                 |> append (sprintf "output-directory=\"%s\"" perfOutput)
                 |> toText
-
-        let result = ExecProcess(fun info -> 
-            info.FileName <- nbenchTestPath
-            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
-            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
+        try
+            let result = ExecProcess(fun info -> 
+                info.FileName <- nbenchTestPath
+                info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
+                info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+            if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
+        with exn -> 
+            if (trialsLeft > 0) then (runNBench assembly (trialsLeft-1))
+            else raise exn
     
-    nbenchTestAssemblies |> Seq.iter (runNBench)
+    for assembly in (nbenchTestAssemblies |> Seq.rev) do
+        runNBench assembly 2
 
 //--------------------------------------------------------------------------------
 // Clean NBench output

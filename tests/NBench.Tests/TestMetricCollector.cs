@@ -17,7 +17,7 @@ namespace NBench.Tests
         {
         }
 
-        public override long Collect()
+        public override double Collect()
         {
             return CollectorValue;
         }

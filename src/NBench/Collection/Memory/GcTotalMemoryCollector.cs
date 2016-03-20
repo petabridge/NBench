@@ -24,7 +24,7 @@ namespace NBench.Collection.Memory
         {
         }
 
-        public override long Collect()
+        public override double Collect()
         {
             /*
              * We intentionally don't allow the garbage collector to collect anything
