@@ -3,9 +3,11 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using NBench.Collection;
 using NBench.Collection.Memory;
 using NBench.Metrics;
+using NBench.Metrics.Counters;
 using NBench.Util;
 
 namespace NBench.Sdk
@@ -16,25 +18,6 @@ namespace NBench.Sdk
     /// </summary>
     public sealed class BenchmarkBuilder
     {
-        /// <summary>
-        ///     All built-in memory metric selectors
-        /// </summary>
-        public static readonly Dictionary<MemoryMetric, MetricsCollectorSelector> MemorySelectors = new Dictionary
-            <MemoryMetric, MetricsCollectorSelector>
-        {
-            {
-                MemoryMetric.TotalBytesAllocated, new TotalMemorySelector()
-            }
-        };
-
-        public static readonly Dictionary<GcMetric, MetricsCollectorSelector> GcSelectors = new Dictionary
-            <GcMetric, MetricsCollectorSelector>
-        {
-            {GcMetric.TotalCollections, new GcCollectionsSelector()}
-        };
-
-        public static readonly MetricsCollectorSelector CounterSelector = new CounterSelector();
-
         /// <summary>
         ///     Creates a new benchmark builder instance.
         /// </summary>
@@ -57,35 +40,29 @@ namespace NBench.Sdk
         {
             var numberOfMetrics = Settings.TotalTrackedMetrics;
             var measurements = new List<MeasureBucket>(numberOfMetrics);
-            var counters = new List<Counter>(Settings.CounterBenchmarks.Count);
+            var counterSettings = Settings.CounterMeasurements.ToList();
+            var counters = new List<Counter>(counterSettings.Count);
 
-            for (var i = 0; i < Settings.DistinctMemoryBenchmarks.Count; i++)
+            // need to exclude counters first 
+            var settingsExceptCounters = Settings.DistinctMeasurements.Except(counterSettings);
+            foreach (var setting in settingsExceptCounters)
             {
-                var setting = Settings.DistinctMemoryBenchmarks[i];
-                var collectors = MemorySelectors[setting.Metric].Create(Settings.RunMode, warmupData, setting);
-                foreach (var collector in collectors)
-                    measurements.Add(new MeasureBucket(collector));
+                var selector = Settings.Collectors[setting.MetricName];
+                var collector = selector.Create(Settings.RunMode, warmupData, setting);
+                measurements.Add(new MeasureBucket(collector));
             }
 
-            for (var i = 0; i < Settings.DistinctGcBenchmarks.Count; i++)
+            foreach (var counterSetting in counterSettings)
             {
-                var setting = Settings.DistinctGcBenchmarks[i];
-                var collectors = GcSelectors[setting.Metric].Create(Settings.RunMode, warmupData, setting);
-                foreach (var collector in collectors)
-                    measurements.Add(new MeasureBucket(collector));
-            }
-
-            for (var i = 0; i < Settings.DistinctCounterBenchmarks.Count; i++)
-            {
-                var setting = Settings.DistinctCounterBenchmarks[i];
+                var setting = counterSetting;
+                var selector = Settings.Collectors[setting.MetricName];
                 var atomicCounter = new AtomicCounter();
                 var createCounterBenchmark = new CreateCounterBenchmarkSetting(setting, atomicCounter);
-                var collectors = CounterSelector.Create(Settings.RunMode, warmupData, createCounterBenchmark);
-                foreach (var collector in collectors)
-                {
-                    measurements.Add(new MeasureBucket(collector));
-                    counters.Add(new Counter(atomicCounter, setting.CounterName));
-                }
+                var collector = selector.Create(Settings.RunMode, warmupData, createCounterBenchmark);
+
+                measurements.Add(new MeasureBucket(collector));
+                counters.Add(new Counter(atomicCounter, setting.CounterName));
+
             }
 
             return new BenchmarkRun(measurements, counters);

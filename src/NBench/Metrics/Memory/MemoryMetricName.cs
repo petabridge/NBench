@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
-namespace NBench.Metrics
+namespace NBench.Metrics.Memory
 {
     /// <summary>
     /// Name for memory metrics
@@ -32,6 +32,16 @@ namespace NBench.Metrics
         public override int GetHashCode()
         {
             return (int) Metric;
+        }
+
+        public override bool Equals(MetricName other)
+        {
+            return other is MemoryMetricName && Equals((MemoryMetricName)other);
+        }
+
+        public override string ToHumanFriendlyString()
+        {
+            return ToString();
         }
 
         public static bool operator ==(MemoryMetricName left, MemoryMetricName right)

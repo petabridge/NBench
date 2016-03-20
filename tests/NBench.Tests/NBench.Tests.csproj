@@ -100,7 +100,6 @@
   <ItemGroup>
     <Compile Include="Collection\Memory\GcCollectionsPerGenerationSpecs.cs" />
     <Compile Include="Collection\Memory\GcTotalMemoryCollectorSpecs.cs" />
-    <Compile Include="Collection\Memory\PerformanceCounterTotalMemoryCollectorSpecs.cs" />
     <Compile Include="Metrics\MeasureBucketSpecs.cs" />
     <Compile Include="Reporting\BenchmarkStatSpecs.cs" />
     <Compile Include="Sdk\BenchmarkExceptionSpecs.cs" />
@@ -109,13 +108,13 @@
     <Compile Include="Sdk\BenchmarkSlowIterationSpecs.cs" />
     <Compile Include="Sdk\BenchmarkThroughputSpecs.cs" />
     <Compile Include="Sdk\Compiler\ReflectionBenchmarkInvokerSpecs.cs" />
+    <Compile Include="Sdk\Compiler\ReflectionDiscoveryConfiguratorSpecs.cs" />
     <Compile Include="TestMetricCollector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sdk\AssertionSpecs.cs" />
     <Compile Include="Sdk\BenchmarkBuilderSpecs.cs" />
     <Compile Include="Sdk\BenchmarkRunSpecs.cs" />
     <Compile Include="Sdk\Compiler\ReflectionDiscoverySpecs.cs" />
-    <Compile Include="Util\EnumerableExtensionsSpecs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -128,6 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Util\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

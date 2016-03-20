@@ -3,6 +3,7 @@
 
 using System;
 using NBench.Metrics;
+using NBench.Metrics.Memory;
 
 namespace NBench.Collection.Memory
 {

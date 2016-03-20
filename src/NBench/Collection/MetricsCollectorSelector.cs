@@ -44,8 +44,8 @@ namespace NBench.Collection
         ///     <see cref="MetricCollector" /> used in some instances.
         /// </param>
         /// <param name="setting">An implementation-specific <see cref="IBenchmarkSetting" /></param>
-        /// <returns>At least one new <see cref="MetricCollector" /> instance. Each instance will be uniquely named.</returns>
-        public IEnumerable<MetricCollector> Create(RunMode runMode, IBenchmarkSetting setting)
+        /// <returns>A new <see cref="MetricCollector" /> instance. </returns>
+        public MetricCollector Create(RunMode runMode, IBenchmarkSetting setting)
         {
             return Create(runMode, WarmupData.PreWarmup, setting);
         }
@@ -59,8 +59,8 @@ namespace NBench.Collection
         /// </param>
         /// <param name="warmup">Warmup data. Influences the type of <see cref="MetricCollector" /> used in some instances.</param>
         /// <param name="setting">An implementation-specific <see cref="IBenchmarkSetting" /></param>
-        /// <returns>At least 1 new <see cref="MetricCollector"/> instance. Each instance will be uniquely named.</returns>
-        public abstract IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup,
+        /// <returns>A new <see cref="MetricCollector" /> instance.</returns>
+        public abstract MetricCollector Create(RunMode runMode, WarmupData warmup,
             IBenchmarkSetting setting);
     }
 }

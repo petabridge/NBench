@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NBench.Collection;
 using NBench.Metrics;
+using NBench.Metrics.Counters;
 using Xunit;
 
 namespace NBench.Tests.Sdk

@@ -2,10 +2,11 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using NBench.Collection;
-using NBench.Metrics;
+using NBench.Collection.Counters;
+using NBench.Sdk;
 using NBench.Util;
 
-namespace NBench.Sdk
+namespace NBench.Metrics.Counters
 {
     /// <summary>
     /// Special internal class needed to pass in a <see cref="AtomicCounter"/> to a <see cref="CounterSelector"/>.
@@ -24,6 +25,11 @@ namespace NBench.Sdk
         public MetricName MetricName => BenchmarkSetting.CounterName;
         public AssertionType AssertionType => BenchmarkSetting.AssertionType;
         public Assertion Assertion => BenchmarkSetting.Assertion;
+        public bool Equals(IBenchmarkSetting other)
+        {
+            return other is CreateCounterBenchmarkSetting &&
+                   ((CreateCounterBenchmarkSetting) other).BenchmarkSetting.Equals(BenchmarkSetting);
+        }
     }
 }
 

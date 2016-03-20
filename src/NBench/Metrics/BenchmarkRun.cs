@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using NBench.Metrics.Counters;
 using NBench.Reporting;
 
 namespace NBench.Metrics

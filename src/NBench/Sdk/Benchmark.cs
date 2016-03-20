@@ -92,7 +92,7 @@ namespace NBench.Sdk
                 return;
             }
 
-            /* Esimate */
+            /* Estimate */
             Allocate(); // allocate all collectors needed
             PreRun();
            
@@ -115,7 +115,7 @@ namespace NBench.Sdk
             }
            
             PostRun();
-            Complete();
+            Complete(true);
 
             // elapsed time
             var runTime = warmupStopWatch.ElapsedTicks;
@@ -259,12 +259,13 @@ namespace NBench.Sdk
         /// <summary>
         /// Complete the current run
         /// </summary>
-        private void Complete()
+        private void Complete(bool isEstimate = false)
         {
             _currentRun.Dispose();
 
             var report = _currentRun.ToReport(StopWatch.Elapsed);
-            Output.WriteRun(report, _isWarmup);
+            if(!isEstimate)
+                Output.WriteRun(report, _isWarmup);
 
             // Change runs, but not on warmup
             if (!_isWarmup)

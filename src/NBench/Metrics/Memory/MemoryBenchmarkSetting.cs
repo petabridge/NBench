@@ -2,9 +2,9 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using NBench.Metrics;
+using NBench.Sdk;
 
-namespace NBench.Sdk
+namespace NBench.Metrics.Memory
 {
     /// <summary>
     /// Used inside a <see cref="BenchmarkSettings"/> class to indiciate that a specific <see cref="MemoryMetric"/>
@@ -29,6 +29,12 @@ namespace NBench.Sdk
         private bool Equals(MemoryBenchmarkSetting other)
         {
             return Metric == other.Metric && Assertion.Equals(other.Assertion);
+        }
+
+        public bool Equals(IBenchmarkSetting other)
+        {
+            return other is MemoryBenchmarkSetting &&
+                   Equals((MemoryBenchmarkSetting) other);
         }
 
         public override bool Equals(object obj)

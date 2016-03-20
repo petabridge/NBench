@@ -2,9 +2,9 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using NBench.Metrics;
+using NBench.Sdk;
 
-namespace NBench.Sdk
+namespace NBench.Metrics.GarbageCollection
 {
     /// <summary>
     /// Used inside a <see cref="BenchmarkSettings"/> class to indiciate that a specific <see cref="GcMetric"/>
@@ -36,6 +36,12 @@ namespace NBench.Sdk
                    && Generation == other.Generation 
                    && AssertionType == other.AssertionType 
                    && Assertion.Equals(other.Assertion);
+        }
+
+        public bool Equals(IBenchmarkSetting other)
+        {
+            return other is GcBenchmarkSetting &&
+                   Equals((GcBenchmarkSetting) other);
         }
 
         public override bool Equals(object obj)

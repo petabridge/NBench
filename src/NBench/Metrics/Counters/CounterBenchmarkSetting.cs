@@ -3,9 +3,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using NBench.Metrics;
+using NBench.Sdk;
 
-namespace NBench.Sdk
+namespace NBench.Metrics.Counters
 {
     /// <summary>
     /// Used inside a <see cref="BenchmarkSettings"/> class to indiciate that a specific <see cref="Counter"/>
@@ -34,6 +34,12 @@ namespace NBench.Sdk
             return string.Equals(CounterName, other.CounterName) 
                    && AssertionType == other.AssertionType 
                    && Assertion.Equals(other.Assertion);
+        }
+
+        public bool Equals(IBenchmarkSetting other)
+        {
+            return other is CounterBenchmarkSetting &&
+                   Equals((CounterBenchmarkSetting) other);
         }
 
         public override bool Equals(object obj)
