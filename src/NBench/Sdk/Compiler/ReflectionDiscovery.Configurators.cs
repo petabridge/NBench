@@ -15,10 +15,6 @@ namespace NBench.Sdk.Compiler
         /// Cache of <see cref="MeasurementAttribute"/> types and their "best fitting" <see cref="IMeasurementConfigurator"/> type
         /// </summary>
         private readonly ConcurrentDictionary<Type, Type> _measurementConfiguratorTypes = new ConcurrentDictionary<Type, Type>();
-        private static readonly Lazy<IReadOnlyList<Type>> AllConfigurators = new Lazy<IReadOnlyList<Type>>(() => LoadAllTypeConfigurators().ToList(), true);
-
-        // force the lazy loading of all configurators; should only happen the first time a ReflectionDiscovery class is instantiated
-        private readonly IReadOnlyList<Type> _configurators = AllConfigurators.Value;
 
         /// <summary>
         /// Finds a matching <see cref="IMeasurementConfigurator{T}"/> type for a given type of <see cref="MeasurementAttribute"/>
@@ -39,7 +35,7 @@ namespace NBench.Sdk.Compiler
 
             // search for a match
             var match = FindBestMatchingConfiguratorForMeasurement(measurementType, 
-                specificAssembly == null ? _configurators : _configurators.Where(x=> x.Assembly.Equals(specificAssembly)));
+                specificAssembly == null ? LoadAllTypeConfigurators() : LoadAllTypeConfigurators().Where(x=> x.Assembly.Equals(specificAssembly)));
 
             // cache the result
             _measurementConfiguratorTypes[measurementType] = match;
