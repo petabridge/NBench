@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using NBench.Metrics.GarbageCollection;
+using NBench.Metrics.Memory;
 using NBench.Reporting;
 using NBench.Sdk;
 using NBench.Sdk.Compiler;
@@ -223,15 +225,16 @@ namespace NBench.Tests.Sdk.Compiler
         [Fact]
         public void ShouldProduceBenchmarkSettings_Complex()
         {
+            var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
             var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(ComplexBenchmarkTypeInfo);
-            var benchmarkSettings = ReflectionDiscovery.CreateSettingsForBenchmark(benchmarkMetaData.First());
+            var benchmarkSettings = discovery.CreateSettingsForBenchmark(benchmarkMetaData.First());
 
             Assert.Equal(TestMode.Test, benchmarkSettings.TestMode);
             Assert.Equal(PerfBenchmarkAttribute.DefaultRunType, benchmarkSettings.RunMode);
-            Assert.Equal(0, benchmarkSettings.GcBenchmarks.Count);
-            Assert.Equal(2, benchmarkSettings.MemoryBenchmarks.Count);
-            Assert.Equal(1, benchmarkSettings.DistinctMemoryBenchmarks.Count);
-            Assert.Equal(0, benchmarkSettings.CounterBenchmarks.Count);
+            Assert.Equal(0, benchmarkSettings.Measurements.Count(x => x is GcBenchmarkSetting));
+            Assert.Equal(2, benchmarkSettings.Measurements.Count(x => x is MemoryBenchmarkSetting));
+            Assert.Equal(1, benchmarkSettings.DistinctMeasurements.Count(x => x is MemoryBenchmarkSetting));
+            Assert.Equal(0, benchmarkSettings.CounterMeasurements.Count());
         }
 
         [Fact]

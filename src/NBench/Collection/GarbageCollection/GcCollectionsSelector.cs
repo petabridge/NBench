@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using NBench.Metrics;
+using NBench.Metrics.GarbageCollection;
 using NBench.Sdk;
 using NBench.Sys;
 
@@ -33,7 +35,7 @@ namespace NBench.Collection.Memory
             return new GcCollectionsPerGenerationCollector(new GcMetricName(GcMetricName.Metric, (GcGeneration)gcGeneration), gcGeneration);
         }
 
-        public override IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup,
+        public override MetricCollector Create(RunMode runMode, WarmupData warmup,
             IBenchmarkSetting setting)
         {
             Contract.Assert(setting != null);
@@ -44,15 +46,10 @@ namespace NBench.Collection.Memory
             // covered by Code Contracts
             if (gcSetting.Generation == GcGeneration.AllGc)
             {
-                var collectors = new List<MetricCollector>(SystemInfo.MaxGcGeneration + 1);
-                for (var i = 0; i <= SystemInfo.MaxGcGeneration; i++)
-                {
-                    collectors.Add(CreateInstanceInternal(i));
-                }
-                return collectors;
+                throw new InvalidOperationException($"{gcSetting.Generation} is not supported by this collector");
             }
 
-            return new[] {CreateInstanceInternal((int) gcSetting.Generation)};
+            return CreateInstanceInternal((int) gcSetting.Generation);
         }
     }
 }

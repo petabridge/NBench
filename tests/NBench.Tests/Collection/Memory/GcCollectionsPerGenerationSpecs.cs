@@ -3,6 +3,8 @@
 
 using System.Linq;
 using NBench.Collection.Memory;
+using NBench.Metrics;
+using NBench.Metrics.GarbageCollection;
 using NBench.Sdk;
 using NBench.Sys;
 using Xunit;
@@ -17,13 +19,12 @@ namespace NBench.Tests.Collection.Memory
         [Fact]
         public void GcCollectionsSelector_should_create_1_GcCollectionsPerGenerationCollector_per_Generation()
         {
-            var gcCollectionsSelector = new GcCollectionsSelector();
+            var gcCollectionsSelector = new GcMeasurementConfigurator();
             var gcGenerations = SysInfo.Instance.MaxGcGeneration;
-            var gcSetting = new GcBenchmarkSetting(GcMetric.TotalCollections, GcGeneration.AllGc, AssertionType.Total,
-                Assertion.Empty);
-            var gcCollectors = gcCollectionsSelector.Create(RunMode.Throughput, gcSetting).Cast<GcCollectionsPerGenerationCollector>().ToList();
+            var gcSetting = new GcMeasurementAttribute(GcMetric.TotalCollections, GcGeneration.AllGc);
+            var gcCollectors = gcCollectionsSelector.GetBenchmarkSettings(gcSetting).Cast<GcBenchmarkSetting>().ToList();
             Assert.Equal(gcGenerations + 1,gcCollectors.Count);
-            Assert.Equal(gcGenerations, gcCollectors.Max(x => x.Generation));
+            Assert.Equal(gcGenerations, (int)gcCollectors.Max(x => x.Generation));
         }
     }
 }

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using NBench.Collection;
+using NBench.Metrics;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 
@@ -14,11 +16,12 @@ namespace NBench.Sdk.Compiler
     /// <summary>
     ///     <see cref="IDiscovery" /> implementation built using reflection
     /// </summary>
-    public class ReflectionDiscovery : IDiscovery
+    public partial class ReflectionDiscovery : IDiscovery
     {
         public static readonly Type PerformanceBenchmarkAttributeType = typeof (PerfBenchmarkAttribute);
         public static readonly Type MeasurementAttributeType = typeof (MeasurementAttribute);
         public static readonly Type BenchmarkContextType = typeof (BenchmarkContext);
+       
 
         public ReflectionDiscovery(IBenchmarkOutput output)
         {
@@ -26,8 +29,10 @@ namespace NBench.Sdk.Compiler
         }
 
         /// <summary>
+        /// WARNING: SHARED MUTABLE STATE BETWEEN REFLECTIONDISCOVERY INSTANCES
+        /// 
         /// Bit of a hack - used internally by <see cref="ReflectionDiscovery"/> for
-        /// logging compilation warnings.
+        /// logging compilation warnings, which are static methods.
         /// 
         /// Writes to the console by default, but can be overridden through the constructor.
         /// </summary>
@@ -61,7 +66,7 @@ namespace NBench.Sdk.Compiler
             return benchmarks;
         }
 
-        public static BenchmarkSettings CreateSettingsForBenchmark(BenchmarkClassMetadata benchmarkClass)
+        public BenchmarkSettings CreateSettingsForBenchmark(BenchmarkClassMetadata benchmarkClass)
         {
             var allBenchmarkMethodAttributes = benchmarkClass.Run.InvocationMethod.GetCustomAttributes().ToList();
 
@@ -70,75 +75,40 @@ namespace NBench.Sdk.Compiler
                     PerfBenchmarkAttribute;
             Contract.Assert(performanceTestAttribute != null);
 
-            var memorySettings =
-                allBenchmarkMethodAttributes.Where(a => a is MemoryMeasurementAttribute)
-                    .Cast<MemoryMeasurementAttribute>()
-                    .Select(CreateBenchmarkSetting)
-                    .ToList();
-            var counterBenchmarkSettings =
-                allBenchmarkMethodAttributes.Where(a => a is CounterMeasurementAttribute)
-                    .Cast<CounterMeasurementAttribute>()
-                    .Select(CreateBenchmarkSetting)
-                    .ToList();
-            var gcBenchmarkSettings =
-                allBenchmarkMethodAttributes.Where(a => a is GcMeasurementAttribute)
-                    .Cast<GcMeasurementAttribute>()
-                    .Select(CreateBenchmarkSetting)
-                    .ToList();
+            var allMeasurementAttributes =
+                allBenchmarkMethodAttributes.Where(a => MeasurementAttributeType.IsInstanceOfType(a)).Cast<MeasurementAttribute>();
+
+            var measurements = new List<IBenchmarkSetting>();
+            var collectors = new Dictionary<MetricName, MetricsCollectorSelector>();
+
+            foreach (var measurement in allMeasurementAttributes)
+            {
+                var configurator = GetConfiguratorForMeasurement(measurement.GetType());
+                if (configurator is MeasurementConfigurator.EmptyConfigurator)
+                {
+                    Output.Warning($"Unable to find valid configurator for {measurement} - skipping...");
+                    continue;
+                }
+
+                var benchmarkSettings = configurator.GetBenchmarkSettings(measurement);
+                var selector = configurator.GetMetricsProvider(measurement);
+                foreach (var setting in benchmarkSettings)
+                {
+                    var name = setting.MetricName;
+                    measurements.Add(setting);
+                    collectors[name] = selector;
+                }
+            }
 
             return new BenchmarkSettings(performanceTestAttribute.TestMode, performanceTestAttribute.RunMode,
                 performanceTestAttribute.NumberOfIterations, performanceTestAttribute.RunTimeMilliseconds,
-                gcBenchmarkSettings, memorySettings, counterBenchmarkSettings, performanceTestAttribute.Description,
+                measurements, collectors, performanceTestAttribute.Description,
                 performanceTestAttribute.Skip);
         }
 
         public static IBenchmarkInvoker CreateInvokerForBenchmark(BenchmarkClassMetadata benchmarkClass)
         {
             return new ReflectionBenchmarkInvoker(benchmarkClass);
-        }
-
-        public static MemoryBenchmarkSetting CreateBenchmarkSetting(
-            MemoryMeasurementAttribute memoryMeasurement)
-        {
-            var assertion = memoryMeasurement as MemoryAssertionAttribute;
-            if (assertion != null)
-            {
-                return new MemoryBenchmarkSetting(memoryMeasurement.Metric,
-                    new Assertion(assertion.Condition, assertion.AverageBytes, assertion.MaxAverageBytes));
-            }
-            return new MemoryBenchmarkSetting(memoryMeasurement.Metric, Assertion.Empty);
-        }
-
-        public static GcBenchmarkSetting CreateBenchmarkSetting(GcMeasurementAttribute gcMeasurement)
-        {
-            var throughputAssertion = gcMeasurement as GcThroughputAssertionAttribute;
-            var totalAssertion = gcMeasurement as GcTotalAssertionAttribute;
-            if (throughputAssertion != null)
-            {
-                return new GcBenchmarkSetting(gcMeasurement.Metric, gcMeasurement.Generation, AssertionType.Throughput, new Assertion(throughputAssertion.Condition, throughputAssertion.AverageOperationsPerSecond, throughputAssertion.MaxAverageOperationsPerSecond));
-            }
-            if (totalAssertion != null)
-            {
-                return new GcBenchmarkSetting(gcMeasurement.Metric, gcMeasurement.Generation, AssertionType.Total, new Assertion(totalAssertion.Condition, totalAssertion.AverageOperationsTotal, totalAssertion.MaxAverageOperationsTotal));
-            }
-            
-            return new GcBenchmarkSetting(gcMeasurement.Metric, gcMeasurement.Generation, AssertionType.Total, Assertion.Empty);
-        }
-
-        public static CounterBenchmarkSetting CreateBenchmarkSetting(CounterMeasurementAttribute counterMeasurement)
-        {
-            var throughputAssertion = counterMeasurement as CounterThroughputAssertionAttribute;
-            var totalAssertion = counterMeasurement as CounterTotalAssertionAttribute;
-            if (throughputAssertion != null)
-            {
-                return new CounterBenchmarkSetting(counterMeasurement.CounterName, AssertionType.Throughput, new Assertion(throughputAssertion.Condition, throughputAssertion.AverageOperationsPerSecond, throughputAssertion.MaxAverageOperationsPerSecond));
-            }
-            if (totalAssertion != null)
-            {
-                return new CounterBenchmarkSetting(counterMeasurement.CounterName, AssertionType.Total, new Assertion(totalAssertion.Condition, totalAssertion.AverageOperationsTotal, totalAssertion.MaxAverageOperationsTotal));
-            }
-
-            return new CounterBenchmarkSetting(counterMeasurement.CounterName, AssertionType.Total, Assertion.Empty);
         }
 
         /// <summary>
@@ -195,7 +165,7 @@ namespace NBench.Sdk.Compiler
             var skipReason = (x.GetCustomAttribute(PerformanceBenchmarkAttributeType) as
                                                         PerfBenchmarkAttribute)?.Skip;
             var benchmarkIsSkipped = hasPerformanceBenchmarkAttribute &&
-                                    !string.IsNullOrEmpty(skipReason);
+                                    !String.IsNullOrEmpty(skipReason);
 
             // code below is for adding interface support
             //var bla =

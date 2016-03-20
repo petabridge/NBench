@@ -13,7 +13,6 @@ namespace NBench.Sdk
     /// </summary>
     public static class AssertionRunner
     {
-        //TODO: need to respect TestMode https://github.com/petabridge/NBench/issues/6
         public static IReadOnlyList<AssertionResult> RunAssertions(BenchmarkSettings settings, BenchmarkResults results)
         {
             Contract.Requires(settings != null);
@@ -26,10 +25,7 @@ namespace NBench.Sdk
             }
 
             // collect all benchmark settings with non-empty assertions
-            IList<IBenchmarkSetting> allSettings =
-                settings.CounterBenchmarks.Concat<IBenchmarkSetting>(settings.GcBenchmarks)
-                    .Concat(settings.MemoryBenchmarks).Where(x => !x.Assertion.Equals(Assertion.Empty))
-                    .ToList();
+            IReadOnlyList<IBenchmarkSetting> allSettings = settings.Measurements.Where(x => !x.Assertion.Equals(Assertion.Empty)).ToList();
 
             foreach (var setting in allSettings)
             {

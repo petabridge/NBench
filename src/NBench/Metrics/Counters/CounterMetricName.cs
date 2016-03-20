@@ -3,7 +3,7 @@
 
 using System.Diagnostics.Contracts;
 
-namespace NBench.Metrics
+namespace NBench.Metrics.Counters
 {
     public class CounterMetricName : MetricName
     {
@@ -32,6 +32,16 @@ namespace NBench.Metrics
         public override int GetHashCode()
         {
             return CounterName.GetHashCode();
+        }
+
+        public override bool Equals(MetricName other)
+        {
+            return other is CounterMetricName && Equals((CounterMetricName)other);
+        }
+
+        public override string ToHumanFriendlyString()
+        {
+            return ToString();
         }
 
         public static bool operator ==(CounterMetricName left, CounterMetricName right)

@@ -2,6 +2,9 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using NBench.Metrics;
+using NBench.Metrics.Counters;
+using NBench.Metrics.GarbageCollection;
+using NBench.Metrics.Memory;
 
 namespace NBench.Collection
 {
@@ -39,6 +42,11 @@ namespace NBench.Collection
         /// Name of the unit measured by counters
         /// </summary>
         public const string CounterUnits = "operations";
+
+        /// <summary>
+        /// The default unit name when none are specified
+        /// </summary>
+        public const string DefaultUnitName = "operations";
     }
 }
 
