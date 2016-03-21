@@ -38,22 +38,24 @@ namespace NBench.PerformanceCounters.Collection
             var counterBenchmarkSetting = setting as PerformanceCounterBenchmarkSetting;
             var name = counterBenchmarkSetting.PerformanceCounterMetric;
 
-            /*
-             * TODO
-             * We need to collect the correct metric from the PerformanceCounter, and that depends on the
-             * PerformanceCounterType enumeration provided back from the PerformanceCounter object we instantiate.
-             *
-             * So we'll switch the implementation out based on the type of counter, with the default value being a raw value collector.
-             */
+            var counterExists = PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName);
+
+            var retries = 5;
             var proxy = new PerformanceCounterProxy(MaximumCounterRestarts, () => new PerformanceCounter(name.CategoryName, name.CounterName,
                 name.InstanceName ?? string.Empty, true));
-            Thread.Sleep(40); // wait a bit before we attempt to use the counter right away
-            if (!proxy.CanWarmup)
+            while (
+                ((!string.IsNullOrEmpty(name.InstanceName) 
+                && !PerformanceCounterCategory.InstanceExists(name.InstanceName, name.CategoryName)) || PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName))
+                && --retries > 0)
             {
-                // should log an issue here...
+                Thread.Sleep(1000);
+                if (proxy.CanWarmup)
+                    break;
             }
-            return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, proxy, true);
 
+            if(!proxy.CanWarmup)
+                throw new NBenchException($"Performance counter {name.ToHumanFriendlyString()} is not registered on this machine. Please create it first.");
+            return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, proxy, true);
         }
     }
 }

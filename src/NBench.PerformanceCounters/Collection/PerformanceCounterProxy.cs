@@ -59,7 +59,7 @@ namespace NBench.PerformanceCounters.Collection
             var counter = GetOrCreate();
             try
             {
-                return counter.RawValue;
+                return Convert.ToInt64(counter.NextValue());
             }
             catch (Exception)
             {
