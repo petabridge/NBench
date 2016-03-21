@@ -39,18 +39,12 @@ namespace NBench.PerformanceCounters.Collection
             {
                 try
                 {
-                    var counter = GetOrCreate();
-
                     // will invoke an exception if the counter was created too quickly
-                    var counterType = counter.CounterType;
-                    var nextValue = counter.NextValue();
+                    Collect();
                     return true;
                 }
                 catch (Exception ex)
                 { 
-                    // recreate counter
-                    CurrentRestarts++;
-                    DisposeCounter();
                     return false;
                 }
             }
@@ -63,7 +57,21 @@ namespace NBench.PerformanceCounters.Collection
         public long Collect()
         {
             var counter = GetOrCreate();
-            return counter.RawValue;
+            try
+            {
+                return counter.RawValue;
+            }
+            catch (Exception)
+            {
+                // recreate counter
+                CurrentRestarts++;
+                if (CurrentRestarts >= MaximumRestarts)
+                {
+                    throw;
+                }
+                DisposeCounter();
+                return 0;
+            }
         }
 
         private PerformanceCounter GetOrCreate()

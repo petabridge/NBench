@@ -47,10 +47,10 @@ namespace NBench.PerformanceCounters.Collection
              */
             var proxy = new PerformanceCounterProxy(MaximumCounterRestarts, () => new PerformanceCounter(name.CategoryName, name.CounterName,
                 name.InstanceName ?? string.Empty, true));
-            Thread.SpinWait(10); // wait a bit before we attempt to use the counter right away
+            Thread.Sleep(40); // wait a bit before we attempt to use the counter right away
             if (!proxy.CanWarmup)
             {
-                throw new NBenchException($"Failed to create PerformanceCounterMeasurement {name.ToHumanFriendlyString()} - internal error while creating performance counter.");
+                // should log an issue here...
             }
             return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, proxy, true);
 

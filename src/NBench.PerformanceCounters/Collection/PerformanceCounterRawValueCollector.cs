@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Diagnostics;
 using NBench.Collection;
 using NBench.Metrics;
@@ -28,7 +29,14 @@ namespace NBench.PerformanceCounters.Collection
 
         public override long Collect()
         {
-            return Counter.Collect();
+            try
+            {
+                return Counter.Collect();
+            }
+            catch (Exception ex)
+            {
+                throw new NBenchException($"Failed to get value for PerformanceCounter {Name.ToHumanFriendlyString()} due to underlying error.", ex);
+            }
         }
 
         protected override void DisposeInternal()
