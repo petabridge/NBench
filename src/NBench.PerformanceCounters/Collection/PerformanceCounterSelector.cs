@@ -37,7 +37,16 @@ namespace NBench.PerformanceCounters.Collection
                 var performanceCounter = new PerformanceCounter(name.CategoryName, name.CounterName,
                     name.InstanceName ?? string.Empty, true);
 
-                return new PerformanceCounterMetricCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, performanceCounter, true);
+                /*
+                 * TODO
+                 * We need to collect the correct metric from the PerformanceCounter, and that depends on the
+                 * PerformanceCounterType enumeration provided back from the PerformanceCounter object we instantiate.
+                 *
+                 * So we'll switch the implementation out based on the type of counter, with the default value being a raw value collector.
+                 */
+
+                return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, performanceCounter, true);
+                
             }
             catch (Exception ex)
             {

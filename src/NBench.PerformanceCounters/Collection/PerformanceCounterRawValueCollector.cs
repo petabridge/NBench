@@ -10,15 +10,17 @@ namespace NBench.PerformanceCounters.Collection
     /// <summary>
     ///     A <see cref="MetricCollector" /> implementation that uses a <see cref="PerformanceCounter" />
     ///     internally to record various system metrics.
+    /// 
+    /// Captures the RAW VALUE from performance counters.
     /// </summary>
-    public class PerformanceCounterMetricCollector : MetricCollector
+    public class PerformanceCounterRawValueCollector : MetricCollector
     {
-        private PerformanceCounter _counter;
+        protected PerformanceCounter Counter;
 
-        public PerformanceCounterMetricCollector(MetricName name, string unitName, PerformanceCounter counter,
+        public PerformanceCounterRawValueCollector(MetricName name, string unitName, PerformanceCounter counter,
             bool disposesCounter) : base(name, unitName)
         {
-            _counter = counter;
+            Counter = counter;
             DisposesCounter = disposesCounter;
         }
 
@@ -26,16 +28,16 @@ namespace NBench.PerformanceCounters.Collection
 
         public override long Collect()
         {
-            return _counter.RawValue;
+            return Counter.RawValue;
         }
 
         protected override void DisposeInternal()
         {
             if (DisposesCounter)
             {
-                _counter.Dispose();
+                Counter.Dispose();
             }
-            _counter = null;
+            Counter = null;
         }
     }
 }
