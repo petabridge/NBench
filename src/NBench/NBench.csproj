@@ -83,6 +83,8 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Collection\Counters\CounterSelector.cs" />
+    <Compile Include="Collection\Timing\TimingCollector.cs" />
+    <Compile Include="Collection\Timing\TimingSelector.cs" />
     <Compile Include="CounterMeasurementAttribute.cs" />
     <Compile Include="ByteConstants.cs" />
     <Compile Include="MeasurementAttribute.cs" />
@@ -92,6 +94,9 @@
     <Compile Include="Metrics\Memory\MemoryMeasurementConfigurator.cs" />
     <Compile Include="Metrics\Memory\MemoryMetricName.cs" />
     <Compile Include="Metrics\MetricName.cs" />
+    <Compile Include="Metrics\Timing\TimingBenchmarkSetting.cs" />
+    <Compile Include="Metrics\Timing\TimingMeasurementConfigurator.cs" />
+    <Compile Include="Metrics\Timing\TimingMetricName.cs" />
     <Compile Include="Properties\Friends.cs" />
     <Compile Include="GcMeasurementAttribute.cs" />
     <Compile Include="MemoryMeasurementAttribute.cs" />
@@ -152,6 +157,7 @@
     <Compile Include="Sdk\TestRunner.cs" />
     <Compile Include="Sdk\WarmupData.cs" />
     <Compile Include="Sys\SysInfo.cs" />
+    <Compile Include="TimingMeasurementAttribute.cs" />
     <Compile Include="Util\AtomicCounter.cs" />
     <Compile Include="Util\FileNameGenerator.cs" />
   </ItemGroup>

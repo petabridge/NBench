@@ -47,6 +47,8 @@ namespace NBench.Collection
         /// The default unit name when none are specified
         /// </summary>
         public const string DefaultUnitName = "operations";
+
+        public const string TimingUnits = "ms";
     }
 }
 
