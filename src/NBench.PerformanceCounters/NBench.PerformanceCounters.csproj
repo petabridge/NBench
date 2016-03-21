@@ -38,6 +38,10 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Collection\CachedPerformanceCounterProxy.cs" />
+    <Compile Include="Collection\IPerformanceCounterProxy.cs" />
+    <Compile Include="Collection\PerformanceCounterCache.cs" />
+    <Compile Include="Collection\PerformanceCounterProxy.cs" />
     <Compile Include="Collection\PerformanceCounterSelector.cs" />
     <Compile Include="Metrics\PerformanceCounterBenchmarkSetting.cs" />
     <Compile Include="Metrics\PerformanceCounterMetricName.cs" />

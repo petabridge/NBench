@@ -15,9 +15,9 @@ namespace NBench.PerformanceCounters.Collection
     /// </summary>
     public class PerformanceCounterRawValueCollector : MetricCollector
     {
-        protected PerformanceCounter Counter;
+        protected IPerformanceCounterProxy Counter;
 
-        public PerformanceCounterRawValueCollector(MetricName name, string unitName, PerformanceCounter counter,
+        public PerformanceCounterRawValueCollector(MetricName name, string unitName, IPerformanceCounterProxy counter,
             bool disposesCounter) : base(name, unitName)
         {
             Counter = counter;
@@ -28,7 +28,7 @@ namespace NBench.PerformanceCounters.Collection
 
         public override long Collect()
         {
-            return Counter.RawValue;
+            return Counter.Collect();
         }
 
         protected override void DisposeInternal()
