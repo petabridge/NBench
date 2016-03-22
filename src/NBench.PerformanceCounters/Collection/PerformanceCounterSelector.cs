@@ -28,6 +28,14 @@ namespace NBench.PerformanceCounters.Collection
         {
         }
 
+        public static bool CanFindPerformanceCounter(PerformanceCounterMetricName name)
+        {
+            var hasInstance = !string.IsNullOrEmpty(name.InstanceName);
+            return hasInstance
+                ? PerformanceCounterCategory.InstanceExists(name.InstanceName, name.CategoryName)
+                : PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName);
+        }
+
         public override MetricCollector Create(RunMode runMode, WarmupData warmup, IBenchmarkSetting setting)
         {
             Contract.Assert(setting != null);
@@ -45,10 +53,7 @@ namespace NBench.PerformanceCounters.Collection
             var retries = 5;
             var proxy = new PerformanceCounterProxy(() => new PerformanceCounter(name.CategoryName, name.CounterName,
                 name.InstanceName ?? string.Empty, true));
-            while (
-                ((!string.IsNullOrEmpty(name.InstanceName) 
-                && !PerformanceCounterCategory.InstanceExists(name.InstanceName, name.CategoryName)) || PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName))
-                && --retries > 0)
+            while (!CanFindPerformanceCounter(name) && --retries > 0)
             {
                 Thread.Sleep(1000);
                 if (proxy.CanWarmup)
