@@ -4,7 +4,7 @@
 using System;
 using NBench.Metrics;
 
-namespace NBench.Collection.Memory
+namespace NBench.Collection.GarbageCollection
 {
     /// <summary>
     ///     Returns the number of times <see cref="System.GC" /> has collected <see cref="Generation" />.

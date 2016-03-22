@@ -14,7 +14,7 @@ open Fake.TaskRunnerHelper
 
 let product = "NBench"
 let authors = [ "Aaron Stannard" ]
-let copyright = "Copyright © 2015"
+let copyright = "Copyright © 2015-2016"
 let company = "Petabridge"
 let description = "X-Platform .NET Performance Testing and Measuring Framework"
 let tags = ["performance";"benchmarking";"benchmark";"perf testing";"NBench";]
@@ -174,6 +174,7 @@ module Nuget =
      // add NBench dependency for other projects
     let getDependencies project =
         match project with
+        | "NBench.PerformanceCounters" -> ["NBench", release.NugetVersion]
         | _ -> []
 
      // used to add -pre suffix to pre-release packages

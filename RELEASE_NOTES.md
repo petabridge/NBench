@@ -1,5 +1,5 @@
-#### 0.1.7 February 15 2016
-Placeholder for vnext
+#### 0.2.0 March 22 2016
+Notes next
 
 #### 0.1.6 February 15 2016
 Includes following features:
