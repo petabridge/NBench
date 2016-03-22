@@ -58,7 +58,10 @@ namespace NBench.PerformanceCounters.Collection
             // check to see that the instance we're interested in is registered
             if (!string.IsNullOrEmpty(name.InstanceName))
             {
-                var category = PerformanceCounterCategory.GetCategories().Single(x => x.CategoryName == name.CategoryName);
+                var categories = PerformanceCounterCategory.GetCategories().Where(x => x.CategoryType == PerformanceCounterCategoryType.MultiInstance).ToList();
+                Console.WriteLine("---- DEBUG -----");
+                Console.WriteLine("{0} multi-instance categories detected", categories.Count);
+                var category = categories.Single(x => x.CategoryName == name.CategoryName);
                 var instances = category.GetInstanceNames();
 
                 if (!instances.Contains(name.InstanceName))
