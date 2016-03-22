@@ -35,7 +35,8 @@ namespace NBench.PerformanceCounters.Collection
                 try
                 {
                     // will invoke an exception if the counter was created too quickly
-                    Collect();
+                    var counter = GetOrCreate();
+                    var value = counter.RawValue;
                     return true;
                 }
                 catch (Exception ex)
