@@ -33,7 +33,7 @@ namespace NBench.Collection
         /// <summary>
         /// Collects the value of this metric
         /// </summary>
-        public abstract long Collect();
+        public abstract double Collect();
 
         public bool WasDisposed { get; private set; }
 

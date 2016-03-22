@@ -23,7 +23,7 @@ namespace NBench.Collection
             _counter = counter;
         }
 
-        public override long Collect()
+        public override double Collect()
         {
             return _counter.Current;
         }

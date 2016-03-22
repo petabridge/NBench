@@ -40,7 +40,6 @@ namespace NBench.Runner
 				package.ConfigurationFile = CommandLine.GetProperty("configuration");
 
 			package.Validate();
-
             var result = TestRunner.Run(package);
        
             return result.AllTestsPassed ? 0 : -1;
