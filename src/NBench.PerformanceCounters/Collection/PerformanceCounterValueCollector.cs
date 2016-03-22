@@ -14,11 +14,11 @@ namespace NBench.PerformanceCounters.Collection
     /// 
     /// Captures the RAW VALUE from performance counters.
     /// </summary>
-    public class PerformanceCounterRawValueCollector : MetricCollector
+    public class PerformanceCounterValueCollector : MetricCollector
     {
         protected IPerformanceCounterProxy Counter;
 
-        public PerformanceCounterRawValueCollector(MetricName name, string unitName, IPerformanceCounterProxy counter,
+        public PerformanceCounterValueCollector(MetricName name, string unitName, IPerformanceCounterProxy counter,
             bool disposesCounter) : base(name, unitName)
         {
             Counter = counter;

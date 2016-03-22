@@ -19,16 +19,10 @@ namespace NBench.PerformanceCounters.Collection
 
         private readonly Func<PerformanceCounter> _counterFactory; // recreate the counter on error
 
-        public int MaximumRestarts { get; }
-        public int CurrentRestarts { get; private set; }
-
-        public PerformanceCounterProxy(int maximumRestarts, Func<PerformanceCounter> counterFactory)
+        public PerformanceCounterProxy(Func<PerformanceCounter> counterFactory)
         {
-            Contract.Requires(MaximumRestarts >= 1);
             Contract.Requires(counterFactory != null);
-            MaximumRestarts = maximumRestarts;
             _counterFactory = counterFactory;
-            CurrentRestarts = 0;
             WasDisposed = false;
         }
 
@@ -66,11 +60,6 @@ namespace NBench.PerformanceCounters.Collection
             catch (Exception)
             {
                 // recreate counter
-                CurrentRestarts++;
-                if (CurrentRestarts >= MaximumRestarts)
-                {
-                    throw;
-                }
                 DisposeCounter();
                 return 0;
             }
@@ -78,7 +67,7 @@ namespace NBench.PerformanceCounters.Collection
 
         private PerformanceCounter GetOrCreate()
         {
-            if (_counter == null && CurrentRestarts < MaximumRestarts && !WasDisposed)
+            if (_counter == null && !WasDisposed)
             {
                 //create the counter
                 _counter = _counterFactory();
