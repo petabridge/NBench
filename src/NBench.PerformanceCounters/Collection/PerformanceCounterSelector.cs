@@ -16,11 +16,6 @@ namespace NBench.PerformanceCounters.Collection
     /// </summary>
     public class PerformanceCounterSelector : MetricsCollectorSelector
     {
-        /// <summary>
-        /// Maximum number of times we can recreate a faulted performance counter
-        /// </summary>
-        public const int MaximumCounterRestarts = 10;
-
         private readonly PerformanceCounterCache _cache = new PerformanceCounterCache();
 
         public PerformanceCounterSelector() : this(PerformanceCounterMetricName.DefaultName) { }
@@ -44,11 +39,11 @@ namespace NBench.PerformanceCounters.Collection
 
             // re-use the PerformanceCounter objects in our pool if possible
             if(_cache.Exists(name))
-                return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
+                return new PerformanceCounterValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
 
             // otherwise, warm up new ones
             var retries = 5;
-            var proxy = new PerformanceCounterProxy(MaximumCounterRestarts, () => new PerformanceCounter(name.CategoryName, name.CounterName,
+            var proxy = new PerformanceCounterProxy(() => new PerformanceCounter(name.CategoryName, name.CounterName,
                 name.InstanceName ?? string.Empty, true));
             while (
                 ((!string.IsNullOrEmpty(name.InstanceName) 
@@ -65,7 +60,7 @@ namespace NBench.PerformanceCounters.Collection
 
             // cache this performance counter and pool it for re-use
             _cache.Put(name, proxy);
-            return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
+            return new PerformanceCounterValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
         }
     }
 }

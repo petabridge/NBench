@@ -47,7 +47,7 @@
     <Compile Include="Metrics\PerformanceCounterBenchmarkSetting.cs" />
     <Compile Include="Metrics\PerformanceCounterMetricName.cs" />
     <Compile Include="PerformanceCounterMeasurementAttribute.cs" />
-    <Compile Include="Collection\PerformanceCounterRawValueCollector.cs" />
+    <Compile Include="Collection\PerformanceCounterValueCollector.cs" />
     <Compile Include="PerformanceCounterMeasurementConfigurator.cs" />
     <Compile Include="PerformanceCounterThroughputAssertionAttribute.cs" />
     <Compile Include="PerformanceCounterTotalAssertionAttribute.cs" />
