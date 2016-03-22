@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
+// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+
+using System.Linq;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
@@ -34,3 +37,4 @@ namespace NBench.PeformanceCounters.Tests.End2End
         }
     }
 }
+

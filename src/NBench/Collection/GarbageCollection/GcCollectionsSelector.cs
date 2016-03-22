@@ -2,14 +2,12 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using NBench.Metrics;
 using NBench.Metrics.GarbageCollection;
 using NBench.Sdk;
 using NBench.Sys;
 
-namespace NBench.Collection.Memory
+namespace NBench.Collection.GarbageCollection
 {
     /// <summary>
     ///     Responsible for creating <see cref="MetricCollector" />s for monitoring GC metrics

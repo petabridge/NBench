@@ -4,7 +4,7 @@
 using NBench.Metrics;
 using NBench.Util;
 
-namespace NBench.Collection
+namespace NBench.Collection.Counters
 {
     /// <summary>
     ///     A simple concurrent counter used for user-defined metrics

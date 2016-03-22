@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NBench.Collection;
 using NBench.Collection.Counters;
+using NBench.Collection.GarbageCollection;
 using NBench.Collection.Memory;
 using NBench.Metrics;
 using NBench.Metrics.Counters;
