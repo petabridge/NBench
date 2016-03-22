@@ -100,6 +100,7 @@
   <ItemGroup>
     <Compile Include="Collection\Memory\GcCollectionsPerGenerationSpecs.cs" />
     <Compile Include="Collection\Memory\GcTotalMemoryCollectorSpecs.cs" />
+    <Compile Include="Collection\Timing\TimingCollectorSpec.cs" />
     <Compile Include="Metrics\MeasureBucketSpecs.cs" />
     <Compile Include="Reporting\BenchmarkStatSpecs.cs" />
     <Compile Include="Sdk\BenchmarkExceptionSpecs.cs" />
