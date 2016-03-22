@@ -39,6 +39,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Collection\CachedPerformanceCounterProxy.cs" />
+    <Compile Include="Collection\EmptyPerformanceCounterProxy.cs" />
     <Compile Include="Collection\IPerformanceCounterProxy.cs" />
     <Compile Include="Collection\PerformanceCounterCache.cs" />
     <Compile Include="Collection\PerformanceCounterProxy.cs" />

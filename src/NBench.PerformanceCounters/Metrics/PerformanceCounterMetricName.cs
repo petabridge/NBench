@@ -95,5 +95,10 @@ namespace NBench.PerformanceCounters.Metrics
                 return $"[PerformanceCounter] {CategoryName}:{CounterName}:{InstanceName}";
             return $"[PerformanceCounter] {CategoryName}:{CounterName}";
         }
+
+        public override string ToString()
+        {
+            return ToHumanFriendlyString();
+        }
     }
 }

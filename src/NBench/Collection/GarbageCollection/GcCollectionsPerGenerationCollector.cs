@@ -26,7 +26,7 @@ namespace NBench.Collection.Memory
         /// </summary>
         public int Generation { get; }
 
-        public override long Collect()
+        public override double Collect()
         {
             return GC.CollectionCount(Generation);
         }

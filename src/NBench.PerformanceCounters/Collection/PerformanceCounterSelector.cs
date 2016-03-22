@@ -21,6 +21,8 @@ namespace NBench.PerformanceCounters.Collection
         /// </summary>
         public const int MaximumCounterRestarts = 10;
 
+        private readonly PerformanceCounterCache _cache = new PerformanceCounterCache();
+
         public PerformanceCounterSelector() : this(PerformanceCounterMetricName.DefaultName) { }
 
         public PerformanceCounterSelector(MetricName name) : base(name)
@@ -40,6 +42,11 @@ namespace NBench.PerformanceCounters.Collection
 
             var counterExists = PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName);
 
+            // re-use the PerformanceCounter objects in our pool if possible
+            if(_cache.Exists(name))
+                return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
+
+            // otherwise, warm up new ones
             var retries = 5;
             var proxy = new PerformanceCounterProxy(MaximumCounterRestarts, () => new PerformanceCounter(name.CategoryName, name.CounterName,
                 name.InstanceName ?? string.Empty, true));
@@ -55,7 +62,10 @@ namespace NBench.PerformanceCounters.Collection
 
             if(!proxy.CanWarmup)
                 throw new NBenchException($"Performance counter {name.ToHumanFriendlyString()} is not registered on this machine. Please create it first.");
-            return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, proxy, true);
+
+            // cache this performance counter and pool it for re-use
+            _cache.Put(name, proxy);
+            return new PerformanceCounterRawValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
         }
     }
 }

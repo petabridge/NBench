@@ -41,6 +41,7 @@ namespace NBench.Runner
 
 			package.Validate();
 
+		    Console.ReadLine(); //BLOCK
             var result = TestRunner.Run(package);
        
             return result.AllTestsPassed ? 0 : -1;

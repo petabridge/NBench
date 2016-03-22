@@ -20,7 +20,7 @@ namespace NBench.PerformanceCounters.Collection
 
         public void Dispose()
         {
-            if (CurrentReferenceCount <= 0)
+            if (CurrentReferenceCount < 0)
             {
                 _getUnderlying()?.Dispose();
             }
@@ -33,7 +33,7 @@ namespace NBench.PerformanceCounters.Collection
         public bool WasDisposed => _getUnderlying().WasDisposed;
         public bool CanWarmup => _getUnderlying().CanWarmup;
 
-        public long Collect()
+        public double Collect()
         {
             return _getUnderlying().Collect();
         }

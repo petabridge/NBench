@@ -27,7 +27,7 @@ namespace NBench.PerformanceCounters.Collection
 
         public bool DisposesCounter { get; }
 
-        public override long Collect()
+        public override double Collect()
         {
             try
             {

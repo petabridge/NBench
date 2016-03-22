@@ -29,6 +29,7 @@ namespace NBench.PerformanceCounters.Collection
             MaximumRestarts = maximumRestarts;
             _counterFactory = counterFactory;
             CurrentRestarts = 0;
+            WasDisposed = false;
         }
 
         public bool WasDisposed { get; private set; }
@@ -54,12 +55,13 @@ namespace NBench.PerformanceCounters.Collection
         /// Return the raw value of the counter
         /// </summary>
         /// <returns>A long integer representing <see cref="PerformanceCounter.RawValue"/></returns>
-        public long Collect()
+        public double Collect()
         {
             var counter = GetOrCreate();
             try
             {
-                return Convert.ToInt64(counter.NextValue());
+                var val = counter.NextValue();
+                return val;
             }
             catch (Exception)
             {
@@ -76,7 +78,7 @@ namespace NBench.PerformanceCounters.Collection
 
         private PerformanceCounter GetOrCreate()
         {
-            if (_counter == null && CurrentRestarts < MaximumRestarts)
+            if (_counter == null && CurrentRestarts < MaximumRestarts && !WasDisposed)
             {
                 //create the counter
                 _counter = _counterFactory();

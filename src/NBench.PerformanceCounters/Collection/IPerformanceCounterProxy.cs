@@ -23,6 +23,6 @@ namespace NBench.PerformanceCounters.Collection
         /// Gets the raw value from the underlying <see cref="PerformanceCounter"/>
         /// </summary>
         /// <returns>A <see cref="long"/> representing the counter's value</returns>
-        long Collect();
+        double Collect();
     }
 }
