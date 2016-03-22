@@ -44,26 +44,43 @@ namespace NBench.PerformanceCounters.Collection
             var counterBenchmarkSetting = setting as PerformanceCounterBenchmarkSetting;
             var name = counterBenchmarkSetting.PerformanceCounterMetric;
 
-            var counterExists = PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName);
-
             // re-use the PerformanceCounter objects in our pool if possible
-            if(_cache.Exists(name))
+            if (_cache.Exists(name))
                 return new PerformanceCounterValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
 
             // otherwise, warm up new ones
             var maxRetries = 3;
             var currentRetries = 0;
-            var proxy = new PerformanceCounterProxy(() => new PerformanceCounter(name.CategoryName, name.CounterName,
-                name.InstanceName ?? string.Empty, true));
+
+            if (!PerformanceCounterCategory.CounterExists(name.CounterName, name.CategoryName))
+                throw new NBenchException($"Performance counter {name.ToHumanFriendlyString()} is not registered on this machine. Please create it first.");
+
+            // check to see that the instance we're interested in is registered
+            if (!string.IsNullOrEmpty(name.InstanceName))
+            {
+                var category = PerformanceCounterCategory.GetCategories().Single(x => x.CategoryName == name.CategoryName);
+                var instances = category.GetInstanceNames();
+
+                if (!instances.Contains(name.InstanceName))
+                    throw new NBenchException($"Performance counter {name.CategoryName}:{name.CounterName} exists, but we could not find an instance {name.InstanceName}.");
+            }
+
+            var proxy = new PerformanceCounterProxy(() =>
+            {
+                var counter = new PerformanceCounter(name.CategoryName, name.CounterName,
+                    name.InstanceName ?? string.Empty, true);
+
+                return counter;
+            });
             while (!CanFindPerformanceCounter(name) && currentRetries <= maxRetries)
             {
-                Thread.Sleep(TimeSpan.FromMilliseconds(1000 + 100*(currentRetries^2))); // little bit of exponential backoff
+                Thread.Sleep(TimeSpan.FromMilliseconds(1000 + 100 * (currentRetries ^ 2))); // little bit of exponential backoff
                 if (proxy.CanWarmup)
                     break;
                 currentRetries++;
             }
 
-            if(!proxy.CanWarmup)
+            if (!proxy.CanWarmup)
                 throw new NBenchException($"Performance counter {name.ToHumanFriendlyString()} is not registered on this machine. Please create it first.");
 
             // cache this performance counter and pool it for re-use
