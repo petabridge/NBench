@@ -158,7 +158,7 @@ Target "NBench" <| fun _ ->
             if (trialsLeft > 0) then (runNBench assembly (trialsLeft-1))
             else raise exn
     
-    for assembly in nbenchTestAssemblies do
+    for assembly in (nbenchTestAssemblies |> Seq.rev) do
         runNBench assembly 2
 
 //--------------------------------------------------------------------------------
