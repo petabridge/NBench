@@ -51,12 +51,13 @@ namespace NBench.PerformanceCounters.Collection
                 return new PerformanceCounterValueCollector(name, name.UnitName ?? MetricNames.DefaultUnitName, _cache.Get(name), true);
 
             // otherwise, warm up new ones
-            var retries = 5;
+            var maxRetries = 7;
+            var currentRetries = 0;
             var proxy = new PerformanceCounterProxy(() => new PerformanceCounter(name.CategoryName, name.CounterName,
                 name.InstanceName ?? string.Empty, true));
-            while (!CanFindPerformanceCounter(name) && --retries > 0)
+            while (!CanFindPerformanceCounter(name) && currentRetries <= maxRetries)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(TimeSpan.FromMilliseconds(1000 + 100*currentRetries^2)); // little bit of exponential backoff
                 if (proxy.CanWarmup)
                     break;
             }
