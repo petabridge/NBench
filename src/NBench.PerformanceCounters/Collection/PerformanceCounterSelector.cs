@@ -62,7 +62,13 @@ namespace NBench.PerformanceCounters.Collection
                 var instances = category.GetInstanceNames();
 
                 if (!instances.Contains(name.InstanceName))
+                {
+                    Console.WriteLine("---- DEBUG -----");
+                    foreach(var instance in instances)
+                        Console.WriteLine(instance);
                     throw new NBenchException($"Performance counter {name.CategoryName}:{name.CounterName} exists, but we could not find an instance {name.InstanceName}.");
+                }
+                    
             }
 
             var proxy = new PerformanceCounterProxy(() =>
