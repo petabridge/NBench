@@ -59,8 +59,8 @@ namespace NBench.Sdk
             // screen line for line duplicates that made it in by accident
             Measurements = new HashSet<IBenchmarkSetting>(benchmarkSettings).ToList();
 
-            // now filter terms that measure the same quantities, but with different assertions
-            // because we only want to collect those measurements ONCE, but use them across mulitple assertions.
+            // now filter terms that measure the same quantities, but with different BenchmarkAssertions
+            // because we only want to collect those measurements ONCE, but use them across mulitple BenchmarkAssertions.
             DistinctMeasurements = Measurements.Distinct(Comparer).ToList();
 
             Collectors = collectors;
@@ -94,7 +94,7 @@ namespace NBench.Sdk
         public IReadOnlyList<IBenchmarkSetting> Measurements { get; private set; }
 
         /// <summary>
-        /// If someone declares two measurements that measure the same thing, but carry different assertions
+        /// If someone declares two measurements that measure the same thing, but carry different BenchmarkAssertions
         /// then those settings will only show up once on this list, whereas they might appear twice on <see cref="Measurements"/>
         /// </summary>
         public IReadOnlyList<IBenchmarkSetting> DistinctMeasurements { get; private set; }

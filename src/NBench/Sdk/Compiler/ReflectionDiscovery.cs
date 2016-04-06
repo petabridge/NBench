@@ -21,11 +21,16 @@ namespace NBench.Sdk.Compiler
         public static readonly Type PerformanceBenchmarkAttributeType = typeof (PerfBenchmarkAttribute);
         public static readonly Type MeasurementAttributeType = typeof (MeasurementAttribute);
         public static readonly Type BenchmarkContextType = typeof (BenchmarkContext);
-       
 
-        public ReflectionDiscovery(IBenchmarkOutput output)
+        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance)
+        {
+        }
+
+
+        public ReflectionDiscovery(IBenchmarkOutput output, IBenchmarkAssertionRunner benchmarkAssertions)
         {
             Output = _reflectionOutput = output;
+            BenchmarkAssertions = benchmarkAssertions;
         }
 
         /// <summary>
@@ -39,6 +44,7 @@ namespace NBench.Sdk.Compiler
         private static IBenchmarkOutput _reflectionOutput = new ConsoleBenchmarkOutput();
 
         public IBenchmarkOutput Output { get; }
+        public IBenchmarkAssertionRunner BenchmarkAssertions { get; }
 
         public IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly)
         {
@@ -48,7 +54,7 @@ namespace NBench.Sdk.Compiler
             {
                 var invoker = CreateInvokerForBenchmark(data);
                 var settings = CreateSettingsForBenchmark(data);
-                benchmarks.Add(new Benchmark(settings, invoker, Output));
+                benchmarks.Add(new Benchmark(settings, invoker, Output, BenchmarkAssertions));
             }
             return benchmarks;
         }
@@ -61,7 +67,7 @@ namespace NBench.Sdk.Compiler
             {
                 var invoker = CreateInvokerForBenchmark(data);
                 var settings = CreateSettingsForBenchmark(data);
-                benchmarks.Add(new Benchmark(settings, invoker, Output));
+                benchmarks.Add(new Benchmark(settings, invoker, Output, BenchmarkAssertions));
             }
             return benchmarks;
         }

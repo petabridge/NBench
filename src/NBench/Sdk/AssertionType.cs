@@ -4,7 +4,7 @@
 namespace NBench.Sdk
 {
     /// <summary>
-    /// Different types of assertions we might use against metrics
+    /// Different types of BenchmarkAssertions we might use against metrics
     /// </summary>
     public enum AssertionType
     {

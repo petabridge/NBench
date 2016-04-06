@@ -20,6 +20,11 @@ namespace NBench.Sdk.Compiler
         IBenchmarkOutput Output { get; }
 
         /// <summary>
+        /// Engine used to perform BenchmarkAssertions against data collected from a <see cref="Benchmark"/>
+        /// </summary>
+        IBenchmarkAssertionRunner BenchmarkAssertions { get; }
+
+        /// <summary>
         /// Uses reflection on the target assembly to discover <see cref="PerfBenchmarkAttribute"/>
         /// instances.
         /// </summary>
