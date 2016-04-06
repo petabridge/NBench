@@ -7,7 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NBench.Collection;
+using NBench.Collection.Counters;
+using NBench.Collection.GarbageCollection;
+using NBench.Collection.Memory;
 using NBench.Metrics;
+using NBench.Metrics.Counters;
+using NBench.Metrics.GarbageCollection;
+using NBench.Metrics.Memory;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
 using Xunit;
@@ -65,12 +72,18 @@ namespace NBench.Tests.Sdk
             });
 
             var counterBenchmark = new CounterBenchmarkSetting(CounterName.CounterName, AssertionType.Total, Assertion.Empty);
-            var gcBenchmark = new GcBenchmarkSetting(GcMetric.TotalCollections, GcGeneration.AllGc, AssertionType.Total,
+            var gcBenchmark = new GcBenchmarkSetting(GcMetric.TotalCollections, GcGeneration.Gen2, AssertionType.Total,
                 Assertion.Empty);
             var memoryBenchmark = new MemoryBenchmarkSetting(MemoryMetric.TotalBytesAllocated, Assertion.Empty);
 
             var settings = new BenchmarkSettings(TestMode.Measurement, RunMode.Iterations, iterationCount, 0,
-               new[] { gcBenchmark }, new MemoryBenchmarkSetting[0], new[] { counterBenchmark });
+               new List<IBenchmarkSetting>() { gcBenchmark, counterBenchmark },
+                new Dictionary<MetricName, MetricsCollectorSelector>()
+                {
+                    { gcBenchmark.MetricName, new GcCollectionsSelector() },
+                    { counterBenchmark.MetricName, new CounterSelector() },
+                    { memoryBenchmark.MetricName, new TotalMemorySelector() }
+                });
 
             var benchmark = new Benchmark(settings, _benchmarkMethods, assertionOutput);
 

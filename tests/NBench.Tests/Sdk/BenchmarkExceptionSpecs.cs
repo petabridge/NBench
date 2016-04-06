@@ -3,6 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using NBench.Collection;
+using NBench.Collection.GarbageCollection;
+using NBench.Collection.Memory;
+using NBench.Metrics;
+using NBench.Metrics.Counters;
+using NBench.Metrics.GarbageCollection;
+using NBench.Metrics.Memory;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
@@ -12,12 +19,14 @@ namespace NBench.Tests.Sdk
 {
     public class BenchmarkExceptionSpecs
     {
+        private static readonly GcBenchmarkSetting _singleFaultySetting = new GcBenchmarkSetting(GcMetric.TotalCollections,
+            GcGeneration.Gen2, AssertionType.Throughput,
+            Assertion.Empty);
         private readonly BenchmarkSettings _faultySettings = new BenchmarkSettings(TestMode.Test, RunMode.Iterations, 4, 1000,
-            new List<GcBenchmarkSetting>
+            new List<IBenchmarkSetting>
             {
-                new GcBenchmarkSetting(GcMetric.TotalCollections, GcGeneration.AllGc, AssertionType.Throughput,
-                    Assertion.Empty)
-            }, new List<MemoryBenchmarkSetting>(), new List<CounterBenchmarkSetting>());
+               _singleFaultySetting
+            }, new Dictionary<MetricName, MetricsCollectorSelector>() { { _singleFaultySetting.MetricName, new GcCollectionsSelector() } });
 
         [Fact]
         public void Should_exit_on_first_iteration_where_Benchmark_throws_Exception()

@@ -1,8 +1,12 @@
-﻿using System;
+﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
+// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace NBench.Sdk
@@ -13,12 +17,28 @@ namespace NBench.Sdk
     [Serializable]
     public class TestPackage : MarshalByRefObject
     {
+		/// <summary>
+		/// List of assemblies to be loaded and tested
+		/// </summary>
         private List<string> _testfiles = new List<string>();
-        
-        /// <summary>
-        /// Gets or sets a file path to the configuration file (app.config) used for the test assemblies
-        /// </summary>
-        public string ConfigurationFile { get; set; }
+
+		/// <summary>
+		/// List of patterns to be included in the tests. Wildchars supported (*, ?)
+		/// </summary>
+		private List<string> _include = new List<string>();
+		private List<Regex> _includePatterns;	// locally build cache
+
+		/// <summary>
+		/// List of patterns to be excluded from the tests. Wildchars supported (*, ?)
+		/// </summary>
+		private List<string> _exclude = new List<string>();
+		private List<Regex> _excludePatterns;   // locally build cache
+
+
+		/// <summary>
+		/// Gets or sets a file path to the configuration file (app.config) used for the test assemblies
+		/// </summary>
+		public string ConfigurationFile { get; set; }
 
         /// <summary>
         /// Gets or sets the directory for the result output file
@@ -29,6 +49,14 @@ namespace NBench.Sdk
         /// Gets or sets the name of the test package
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// If <c>true</c>, NBench disables any processor affinity or thread priority settings.
+        /// If <c>false</c>, NBench will run in single-threaded mode and set processor affinity + thread priority.
+        /// 
+        /// Defaults to false.
+        /// </summary>
+        public bool Concurrent { get; set; }
 
 		/// <summary>
 		/// Gets the file names of the assemblies containing tests
@@ -42,19 +70,38 @@ namespace NBench.Sdk
         /// Initializes a new test package with one test file.
         /// </summary>
         /// <param name="filePath">The path to a test file.</param>
-        public TestPackage(string filePath)
+        /// <param name="include">An optional include pattern</param>
+        /// <param name="exclude">An optiona exclude pattern</param>
+        /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
+        public TestPackage(string filePath, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
 		{
 			if (string.IsNullOrEmpty(filePath))
 				throw new ArgumentNullException("filePath");
 
 			AddSingleFile(filePath);
-		}		
 
-		/// <summary>
-		/// Initializes a new package with multiple test files.
-		/// </summary>
-		/// <param name="files">A list of test files.</param>
-		public TestPackage(IEnumerable<string> files)
+			if (include != null)
+			{
+				foreach (var p in include)
+					AddInclude(p.Trim());
+			}
+			if (exclude != null)
+			{
+				foreach (var p in exclude)
+					AddExclude(p.Trim());
+			}
+
+            Concurrent = concurrent;
+		}
+
+        /// <summary>
+        /// Initializes a new package with multiple test files.
+        /// </summary>
+        /// <param name="files">A list of test files.</param>
+        /// <param name="include">Optional list of include patterns</param>
+        /// <param name="exclude">Optional list of exclude patterns</param>
+        /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
+        public TestPackage(IEnumerable<string> files, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
         {
             if (files == null || !files.Any())
                 throw new ArgumentException("Please provide at least one test file." ,"files");
@@ -67,6 +114,19 @@ namespace NBench.Sdk
 				foreach (var file in files)
 					_testfiles.Add(Path.GetFullPath(file));
 			}
+
+		    if (include != null)
+		    {
+			    foreach(var p in include)
+					AddInclude(p.Trim());
+		    }
+			if (exclude != null)
+			{
+				foreach (var p in exclude)
+					AddExclude(p.Trim());
+			}
+
+            Concurrent = concurrent;
         }
 
         /// <summary>
@@ -126,5 +186,61 @@ namespace NBench.Sdk
 
 			Name = Path.GetFileNameWithoutExtension(filePath);
 		}
-	}	
+
+		/// <summary>
+		/// Add a pattern to be excluded. We'll ignore nulls.
+		/// </summary>
+		/// <param name="exclude"></param>
+		private void AddExclude(string exclude)
+		{
+			if (String.IsNullOrEmpty(exclude))
+				return;
+			
+			_exclude.Add(exclude);
+		}
+
+		/// <summary>
+		/// Add a pattern to be included. We'll ignore nulls.
+		/// </summary>
+		/// <param name="include"></param>
+		private void AddInclude(string include)
+		{
+			if (String.IsNullOrEmpty(include))
+				return;
+			_include.Add(include);
+		}
+
+	    public bool ShouldRunBenchmark(string benchmarkName)
+	    {
+		    PreparePatterns();
+		    return _includePatterns.All(p => p.IsMatch(benchmarkName)) && !_excludePatterns.Any(p => p.IsMatch(benchmarkName));
+	    }
+
+	    private void PreparePatterns()
+	    {
+		    if (_includePatterns != null)
+			    return;
+			_includePatterns = new List<Regex>();
+		    if (_include.Count == 0)
+		    {
+			    // no pattern - assume pattern is "*"
+			    _includePatterns.Add(BuildPattern("*"));
+		    }
+		    else
+		    {
+			    _include.ForEach(p => _includePatterns.Add(BuildPattern(p)));
+		    }
+			_excludePatterns = new List<Regex>();
+		    _exclude.ForEach(p => _excludePatterns.Add(BuildPattern(p)));
+	    }
+
+		/// <summary>
+		/// Converts a wildcard to a regex pattern
+		/// </summary>
+		public static Regex BuildPattern(string pattern)
+		{
+			return new Regex("^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		}
+	}
 }
+

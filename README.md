@@ -1,5 +1,7 @@
 # NBench
 
+![NBench logo](images/NBench_logo_square_140.png)
+
 [![Join the chat at https://gitter.im/petabridge/NBench](https://badges.gitter.im/petabridge/NBench.svg)](https://gitter.im/petabridge/NBench?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Cross-platform performance benchmarking and testing framework for .NET applications.
 
@@ -55,8 +57,25 @@ After defining some NBench `PerfBenchmark` methods and declaring some measuremen
 PS> Install-Package NBench.Runner
 PS> .\packages\NBench.Runner\NBench.Runner.exe .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
 ```
-
 And this command will run your `PerfBenchmark` and write output [that looks like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf) to a markdown file in the `output-directory`.
+
+## Command Line Paramters
+```
+NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
+```
+
+* **assembly names** - list of assemblies to load and test. Space delimited. Requires `.dll` or `.exe` at the end of each assembly name
+* **output-directory=path** - folder where a Markdown report will be exported. Report will [look like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf)
+* **configuration=path** - folder with a config file to be used when loading the `assembly names`
+* **include=name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and included in the tests. Default value is `*` (all)
+The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
+* **exclude=name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and excluded in the tests. Default value is `` (none)
+The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
+* **concurrent=true|false** - disables thread priority and processor affinity operations for all benchmarks. Used only when running multi-threaded benchmarks. Set to `false` (single-threaded) by default.
+
+Supported wildcard patterns are `*` any string and `?` any char. In order to include a class with all its tests in the benchmark
+you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass.*`.
+
 
 ## API
 Every NBench performance test is created by decorating a method on a POCO class with a `PerfBenchmark` attribute and at least one type of "measurement" attribute.
@@ -237,3 +256,5 @@ Here are a few best practices to bear in mind when working with counters:
 
 1. It's always best to store references to your `Counter` instances as fields inside your POCO class and to get those references during a `PerfSetup` call, rather than get references to them on-the-fly inside your benchmark.
 1. Adding the `BenchmarkContext` parameter to your `PerfBenchmark` methods will improve throughput slightly, due to a design of NBench's `ReflectionInvoker`.
+
+Copyright (c) [Petabridge, LLC](https://petabridge.com/) 2015-2016

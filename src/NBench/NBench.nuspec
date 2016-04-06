@@ -9,6 +9,7 @@
     <description>NBench is a cross-platform automated performance profiling and testing framework for.NET applications.</description>
     <licenseUrl>https://github.com/petabridge/NBench/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/petabridge/NBench</projectUrl>
+    <iconUrl>https://github.com/petabridge/NBench/blob/dev/images/NBench_logo_square_90.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
     <copyright>@copyright@</copyright>

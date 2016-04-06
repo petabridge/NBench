@@ -36,7 +36,24 @@ namespace NBench.Sdk
         private int _pendingIterations;
         protected WarmupData WarmupData = WarmupData.PreWarmup;
 
-        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer)
+        /// <summary>
+        /// Backwards-compatible constructor for NBench 0.1.6 and earlier.
+        /// </summary>
+        /// <param name="settings">The settings for this benchmark.</param>
+        /// <param name="invoker">The invoker used to execute benchmark and setup / cleanup methods.</param>
+        /// <param name="writer">The output target this benchmark will write to.</param>
+        /// <remarks>Uses the <see cref="DefaultBenchmarkAssertionRunner"/> to assert benchmark data.</remarks>
+        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer) 
+            : this(settings, invoker, writer, DefaultBenchmarkAssertionRunner.Instance) { }
+
+        /// <summary>
+        /// Backwards-compatible constructor for NBench 0.1.6 and earlier.
+        /// </summary>
+        /// <param name="settings">The settings for this benchmark.</param>
+        /// <param name="invoker">The invoker used to execute benchmark and setup / cleanup methods.</param>
+        /// <param name="writer">The output target this benchmark will write to.</param>
+        /// <param name="benchmarkAssertions">The assertion engine we'll use to perform BenchmarkAssertions against benchmarks.</param>
+        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer, IBenchmarkAssertionRunner benchmarkAssertions)
         {
             Settings = settings;
             _pendingIterations = Settings.NumberOfIterations;
@@ -44,6 +61,7 @@ namespace NBench.Sdk
             Output = writer;
             CompletedRuns = new Queue<BenchmarkRunReport>(Settings.NumberOfIterations);
             Builder = new BenchmarkBuilder(Settings);
+            BenchmarkAssertionRunner = benchmarkAssertions;
         }
 
         public RunMode RunMode => Settings.RunMode;
@@ -52,9 +70,10 @@ namespace NBench.Sdk
         public bool ShutdownCalled { get; private set; }
         protected IBenchmarkInvoker Invoker { get; }
         protected IBenchmarkOutput Output { get; }
+        protected IBenchmarkAssertionRunner BenchmarkAssertionRunner { get; }
 
         /// <summary>
-        /// Returns <c>true</c> if <see cref="Finish"/> was called and all assertions passed,
+        /// Returns <c>true</c> if <see cref="Finish"/> was called and all BenchmarkAssertions passed,
         /// or if it was never called.
         /// </summary>
         public bool AllAssertsPassed { get; private set; }
@@ -92,7 +111,7 @@ namespace NBench.Sdk
                 return;
             }
 
-            /* Esimate */
+            /* Estimate */
             Allocate(); // allocate all collectors needed
             PreRun();
            
@@ -115,7 +134,7 @@ namespace NBench.Sdk
             }
            
             PostRun();
-            Complete();
+            Complete(true);
 
             // elapsed time
             var runTime = warmupStopWatch.ElapsedTicks;
@@ -259,12 +278,13 @@ namespace NBench.Sdk
         /// <summary>
         /// Complete the current run
         /// </summary>
-        private void Complete()
+        private void Complete(bool isEstimate = false)
         {
             _currentRun.Dispose();
 
             var report = _currentRun.ToReport(StopWatch.Elapsed);
-            Output.WriteRun(report, _isWarmup);
+            if(!isEstimate)
+                Output.WriteRun(report, _isWarmup);
 
             // Change runs, but not on warmup
             if (!_isWarmup)
@@ -288,7 +308,7 @@ namespace NBench.Sdk
 
         public BenchmarkFinalResults AssertResults(BenchmarkResults result)
         {
-            var assertionResults = AssertionRunner.RunAssertions(Settings, result);
+            var assertionResults = BenchmarkAssertionRunner.RunAssertions(Settings, result);
             return new BenchmarkFinalResults(result, assertionResults);
         }
 

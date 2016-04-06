@@ -55,7 +55,9 @@
     <Compile Include="SampleBenchmarks\CounterThroughputBenchmark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NBenchIntregrationTest.cs" />
+    <Compile Include="SampleBenchmarks\GcAllGenerationsAssertionBenchmark.cs" />
     <Compile Include="SampleBenchmarks\SimpleCounterBenchmark.cs" />
+    <Compile Include="SampleBenchmarks\SimpleTimingAssertionBenchmark.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

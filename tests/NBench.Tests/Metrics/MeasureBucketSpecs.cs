@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NBench.Metrics;
+using NBench.Metrics.Counters;
 using NBench.Util;
 using Xunit;
 

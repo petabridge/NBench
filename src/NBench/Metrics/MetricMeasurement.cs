@@ -10,7 +10,9 @@ namespace NBench.Metrics
     /// </summary>
     public struct MetricMeasurement
     {
-        public MetricMeasurement(long elapsedTicks, long metricValue)
+        public const double PrecisionTolerance = 0.000001d;
+
+        public MetricMeasurement(long elapsedTicks, double metricValue)
         {
             ElapsedTicks = elapsedTicks;
             MetricValue = metricValue;
@@ -18,11 +20,11 @@ namespace NBench.Metrics
 
         public long ElapsedTicks { get; }
 
-        public long MetricValue { get; }
+        public double MetricValue { get; }
 
         public bool Equals(MetricMeasurement other)
         {
-            return ElapsedTicks == other.ElapsedTicks && MetricValue == other.MetricValue;
+            return ElapsedTicks == other.ElapsedTicks && Math.Abs(MetricValue - other.MetricValue) < PrecisionTolerance;
         }
 
         public override bool Equals(object obj)

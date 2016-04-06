@@ -20,7 +20,7 @@ namespace NBench.Runner
     /// </summary>
     public class CommandLine
     {
-        private readonly static Lazy<StringDictionary> Values = new Lazy<StringDictionary>(() =>
+        private static readonly Lazy<StringDictionary> Values = new Lazy<StringDictionary>(() =>
         {
             var dictionary = new StringDictionary();
             foreach (var arg in Environment.GetCommandLineArgs())
@@ -72,6 +72,11 @@ namespace NBench.Runner
         public static int GetInt32(string key)
         {
             return Convert.ToInt32(GetProperty(key));
+        }
+
+        public static bool GetBool(string key)
+        {
+            return Convert.ToBoolean(GetProperty(key));
         }
     }
 }

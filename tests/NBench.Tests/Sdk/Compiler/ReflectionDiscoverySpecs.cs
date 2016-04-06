@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using NBench.Metrics.GarbageCollection;
+using NBench.Metrics.Memory;
 using NBench.Reporting;
 using NBench.Sdk;
 using NBench.Sdk.Compiler;
@@ -137,6 +139,20 @@ namespace NBench.Tests.Sdk.Compiler
             }
         }
 
+        public class BenchmarkWithOnlySkippedMethods
+        {
+            /// <summary>
+            /// Should be skipped
+            /// </summary>
+            [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = 100, RunTimeMilliseconds = 1000, Skip = "SKIP")]
+            [CounterMeasurement("MyCounter")]
+            [CounterThroughputAssertion("MyCounter", MustBe.GreaterThan, 100.0d)]
+            public void Run()
+            {
+
+            }
+        }
+
         public static readonly TypeInfo ComplexBenchmarkTypeInfo =
             typeof (DefaultMemoryMeasurementBenchmark).GetTypeInfo();
 
@@ -144,6 +160,9 @@ namespace NBench.Tests.Sdk.Compiler
 
         public static readonly TypeInfo BenchmarkWithoutMeasurementsTypeInfo =
             typeof (BenchmarkWithoutMeasurements).GetTypeInfo();
+
+        public static readonly TypeInfo SkippedBenchmarksTypeInfo =
+            typeof (BenchmarkWithOnlySkippedMethods).GetTypeInfo();
 
         [Fact]
         public void ShouldFindSetupMethod()
@@ -206,21 +225,29 @@ namespace NBench.Tests.Sdk.Compiler
         [Fact]
         public void ShouldProduceBenchmarkSettings_Complex()
         {
+            var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
             var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(ComplexBenchmarkTypeInfo);
-            var benchmarkSettings = ReflectionDiscovery.CreateSettingsForBenchmark(benchmarkMetaData.First());
+            var benchmarkSettings = discovery.CreateSettingsForBenchmark(benchmarkMetaData.First());
 
             Assert.Equal(TestMode.Test, benchmarkSettings.TestMode);
             Assert.Equal(PerfBenchmarkAttribute.DefaultRunType, benchmarkSettings.RunMode);
-            Assert.Equal(0, benchmarkSettings.GcBenchmarks.Count);
-            Assert.Equal(2, benchmarkSettings.MemoryBenchmarks.Count);
-            Assert.Equal(1, benchmarkSettings.DistinctMemoryBenchmarks.Count);
-            Assert.Equal(0, benchmarkSettings.CounterBenchmarks.Count);
+            Assert.Equal(0, benchmarkSettings.Measurements.Count(x => x is GcBenchmarkSetting));
+            Assert.Equal(2, benchmarkSettings.Measurements.Count(x => x is MemoryBenchmarkSetting));
+            Assert.Equal(1, benchmarkSettings.DistinctMeasurements.Count(x => x is MemoryBenchmarkSetting));
+            Assert.Equal(0, benchmarkSettings.CounterMeasurements.Count());
         }
 
         [Fact]
         public void ShouldNotCreateBenchmarkForClassWithNoDeclaredMeasurements()
         {
             var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(BenchmarkWithoutMeasurementsTypeInfo);
+            Assert.Equal(0, benchmarkMetaData.Count);
+        }
+
+        [Fact]
+        public void ShouldNotCreateBenchmarkForClassWithOnlySkippedBenchmarkMethods()
+        {
+            var benchmarkMetaData = ReflectionDiscovery.CreateBenchmarksForClass(SkippedBenchmarksTypeInfo);
             Assert.Equal(0, benchmarkMetaData.Count);
         }
 

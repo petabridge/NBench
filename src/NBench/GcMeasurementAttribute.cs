@@ -80,7 +80,7 @@ namespace NBench
         /// Used only on <see cref="MustBe.Between"/> comparisons. This is the upper bound of that comparison
         /// and <see cref="AverageOperationsPerSecond"/> is the lower bound.
         /// </summary>
-        public long? MaxAverageOperationsPerSecond { get; set; }
+        public double? MaxAverageOperationsPerSecond { get; set; }
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ namespace NBench
         /// Used only on <see cref="MustBe.Between"/> comparisons. This is the upper bound of that comparison
         /// and <see cref="AverageOperationsTotal"/> is the lower bound.
         /// </summary>
-        public long? MaxAverageOperationsTotal { get; set; }
+        public double? MaxAverageOperationsTotal { get; set; }
     }
 }
 

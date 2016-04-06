@@ -6,7 +6,7 @@ using System;
 namespace NBench.Reporting.Targets
 {
     /// <summary>
-    /// An <see cref="IBenchmarkOutput"/> designed to run assertions against the data we collect on each run and in the final benchmark.
+    /// An <see cref="IBenchmarkOutput"/> designed to run BenchmarkAssertions against the data we collect on each run and in the final benchmark.
     /// </summary>
     public sealed class ActionBenchmarkOutput : IBenchmarkOutput
     {

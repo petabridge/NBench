@@ -28,13 +28,13 @@ namespace NBench.Tests.Collection.Memory
         {
             var totalMemoryCollector = new GcTotalMemoryCollector(MetricNames.TotalMemoryAllocated);
            
-            long initialReading = totalMemoryCollector.Collect();
+            var initialReading = totalMemoryCollector.Collect();
             {
                 var bytes = new byte[bytesAllocated];
                 bytes = null;
             }
-            long finalReading = totalMemoryCollector.Collect();
-            long delta = finalReading - initialReading;
+            var finalReading = totalMemoryCollector.Collect();
+            var delta = finalReading - initialReading;
             Assert.True(finalReading > initialReading, "Should be: finalReading > initialReading");
             double actualDifference = Math.Abs(delta - bytesAllocated)/(double)bytesAllocated;
             Assert.True(actualDifference <= accuracy,

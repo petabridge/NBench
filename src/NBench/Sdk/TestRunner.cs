@@ -1,23 +1,33 @@
-﻿using NBench.Reporting;
+﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
+// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+
+using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk.Compiler;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace NBench.Sdk
 {
+	/// <summary>
+	/// Results collected by the test runner
+	/// </summary>
+	[Serializable]
+	public class TestRunnerResult
+	{
+		public bool AllTestsPassed { get; set; }
+
+		public int ExecutedTestsCount { get; set; }
+		public int IgnoredTestsCount { get; set; }
+	}
     /// <summary>
     /// Executor of tests
     /// </summary>
     /// <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
     public class TestRunner : MarshalByRefObject
     {
-        private TestPackage _package;
+        private readonly TestPackage _package;
 
         /// <summary>
         /// Initializes a new instance of the test runner.
@@ -46,7 +56,7 @@ namespace NBench.Sdk
         /// <param name="package">The test package to execute.</param>
         /// <returns>True if all tests passed.</returns>
         /// <remarks>Creates a new AppDomain and executes the tests.</remarks>
-        public static bool Run(TestPackage package)
+        public static TestRunnerResult Run(TestPackage package)
         {
             // create the test app domain
             var testDomain = DomainManager.CreateDomain(package);
@@ -84,17 +94,23 @@ namespace NBench.Sdk
         /// Executes the tests
         /// </summary>
         /// <returns>True if all tests passed.</returns>
-        public bool Execute()
+        public TestRunnerResult Execute()
         {
-            SetProcessPriority();
+            // Perform core / thread optimizations if we're running in single-threaded mode
+            // But not if the user has specified that they're going to be running multi-threaded benchmarks
+            if(!_package.Concurrent)
+                SetProcessPriority();
 
             IBenchmarkOutput output = CreateOutput();
             var discovery = new ReflectionDiscovery(output);
-            bool allTestsPassed = true;
+	        var result = new TestRunnerResult()
+	        {
+		        AllTestsPassed = true
+	        };
 
 			try
 			{
-				foreach (var testFile in _package.Files)
+                foreach (var testFile in _package.Files)
 				{
 					var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
 
@@ -102,22 +118,32 @@ namespace NBench.Sdk
 
 					foreach (var benchmark in benchmarks)
 					{
-						output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
-						benchmark.Run();
-						benchmark.Finish();
+						// verify if the benchmark should be included/excluded from the list of benchmarks to be run
+						if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
+						{
+							output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
+							benchmark.Run();
+							benchmark.Finish();
 
-						// if one assert fails, all fail
-						allTestsPassed = allTestsPassed && benchmark.AllAssertsPassed;
-						output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
+							// if one assert fails, all fail
+							result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
+							output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
+							result.ExecutedTestsCount = result.ExecutedTestsCount+1;
+						}
+						else
+						{
+							output.WriteLine($"------------ NOTRUN {benchmark.BenchmarkName} ---------- ");
+							result.IgnoredTestsCount = result.IgnoredTestsCount+1;
+						}
 					}
 				}
 			} catch(Exception ex)
 			{
 				output.Error(ex, "Error while executing the tests.");
-				allTestsPassed = false;
+				result.AllTestsPassed = false;
 			}
 
-            return allTestsPassed;
+            return result;
         }
 
         /// <summary>
@@ -142,3 +168,4 @@ namespace NBench.Sdk
         }
     }
 }
+

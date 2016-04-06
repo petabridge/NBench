@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using NBench.Metrics;
+using NBench.Metrics.Memory;
 using NBench.Sdk;
 using NBench.Sys;
 
@@ -24,11 +25,11 @@ namespace NBench.Collection.Memory
         {
         }
 
-        public override IEnumerable<MetricCollector> Create(RunMode runMode, WarmupData warmup, IBenchmarkSetting setting)
+        public override MetricCollector Create(RunMode runMode, WarmupData warmup, IBenchmarkSetting setting)
         {
 
             //if (warmup.ElapsedTicks <= BenchmarkConstants.SamplingPrecisionTicks)
-                return new[] {new GcTotalMemoryCollector(MemoryMetricName)};
+            return new GcTotalMemoryCollector(MemoryMetricName);
             //return new[] {new PerformanceCounterTotalMemoryCollector(MemoryMetricName)};
         }
     }

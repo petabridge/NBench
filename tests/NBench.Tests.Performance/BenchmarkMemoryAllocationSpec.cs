@@ -21,8 +21,9 @@ namespace NBench.Tests.Performance
         [PerfSetup]
         public void Setup()
         {
+            var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
             var benchmarkData = ReflectionDiscovery.CreateBenchmarksForClass(typeof (MemoryAllocationSpec)).First();
-            var settings = ReflectionDiscovery.CreateSettingsForBenchmark(benchmarkData);
+            var settings = discovery.CreateSettingsForBenchmark(benchmarkData);
             var invoker = ReflectionDiscovery.CreateInvokerForBenchmark(benchmarkData);
             _testableBenchmark = new Benchmark(settings, invoker, BenchmarkOutput);
         }

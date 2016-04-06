@@ -4,6 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NBench.Collection;
+using NBench.Metrics;
+using NBench.Metrics.Counters;
+using NBench.Metrics.GarbageCollection;
+using NBench.Metrics.Memory;
 
 namespace NBench.Sdk
 {
@@ -12,22 +17,37 @@ namespace NBench.Sdk
     /// </summary>
     public class BenchmarkSettings
     {
+        internal class BenchmarkEqualityComparer : IEqualityComparer<IBenchmarkSetting>
+        {
+            public bool Equals(IBenchmarkSetting x, IBenchmarkSetting y)
+            {
+                /*
+                 * We only care that the metrics have the same name
+                 */
+                return x.MetricName.Equals(y.MetricName);
+            }
+
+            public int GetHashCode(IBenchmarkSetting obj)
+            {
+                return obj.MetricName.GetHashCode();
+            }
+        }
+        private static readonly BenchmarkEqualityComparer Comparer = new BenchmarkEqualityComparer();
+
         public const long DefaultRuntimeMilliseconds = 1000;
 
         public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTime,
-            IEnumerable<GcBenchmarkSetting> gcBenchmarks,
-            IEnumerable<MemoryBenchmarkSetting> memoryBenchmarks,
-            IEnumerable<CounterBenchmarkSetting> counterBenchmarks)
+            IEnumerable<IBenchmarkSetting> benchmarkSettings,
+            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors)
             : this(
-                testMode, runMode, numberOfIterations, runTime, gcBenchmarks, memoryBenchmarks,
-                counterBenchmarks, string.Empty, string.Empty)
+                testMode, runMode, numberOfIterations, runTime, 
+                benchmarkSettings, collectors, string.Empty, string.Empty)
         {
         }
 
         public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTimeMilliseconds,
-            IEnumerable<GcBenchmarkSetting> gcBenchmarks,
-            IEnumerable<MemoryBenchmarkSetting> memoryBenchmarks,
-            IEnumerable<CounterBenchmarkSetting> counterBenchmarks, string description, string skip)
+            IEnumerable<IBenchmarkSetting> benchmarkSettings,
+            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip)
         {
             TestMode = testMode;
             RunMode = runMode;
@@ -36,25 +56,17 @@ namespace NBench.Sdk
             Description = description;
             Skip = skip;
 
-            // Strip out any duplicates here
-            // TODO: is it better to move that responsibility outside of the BenchmarkSettings class?
+            // screen line for line duplicates that made it in by accident
+            Measurements = new HashSet<IBenchmarkSetting>(benchmarkSettings).ToList();
 
-            GcBenchmarks = new HashSet<GcBenchmarkSetting>(gcBenchmarks).ToList();
-            MemoryBenchmarks = new HashSet<MemoryBenchmarkSetting>(memoryBenchmarks).ToList();
-            CounterBenchmarks = new HashSet<CounterBenchmarkSetting>(counterBenchmarks).ToList();
+            // now filter terms that measure the same quantities, but with different BenchmarkAssertions
+            // because we only want to collect those measurements ONCE, but use them across mulitple BenchmarkAssertions.
+            DistinctMeasurements = Measurements.Distinct(Comparer).ToList();
 
-            DistinctGcBenchmarks =
-                GcBenchmarks.Distinct(GcBenchmarkSetting.GcBenchmarkDistinctComparer.Instance).ToList();
-
-            DistinctCounterBenchmarks =
-                CounterBenchmarks.Distinct(CounterBenchmarkSetting.CounterBenchmarkDistinctComparer.Instance).ToList();
-
-            DistinctMemoryBenchmarks =
-                MemoryBenchmarks.Distinct(MemoryBenchmarkSetting.MemoryBenchmarkDistinctComparer.Instance).ToList();
+            Collectors = collectors;
         }
 
         /// <summary>
-        ///     The mode in which this performance test assertions will be tested.
         /// </summary>
         public TestMode TestMode { get; private set; }
 
@@ -76,17 +88,35 @@ namespace NBench.Sdk
         /// <remarks>Set to 0 to disable.</remarks>
         public TimeSpan RunTime { get; private set; }
 
-        public IReadOnlyList<GcBenchmarkSetting> GcBenchmarks { get; }
-        public IReadOnlyList<MemoryBenchmarkSetting> MemoryBenchmarks { get; }
-        public IReadOnlyList<CounterBenchmarkSetting> CounterBenchmarks { get; }
-        internal IReadOnlyList<GcBenchmarkSetting> DistinctGcBenchmarks { get; }
-        internal IReadOnlyList<MemoryBenchmarkSetting> DistinctMemoryBenchmarks { get; }
-        internal IReadOnlyList<CounterBenchmarkSetting> DistinctCounterBenchmarks { get; }
+        /// <summary>
+        /// All of the configured metrics for this <see cref="Benchmark"/>
+        /// </summary>
+        public IReadOnlyList<IBenchmarkSetting> Measurements { get; private set; }
+
+        /// <summary>
+        /// If someone declares two measurements that measure the same thing, but carry different BenchmarkAssertions
+        /// then those settings will only show up once on this list, whereas they might appear twice on <see cref="Measurements"/>
+        /// </summary>
+        public IReadOnlyList<IBenchmarkSetting> DistinctMeasurements { get; private set; }
+
+        /// <summary>
+        /// Counter settings, which require special treatment since they have to be injected
+        /// into <see cref="BenchmarkContext"/>. Derived from <see cref="DistinctMeasurements"/>.
+        /// </summary>
+        public IEnumerable<CounterBenchmarkSetting> CounterMeasurements
+            => DistinctMeasurements
+                .Where(x => x is CounterBenchmarkSetting)
+                .Cast<CounterBenchmarkSetting>();
+
+        /// <summary>
+        /// The table of collectors we're going to use to gather the metrics configured in <see cref="Measurements"/>
+        /// </summary>
+        public IReadOnlyDictionary<MetricName, MetricsCollectorSelector> Collectors { get; private set; }
 
         /// <summary>
         ///     Total number of all metrics tracked in this benchmark
         /// </summary>
-        public int TotalTrackedMetrics => GcBenchmarks.Count + MemoryBenchmarks.Count + CounterBenchmarks.Count;
+        public int TotalTrackedMetrics => Measurements.Count;
 
         /// <summary>
         ///     A description of this performance benchmark, which will be written into the report.
