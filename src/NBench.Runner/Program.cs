@@ -1,14 +1,6 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using NBench.Reporting;
-using NBench.Reporting.Targets;
-using NBench.Sdk.Compiler;
 using NBench.Sdk;
 
 namespace NBench.Runner
@@ -18,7 +10,7 @@ namespace NBench.Runner
 		/// <summary>
 		/// NBench Runner takes the following <see cref="args"/>
 		/// 
-		/// C:\> NBench.Runner.exe [assembly name] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*]
+		/// C:\> NBench.Runner.exe [assembly name] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
 		/// 
 		/// </summary>
 		/// <param name="args">The commandline arguments</param>
@@ -26,12 +18,16 @@ namespace NBench.Runner
 		{
 			string[] include = null;
 			string[] exclude = null;
+		    bool concurrent = false;
 			if (CommandLine.HasProperty("include"))
 				include = CommandLine.GetProperty("include").Split(',');
 			if (CommandLine.HasProperty("exclude"))
-				include = CommandLine.GetProperty("exclude").Split(',');
+				exclude = CommandLine.GetProperty("exclude").Split(',');
+		    if (CommandLine.HasProperty("concurrent"))
+		        concurrent = CommandLine.GetBool("concurrent");
 
-			TestPackage package = new TestPackage(CommandLine.GetFiles(args), include, exclude);
+
+			TestPackage package = new TestPackage(CommandLine.GetFiles(args), include, exclude, concurrent);
 
 			if (CommandLine.HasProperty("output-directory"))
 				package.OutputDirectory = CommandLine.GetProperty("output-directory");

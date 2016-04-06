@@ -96,7 +96,10 @@ namespace NBench.Sdk
         /// <returns>True if all tests passed.</returns>
         public TestRunnerResult Execute()
         {
-            SetProcessPriority();
+            // Perform core / thread optimizations if we're running in single-threaded mode
+            // But not if the user has specified that they're going to be running multi-threaded benchmarks
+            if(!_package.Concurrent)
+                SetProcessPriority();
 
             IBenchmarkOutput output = CreateOutput();
             var discovery = new ReflectionDiscovery(output);

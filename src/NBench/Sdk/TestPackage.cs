@@ -50,6 +50,14 @@ namespace NBench.Sdk
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// If <c>true</c>, NBench disables any processor affinity or thread priority settings.
+        /// If <c>false</c>, NBench will run in single-threaded mode and set processor affinity + thread priority.
+        /// 
+        /// Defaults to false.
+        /// </summary>
+        public bool Concurrent { get; set; }
+
 		/// <summary>
 		/// Gets the file names of the assemblies containing tests
 		/// </summary>
@@ -58,13 +66,14 @@ namespace NBench.Sdk
             get { return _testfiles; }
         }
 
-	    /// <summary>
-	    /// Initializes a new test package with one test file.
-	    /// </summary>
-	    /// <param name="filePath">The path to a test file.</param>
-	    /// <param name="include">An optional include pattern</param>
-	    /// <param name="exclude">An optiona exclude pattern</param>
-	    public TestPackage(string filePath, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        /// <summary>
+        /// Initializes a new test package with one test file.
+        /// </summary>
+        /// <param name="filePath">The path to a test file.</param>
+        /// <param name="include">An optional include pattern</param>
+        /// <param name="exclude">An optiona exclude pattern</param>
+        /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
+        public TestPackage(string filePath, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
 		{
 			if (string.IsNullOrEmpty(filePath))
 				throw new ArgumentNullException("filePath");
@@ -81,15 +90,18 @@ namespace NBench.Sdk
 				foreach (var p in exclude)
 					AddExclude(p.Trim());
 			}
+
+            Concurrent = concurrent;
 		}
 
-	    /// <summary>
-	    /// Initializes a new package with multiple test files.
-	    /// </summary>
-	    /// <param name="files">A list of test files.</param>
-	    /// <param name="include">Optional list of include patterns</param>
-	    /// <param name="exclude">Optional list of exclude patterns</param>
-	    public TestPackage(IEnumerable<string> files, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        /// <summary>
+        /// Initializes a new package with multiple test files.
+        /// </summary>
+        /// <param name="files">A list of test files.</param>
+        /// <param name="include">Optional list of include patterns</param>
+        /// <param name="exclude">Optional list of exclude patterns</param>
+        /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
+        public TestPackage(IEnumerable<string> files, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
         {
             if (files == null || !files.Any())
                 throw new ArgumentException("Please provide at least one test file." ,"files");
@@ -113,7 +125,9 @@ namespace NBench.Sdk
 				foreach (var p in exclude)
 					AddExclude(p.Trim());
 			}
-		}
+
+            Concurrent = concurrent;
+        }
 
         /// <summary>
         /// Validates the test package
