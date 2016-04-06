@@ -1,5 +1,35 @@
 #### 0.2.0 March 22 2016
-Notes next
+Major changes in NBench v0.2, beginning with our new logo: ![NBench logo](images/NBench_logo_square_140.png)
+
+First, we've added an [extensible plugin API for capturing third-party metrics not natively provided by NBench](https://github.com/petabridge/NBench/pull/86). We will be providing more detailed documentation for this in a later release.
+
+**NBench.PerformanceCounters**
+The first example of this can be found in NBench.PerformanceCounters, a brand new NuGet package that allows you to instrument any arbitrary Windows `PerformanceCounter` on any of your tests.
+
+    PS> Install-Package NBench.PerformanceCounters
+
+This package introduces the three following attributes you can use on your benchmarks and performance tests:
+
+* `PerformanceCounterMeasurementAttribute` - measures any available performance counter.
+* `PerformanceCounterThroughputAssertion` - asserts a performance counter's *per-second* value.
+* `PerformanceCounterTotalAssertion` - asserts a performance counter's *total* value.
+
+**TimingMeasurement and ElapsedTimeAssertion**
+Somewhat related to traditional `CounterMeasurement`s, we've added two new attributes which allow you to measure and assert against the total amount of elapsed time it took to run a particular block of code.
+
+* `TimingMeasurementAttribute` - reports on the elapsed time a single run of a benchmark took in milliseconds. Designed to work with `RunMode.Iterations` benchmarks.
+* `ElapsedTimeAssertionAttribute` - performs a bounds-checking assertion on amount of time it took to run a particular benchmark. Designed to work with `RunMode.Iterations` benchmarks.
+
+These are now available as part of the core NBench package.
+
+**Additional NBench.Runner Options**
+NBench.Runner now supports a new flag argument, `concurrent=true|false`
+
+```
+NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
+```
+
+**concurrent=true|false** - disables thread priority and processor affinity operations for all benchmarks. Used only when running multi-threaded benchmarks. Set to `false` (single-threaded) by default.
 
 #### 0.1.6 February 15 2016
 Includes following features:
