@@ -26,7 +26,7 @@ namespace NBench.Tests.Collection.Timing
             Task.Delay(TimeSpan.FromMilliseconds(waitTime)).Wait();
             var next = timingCollector.Collect();
             var delta = next - initial;
-            Assert.True(delta < maxAllowedTime);
+            Assert.True(delta < maxAllowedTime, $"Expected a time between {waitTime} ms and {maxAllowedTime} ms - got {delta} ms instead.");
         }
     }
 }

@@ -59,7 +59,7 @@ And this command will run your `PerfBenchmark` and write output [that looks like
 
 ## Command Line Paramters
 ```
-NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*]
+NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
 ```
 
 * **assembly names** - list of assemblies to load and test. Space delimited. Requires `.dll` or `.exe` at the end of each assembly name
@@ -69,6 +69,7 @@ NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration=
 The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
 * **exclude=name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and excluded in the tests. Default value is `` (none)
 The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
+* **concurrent=true|false** - disables thread priority and processor affinity operations for all benchmarks. Used only when running multi-threaded benchmarks. Set to `false` (single-threaded) by default.
 
 Supported wildcard patterns are `*` any string and `?` any char. In order to include a class with all its tests in the benchmark
 you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass.*`.
