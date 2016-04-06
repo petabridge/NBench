@@ -1,5 +1,7 @@
 # NBench
 
+![NBench logo](images/NBench_logo_square_140.png)
+
 [![Join the chat at https://gitter.im/petabridge/NBench](https://badges.gitter.im/petabridge/NBench.svg)](https://gitter.im/petabridge/NBench?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Cross-platform performance benchmarking and testing framework for .NET applications.
 
@@ -253,3 +255,5 @@ Here are a few best practices to bear in mind when working with counters:
 
 1. It's always best to store references to your `Counter` instances as fields inside your POCO class and to get those references during a `PerfSetup` call, rather than get references to them on-the-fly inside your benchmark.
 1. Adding the `BenchmarkContext` parameter to your `PerfBenchmark` methods will improve throughput slightly, due to a design of NBench's `ReflectionInvoker`.
+
+Copyright (c) [Petabridge, LLC](https://petabridge.com/) 2015-2016
