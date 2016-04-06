@@ -1,5 +1,5 @@
 #### 0.2.0 March 22 2016
-Major changes in NBench v0.2, beginning with our new logo: ![NBench logo](images/NBench_logo_square_140.png)
+Major changes in NBench v0.2, beginning with our new logo: ![NBench logo](https://github.com/petabridge/NBench/blob/dev/images/NBench_logo_square_140.png)
 
 First, we've added an [extensible plugin API for capturing third-party metrics not natively provided by NBench](https://github.com/petabridge/NBench/pull/86). We will be providing more detailed documentation for this in a later release.
 
