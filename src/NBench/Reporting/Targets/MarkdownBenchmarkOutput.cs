@@ -96,7 +96,7 @@ namespace NBench.Reporting.Targets
             sb.AppendFormat(BuildRunTable(results.Data.Runs));
             if (results.AssertionResults.Count > 0)
             {
-                sb.AppendLine("## Assertions");
+                sb.AppendLine("## BenchmarkAssertions");
                 sb.AppendLine();
                 foreach (var assertion in results.AssertionResults)
                 {

@@ -17,7 +17,7 @@ namespace NBench
         Test,
 
         /// <summary>
-        /// Performs no assertions - just records the metrics and writes them to the log
+        /// Performs no BenchmarkAssertions - just records the metrics and writes them to the log
         /// </summary>
         Measurement,
     }

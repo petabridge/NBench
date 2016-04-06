@@ -11,20 +11,24 @@ namespace NBench.Sdk
     /// <summary>
     ///     Responsible for running <see cref="Assertion" />s over <see cref="BenchmarkResults" />.
     /// </summary>
-    public static class AssertionRunner
+    public class DefaultBenchmarkAssertionRunner : IBenchmarkAssertionRunner
     {
-        public static IReadOnlyList<AssertionResult> RunAssertions(BenchmarkSettings settings, BenchmarkResults results)
+        public static readonly DefaultBenchmarkAssertionRunner Instance = new DefaultBenchmarkAssertionRunner();
+
+        private DefaultBenchmarkAssertionRunner() { }
+
+        public IReadOnlyList<AssertionResult> RunAssertions(BenchmarkSettings settings, BenchmarkResults results)
         {
             Contract.Requires(settings != null);
             var assertionResults = new List<AssertionResult>();
 
-            // Not in testing mode, therefore we don't need to apply these assertions
+            // Not in testing mode, therefore we don't need to apply these BenchmarkAssertions
             if (settings.TestMode == TestMode.Measurement)
             {
                 return assertionResults;
             }
 
-            // collect all benchmark settings with non-empty assertions
+            // collect all benchmark settings with non-empty BenchmarkAssertions
             IReadOnlyList<IBenchmarkSetting> allSettings = settings.Measurements.Where(x => !x.Assertion.Equals(Assertion.Empty)).ToList();
 
             foreach (var setting in allSettings)

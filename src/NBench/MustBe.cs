@@ -4,7 +4,7 @@
 namespace NBench
 {
     /// <summary>
-    /// Comparison and test types used by NBench for performing performance test assertions
+    /// Comparison and test types used by NBench for performing performance test BenchmarkAssertions
     /// </summary>
     public enum MustBe
     {

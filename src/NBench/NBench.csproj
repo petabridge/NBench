@@ -117,12 +117,13 @@
     <Compile Include="Reporting\Targets\MarkdownBenchmarkOutput.cs" />
     <Compile Include="Sdk\Assertion.cs" />
     <Compile Include="Sdk\AssertionResult.cs" />
-    <Compile Include="Sdk\AssertionRunner.cs" />
+    <Compile Include="Sdk\DefaultBenchmarkAssertionRunner.cs" />
     <Compile Include="Sdk\AssertionType.cs" />
     <Compile Include="BenchmarkContext.cs" />
     <Compile Include="Sdk\BenchmarkBuilder.cs" />
     <Compile Include="Metrics\Counters\CounterMeasurementConfigurator.cs" />
     <Compile Include="Sdk\Compiler\ReflectionDiscovery.Configurators.cs" />
+    <Compile Include="Sdk\IBenchmarkAssertionRunner.cs" />
     <Compile Include="Sdk\IMeasurementConfigurator.cs" />
     <Compile Include="Sdk\MeasurementConfigurator.cs" />
     <Compile Include="Sdk\BenchmarkConstants.cs" />

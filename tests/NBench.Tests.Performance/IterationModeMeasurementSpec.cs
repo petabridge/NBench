@@ -18,7 +18,7 @@ namespace NBench.Tests.Performance
         [PerfBenchmark(Description = "Test to ensure that the math following an iteration mode test is accurate",
             NumberOfIterations = 3, RunMode = RunMode.Iterations, RunTimeMilliseconds = 1000, TestMode = TestMode.Test)]
         [CounterTotalAssertion("Counter1", MustBe.GreaterThanOrEqualTo, 1000.0d)]
-        [CounterTotalAssertion("Counter1", MustBe.GreaterThan, 500.0d)] // duplicate, to see if multiple assertions against same counter run
+        [CounterTotalAssertion("Counter1", MustBe.GreaterThan, 500.0d)] // duplicate, to see if multiple BenchmarkAssertions against same counter run
         [CounterTotalAssertion("Counter2", MustBe.GreaterThanOrEqualTo, 1000.0d)]
         [CounterMeasurement("Counter2")]
         public void Benchmark()
