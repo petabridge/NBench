@@ -1,5 +1,5 @@
 #### 0.2.1 March 22 2016
-Vnext
+Fixed issue with NuGet logos and concurrency settings - we now still keep the process priority set to high, as we did before.
 
 #### 0.2.0 March 22 2016
 Major changes in NBench v0.2, beginning with our new logo: ![NBench logo](https://github.com/petabridge/NBench/blob/dev/images/NBench_logo_square_140.png)
