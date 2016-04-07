@@ -10,17 +10,17 @@ using System.Threading;
 
 namespace NBench.Sdk
 {
-	/// <summary>
-	/// Results collected by the test runner
-	/// </summary>
-	[Serializable]
-	public class TestRunnerResult
-	{
-		public bool AllTestsPassed { get; set; }
+    /// <summary>
+    /// Results collected by the test runner
+    /// </summary>
+    [Serializable]
+    public class TestRunnerResult
+    {
+        public bool AllTestsPassed { get; set; }
 
-		public int ExecutedTestsCount { get; set; }
-		public int IgnoredTestsCount { get; set; }
-	}
+        public int ExecutedTestsCount { get; set; }
+        public int IgnoredTestsCount { get; set; }
+    }
     /// <summary>
     /// Executor of tests
     /// </summary>
@@ -37,7 +37,7 @@ namespace NBench.Sdk
         {
             _package = package;
         }
-        
+
         /// <summary>
         /// Creates a new instance of the test runner in the given app domain.
         /// </summary>
@@ -60,11 +60,11 @@ namespace NBench.Sdk
         {
             // create the test app domain
             var testDomain = DomainManager.CreateDomain(package);
-            
+
             try
             {
                 var runner = TestRunner.CreateRunner(testDomain, package);
-                return runner.Execute();                
+                return runner.Execute();
             }
             finally
             {
@@ -75,13 +75,16 @@ namespace NBench.Sdk
         /// <summary>
         /// Initializes the process and thread
         /// </summary>
-        public static void SetProcessPriority()
+        public void SetProcessPriority(bool concurrent)
         {
             /*
             * Set processor affinity
             */
-            Process Proc = Process.GetCurrentProcess();
-            Proc.ProcessorAffinity = new IntPtr(2); // either of the first two processors
+            if (!concurrent)
+            {
+                var proc = Process.GetCurrentProcess();
+                proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
+            }
 
             /*
              * Set priority
@@ -98,50 +101,50 @@ namespace NBench.Sdk
         {
             // Perform core / thread optimizations if we're running in single-threaded mode
             // But not if the user has specified that they're going to be running multi-threaded benchmarks
-            if(!_package.Concurrent)
-                SetProcessPriority();
+            SetProcessPriority(_package.Concurrent);
 
             IBenchmarkOutput output = CreateOutput();
             var discovery = new ReflectionDiscovery(output);
-	        var result = new TestRunnerResult()
-	        {
-		        AllTestsPassed = true
-	        };
+            var result = new TestRunnerResult()
+            {
+                AllTestsPassed = true
+            };
 
-			try
-			{
+            try
+            {
                 foreach (var testFile in _package.Files)
-				{
-					var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
+                {
+                    var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
 
-					var benchmarks = discovery.FindBenchmarks(assembly);
+                    var benchmarks = discovery.FindBenchmarks(assembly);
 
-					foreach (var benchmark in benchmarks)
-					{
-						// verify if the benchmark should be included/excluded from the list of benchmarks to be run
-						if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
-						{
-							output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
-							benchmark.Run();
-							benchmark.Finish();
+                    foreach (var benchmark in benchmarks)
+                    {
+                        // verify if the benchmark should be included/excluded from the list of benchmarks to be run
+                        if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
+                        {
+                            output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
+                            benchmark.Run();
+                            benchmark.Finish();
 
-							// if one assert fails, all fail
-							result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
-							output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
-							result.ExecutedTestsCount = result.ExecutedTestsCount+1;
-						}
-						else
-						{
-							output.WriteLine($"------------ NOTRUN {benchmark.BenchmarkName} ---------- ");
-							result.IgnoredTestsCount = result.IgnoredTestsCount+1;
-						}
-					}
-				}
-			} catch(Exception ex)
-			{
-				output.Error(ex, "Error while executing the tests.");
-				result.AllTestsPassed = false;
-			}
+                            // if one assert fails, all fail
+                            result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
+                            output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
+                            result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
+                        }
+                        else
+                        {
+                            output.WriteLine($"------------ NOTRUN {benchmark.BenchmarkName} ---------- ");
+                            result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                output.Error(ex, "Error while executing the tests.");
+                result.AllTestsPassed = false;
+            }
 
             return result;
         }
