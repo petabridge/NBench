@@ -6,6 +6,7 @@ using NBench.Reporting.Targets;
 using NBench.Sdk.Compiler;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Threading;
 
 namespace NBench.Sdk
@@ -46,6 +47,7 @@ namespace NBench.Sdk
         /// <returns></returns>
         public static TestRunner CreateRunner(AppDomain domain, TestPackage package)
         {
+            Contract.Requires(domain != null);
             var runnerType = typeof(TestRunner);
             return domain.CreateInstanceAndUnwrap(runnerType.Assembly.FullName, runnerType.FullName, false, 0, null, new object[] { package }, null, null) as TestRunner;
         }
@@ -58,6 +60,7 @@ namespace NBench.Sdk
         /// <remarks>Creates a new AppDomain and executes the tests.</remarks>
         public static TestRunnerResult Run(TestPackage package)
         {
+            Contract.Requires(package != null);
             // create the test app domain
             var testDomain = DomainManager.CreateDomain(package);
 
