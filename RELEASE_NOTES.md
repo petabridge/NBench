@@ -1,3 +1,6 @@
+#### 0.2.2 May 03 2016
+Warmup count is now equal to iteration count on all benchmarks, useful for users with long-running macro benchmarks and stress tests.
+
 #### 0.2.1 March 22 2016
 Fixed issue with NuGet logos and concurrency settings - we now still keep the process priority set to high, as we did before.
 

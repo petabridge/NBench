@@ -108,6 +108,7 @@
     <Compile Include="Sdk\BenchmarkSettingsSpecs.cs" />
     <Compile Include="Sdk\BenchmarkSlowIterationSpecs.cs" />
     <Compile Include="Sdk\BenchmarkThroughputSpecs.cs" />
+    <Compile Include="Sdk\BenchmarkWarmupSpecs.cs" />
     <Compile Include="Sdk\Compiler\ReflectionBenchmarkInvokerSpecs.cs" />
     <Compile Include="Sdk\Compiler\ReflectionDiscoveryConfiguratorSpecs.cs" />
     <Compile Include="TestMetricCollector.cs" />
