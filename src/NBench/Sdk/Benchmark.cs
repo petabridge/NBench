@@ -18,7 +18,7 @@ namespace NBench.Sdk
     /// </summary>
     public class Benchmark
     {
-        public const int WarmupCount = 13;
+        private readonly int _warmupCount;
         protected readonly BenchmarkBuilder Builder;
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace NBench.Sdk
         public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer, IBenchmarkAssertionRunner benchmarkAssertions)
         {
             Settings = settings;
-            _pendingIterations = Settings.NumberOfIterations;
+            _warmupCount = _pendingIterations = Settings.NumberOfIterations;
             Invoker = invoker;
             Output = writer;
             CompletedRuns = new Queue<BenchmarkRunReport>(Settings.NumberOfIterations);
@@ -141,7 +141,7 @@ namespace NBench.Sdk
 
             WarmupData = new WarmupData(runTime, runCount);
 
-            var i = WarmupCount;
+            var i = _warmupCount;
 
             /* Warmup to force CPU caching */
             while (i > 0 && !_currentRun.IsFaulted)
