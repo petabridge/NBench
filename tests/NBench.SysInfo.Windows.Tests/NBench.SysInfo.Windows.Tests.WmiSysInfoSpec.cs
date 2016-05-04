@@ -5,29 +5,81 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Xunit;
+using System.Reflection;
 
 namespace NBench.SysInfo.Windows.Tests
 {
     public class WmiSysInfoSpec
     {
         [Fact]
-        public void LoadWmiSysInfo()
+        public void LoadWmiProcessorSysInfo()
         {
-            var info = new SortedDictionary<string, string>();
+            var hardwareInfo = new SortedDictionary<string, string>();
 
-            var wmiSysInfo = new NBench.SysInfo.Windows.WmiSysInfo();
-            wmiSysInfo.LoadSysInfo(info);
+            var wmiSysInfo = new NBench.SysInfo.Windows.WmiProcessorSysInfo();
+            wmiSysInfo.LoadSysInfo(hardwareInfo);
 
-            Assert.NotEmpty(info);
+            Assert.NotEmpty(hardwareInfo);
 
-            Debug.WriteLine(string.Empty.PadLeft(25, '=') + " Win32_Processor:");
-            foreach (var key in info.Keys)
+            DebugWriteAll(hardwareInfo, "Win32_Processor");
+        }
+
+        [Fact]
+        public void LoadWmiMemorySysInfo()
+        {
+            var hardwareInfo = new SortedDictionary<string, string>();
+
+            var wmiSysInfo = new NBench.SysInfo.Windows.WmiPhysicalMemorySysInfo();
+            wmiSysInfo.LoadSysInfo(hardwareInfo);
+
+            Assert.NotEmpty(hardwareInfo);
+
+            DebugWriteAll(hardwareInfo, "Win32_PhysicalMemory");
+        }
+
+        [Fact]
+        public void LoadWmiBiosSysInfo()
+        {
+            var hardwareInfo = new SortedDictionary<string, string>();
+
+            var wmiSysInfo = new NBench.SysInfo.Windows.WmiBiosSysInfo();
+            wmiSysInfo.LoadSysInfo(hardwareInfo);
+
+            Assert.NotEmpty(hardwareInfo);
+
+            DebugWriteAll(hardwareInfo, "Win32_BIOS");
+        }
+
+        [Fact]
+        public void LoadAllWmISysInfo()
+        {
+            var hardwareInfo = new SortedDictionary<string, string>();
+
+            var theAssembly = Assembly.GetAssembly(typeof(WmiSysInfo));
+            var wmisiTypes = from t in theAssembly.GetTypes()
+                             where t.BaseType == typeof(WmiSysInfo)
+                             select t;
+
+            foreach (var t in wmisiTypes)
             {
-                Debug.WriteLine(string.Format(" {0}: {1}", key, info[key]));
+                var wmisi = Activator.CreateInstance(t);
+                ((WmiSysInfo)wmisi).LoadSysInfo(hardwareInfo);
             }
-            Debug.WriteLine(string.Empty.PadLeft(25, '=') + " Win32_Processor (END)");
+
+            Assert.NotEmpty(hardwareInfo);
+
+            DebugWriteAll(hardwareInfo, "FULL HARDWARE INFO");
+        }
+
+        private static void DebugWriteAll(IDictionary<string, string> hardwareInfo, string label)
+        {
+            Debug.WriteLine(string.Empty.PadLeft(25, '=') + " " + label + ":");
+            foreach (var key in hardwareInfo.Keys)
+            {
+                Debug.WriteLine(string.Format(" {0}: {1}", key, hardwareInfo[key]));
+            }
+            Debug.WriteLine(string.Empty.PadLeft(25, '=') + label + " (END)");
         }
     }
 }

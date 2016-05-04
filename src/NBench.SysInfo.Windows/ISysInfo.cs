@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace NBench.SysInfo.Windows
+namespace NBench.Sys
 {
     public interface ISysInfo
     {
