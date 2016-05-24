@@ -72,6 +72,7 @@ The test is executed on the complete name of the benchmark `Namespace.Class+Meth
 * **exclude=name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and excluded in the tests. Default value is `` (none)
 The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
 * **concurrent=true|false** - disables thread priority and processor affinity operations for all benchmarks. Used only when running multi-threaded benchmarks. Set to `false` (single-threaded) by default.
+* **tracing=true|false** - turns on trace capture inside the NBench runner and will save any captured messages to all available output targets, including Markdown reports. Set to `false` by default.
 
 Supported wildcard patterns are `*` any string and `?` any char. In order to include a class with all its tests in the benchmark
 you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass.*`.
@@ -89,6 +90,7 @@ Here are the different options for creating a `PerfBenchmark`:
 * `TestMode` - sets the test mode for this benchmark. Possible options are `TestMode.Measurement` and `TestMode.Test`. More on what those options mean in a moment.
 * `NumberOfIterations` - determines how many times this benchmark will be run. All final benchmark statistics are reported as an aggregate across all iterations.
 * `RunTimeMilliseconds` - for `RunMode.ThroughPut`, this indicates how long we'll attempt to run a test for in order to measure the metric per second values.
+* `SkipWarmups` - disables "warmup" iterations that are used to perform cache warming on the CPU. Disabling warmups is often used in long-running iteration tests.
 
 You can declare a `PerfBenchmark` attribute on multiple methods within a single POCO class and each one will be run as its own independent benchmark.
 

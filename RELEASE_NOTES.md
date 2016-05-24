@@ -1,5 +1,70 @@
-#### 0.2.3 May 03 2016
-Placeholder for vNext
+#### 0.3.0 May 24 2016
+This release introduces some breaking changes to NBench:
+
+**Tracing**
+The biggest feature included in this release is the addition of tracing support, which is exposed directly to end-users so they can capture trace events and include them in the output produced by NBench.
+
+You can access the `IBenchmarkTrace` object through the `BenchmarkContext` passed into any of your `PerfSetup`, `PerfBenchmark`, or `PerfCleanup` methods like such:
+
+```csharp
+public class TracingBenchmark
+{
+   
+    [PerfSetup]
+    public void Setup(BenchmarkContext context)
+    {
+        context.Trace.Debug(SetupTrace);
+    }
+
+    [PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = IterationCount, RunTimeMilliseconds = 1000)]
+    [MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+    [MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
+    public void Run1(BenchmarkContext context)
+    {
+        context.Trace.Debug(RunTrace);
+    }
+
+    [PerfCleanup]
+    public void Cleanup(BenchmarkContext context)
+    {
+        context.Trace.Info(CleanupTrace);
+    }
+}
+```
+
+`NBench.Runner.exe` now takes a `trace=true|false` commandline argument, which will enable the new tracing feature introduced in this release.
+
+**Tracing is disabled by default**.
+
+**Skippable Warmups**
+You can now elect to skip warmups altogether for your specs. This feature is particularly useful for long-running iteration benchmarks, which are often used for stress tests. Warmups don't add any value here.
+
+Here's how you can skip warmups:
+
+```csharp
+[PerfBenchmark(TestMode = TestMode.Test, NumberOfIterations = IterationCount, RunTimeMilliseconds = 1000, SkipWarmups = true)]
+[MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+[MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
+public void Run1(BenchmarkContext context)
+{
+    context.Trace.Debug(RunTrace);
+}
+```
+
+Just set `SkipWarmups = true` on your `PerfBenchmark` attribute wherever you wish to skip a warmup.
+
+**Foreground thread is no longer given high priority when concurrent mode is on**.
+
+If you are running the `NBench.Runner` with `concurrent=true`, we no longer give the main foreground thread high priority as this resulted in some unfair scheduling during concurrent tests. All threads within the `NBench.Runner` process all share the same priority now.
+
+**Markdown reports include additional data**
+All markdown reports now include:
+
+* The concurrency setting for NBench
+* The tracing setting for NBench
+* A flag indicating if warmups were skipped or not
+
+All of these were added in order to make it easy for end-users reading the reports to know what the NBench settings were at the time the report was produced.
 
 #### 0.2.2 May 03 2016
 Warmup count is now equal to iteration count on all benchmarks, useful for users with long-running macro benchmarks and stress tests.
