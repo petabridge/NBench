@@ -82,6 +82,10 @@ namespace NBench.Reporting.Targets
             sb.AppendLine("### NBench Settings");
             sb.AppendLine("```ini");
             sb.AppendLine($"RunMode={results.Data.Settings.RunMode}, TestMode={results.Data.Settings.TestMode}");
+            if (results.Data.Settings.SkipWarmups)
+            {
+                sb.AppendLine($"SkipWarmups={results.Data.Settings.SkipWarmups}");
+            }
             sb.AppendLine(
                 $"NumberOfIterations={results.Data.Settings.NumberOfIterations}, MaximumRunTime={results.Data.Settings.RunTime}");
             sb.AppendLine($"Concurrency Mode Enabled={results.Data.Settings.ConcurrentMode}");

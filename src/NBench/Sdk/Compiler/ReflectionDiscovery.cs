@@ -114,10 +114,12 @@ namespace NBench.Sdk.Compiler
                 }
             }
 
+            // TODO: need to start packing more of these settings in as propreties rather than constructor arguments
+            // it's becoming unsustainable, the number of different things we need to pass in here
             return new BenchmarkSettings(performanceTestAttribute.TestMode, performanceTestAttribute.RunMode,
                 performanceTestAttribute.NumberOfIterations, performanceTestAttribute.RunTimeMilliseconds,
                 measurements, collectors, performanceTestAttribute.Description,
-                performanceTestAttribute.Skip, Trace, RunnerSettings.ConcurrentModeEnabled);
+                performanceTestAttribute.Skip, Trace, RunnerSettings.ConcurrentModeEnabled){ SkipWarmups = performanceTestAttribute.SkipWarmups };
         }
 
         public static IBenchmarkInvoker CreateInvokerForBenchmark(BenchmarkClassMetadata benchmarkClass)
