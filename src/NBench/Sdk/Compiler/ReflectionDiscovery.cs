@@ -117,7 +117,7 @@ namespace NBench.Sdk.Compiler
             return new BenchmarkSettings(performanceTestAttribute.TestMode, performanceTestAttribute.RunMode,
                 performanceTestAttribute.NumberOfIterations, performanceTestAttribute.RunTimeMilliseconds,
                 measurements, collectors, performanceTestAttribute.Description,
-                performanceTestAttribute.Skip, Trace);
+                performanceTestAttribute.Skip, Trace, RunnerSettings.ConcurrentModeEnabled);
         }
 
         public static IBenchmarkInvoker CreateInvokerForBenchmark(BenchmarkClassMetadata benchmarkClass)

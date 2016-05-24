@@ -48,7 +48,7 @@ namespace NBench.Sdk
 
         public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTimeMilliseconds,
             IEnumerable<IBenchmarkSetting> benchmarkSettings,
-            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip, IBenchmarkTrace trace)
+            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip, IBenchmarkTrace trace, bool concurrencyModeEnabled = false)
         {
             TestMode = testMode;
             RunMode = runMode;
@@ -67,6 +67,7 @@ namespace NBench.Sdk
             Collectors = collectors;
 
             Trace = trace;
+            ConcurrentMode = concurrencyModeEnabled;
         }
 
         /// <summary>
@@ -77,6 +78,16 @@ namespace NBench.Sdk
         ///     The mode in which the performance test will be executed.
         /// </summary>
         public RunMode RunMode { get; private set; }
+
+        /// <summary>
+        /// Indicates whether concurrency is enabled or not
+        /// </summary>
+        public bool ConcurrentMode { get; private set; }
+
+        /// <summary>
+        /// Indicates whether tracing is enabled or not
+        /// </summary>
+        public bool TracingEnabled => !(Trace is NoOpBenchmarkTrace);
 
         /// <summary>
         ///     Number of times this test will be run
