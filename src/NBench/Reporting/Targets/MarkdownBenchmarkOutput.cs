@@ -88,8 +88,8 @@ namespace NBench.Reporting.Targets
             }
             sb.AppendLine(
                 $"NumberOfIterations={results.Data.Settings.NumberOfIterations}, MaximumRunTime={results.Data.Settings.RunTime}");
-            sb.AppendLine($"Concurrency Mode Enabled={results.Data.Settings.ConcurrentMode}");
-            sb.AppendLine($"Tracing Enabled={results.Data.Settings.TracingEnabled}");
+            sb.AppendLine($"Concurrent={results.Data.Settings.ConcurrentMode}");
+            sb.AppendLine($"Tracing={results.Data.Settings.TracingEnabled}");
             sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("## Data");
