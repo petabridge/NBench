@@ -299,12 +299,20 @@ namespace NBench.Sdk
         }
 
         /// <summary>
+        /// Helper method for printing out the correct label to trace
+        /// </summary>
+        private static string PrintWarmupOrRun(bool isWarmup)
+        {
+            return isWarmup ? "warmup" : "run";
+        }
+
+        /// <summary>
         /// Complete the current run
         /// </summary>
         private void Complete(bool isEstimate = false)
         {
             _currentRun.Dispose();
-            Trace.Info($"Generating report for run {_pendingIterations} of {BenchmarkName}");
+            Trace.Info($"Generating report for {PrintWarmupOrRun(_isWarmup)} {1 + Settings.NumberOfIterations - _pendingIterations} of {BenchmarkName}");
             var report = _currentRun.ToReport(StopWatch.Elapsed);
             if(!isEstimate)
                 Output.WriteRun(report, _isWarmup);

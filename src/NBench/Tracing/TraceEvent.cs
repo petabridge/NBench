@@ -8,6 +8,8 @@ namespace NBench.Tracing
     /// </summary>
     public abstract class TraceMessage
     {
+        public const string TraceIndicator = "[NBench]";
+
         protected TraceMessage(string message, TraceLevel level)
         {
             Message = message;
@@ -27,7 +29,7 @@ namespace NBench.Tracing
         public override string ToString()
         {
             return
-                $"[NBench][{Level.ToString().ToUpperInvariant()}][{Timestamp}][Thread {ThreadId.ToString().PadLeft(4, '0')}] {Message}";
+                $"{TraceIndicator}[{Level.ToString().ToUpperInvariant()}][{Timestamp}][Thread {ThreadId.ToString().PadLeft(4, '0')}] {Message}";
         }
     }
 
