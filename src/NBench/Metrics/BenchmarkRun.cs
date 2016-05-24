@@ -15,14 +15,14 @@ namespace NBench.Metrics
     /// </summary>
     public class BenchmarkRun : IDisposable
     {
-        public BenchmarkRun(IReadOnlyList<MeasureBucket> measures, IReadOnlyList<Counter> counters)
+        public BenchmarkRun(IReadOnlyList<MeasureBucket> measures, IReadOnlyList<Counter> counters, IBenchmarkTrace trace)
         {
             Contract.Requires(measures != null);
             Contract.Requires(counters != null);
             Measures = measures;
             MeasureCount = measures.Count;
             Counters = counters.ToDictionary(key => key.Name, v => v);
-            Context = new BenchmarkContext(Counters);
+            Context = new BenchmarkContext(Counters, trace);
         }
 
         public bool WasDisposed { get; private set; }

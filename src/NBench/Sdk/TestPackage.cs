@@ -67,6 +67,14 @@ namespace NBench.Sdk
         }
 
         /// <summary>
+        /// If <c>true</c>, NBench enables tracing and writes its output to all configured output targets.
+        /// If <c>false</c>, NBench disables tracing and will not write any output.
+        /// 
+        /// Defaults to false.
+        /// </summary>
+        public bool Tracing { get; set; }
+
+        /// <summary>
         /// Initializes a new test package with one test file.
         /// </summary>
         /// <param name="filePath">The path to a test file.</param>
@@ -76,7 +84,7 @@ namespace NBench.Sdk
         public TestPackage(string filePath, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
 		{
 			if (string.IsNullOrEmpty(filePath))
-				throw new ArgumentNullException("filePath");
+				throw new ArgumentNullException(nameof(filePath));
 
 			AddSingleFile(filePath);
 
@@ -103,15 +111,16 @@ namespace NBench.Sdk
         /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
         public TestPackage(IEnumerable<string> files, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
         {
-            if (files == null || !files.Any())
-                throw new ArgumentException("Please provide at least one test file." ,"files");
+            var enumerable = files as string[] ?? files.ToArray();
+            if (files == null || !enumerable.Any())
+                throw new ArgumentException("Please provide at least one test file." ,nameof(files));
 
 			// if only one file is given use same common logic
-			if (files.Count() == 1)
-				AddSingleFile(files.ElementAt(0));
+			if (enumerable.Count() == 1)
+				AddSingleFile(enumerable.ElementAt(0));
 			else
 			{
-				foreach (var file in files)
+				foreach (var file in enumerable)
 					_testfiles.Add(Path.GetFullPath(file));
 			}
 
@@ -138,7 +147,7 @@ namespace NBench.Sdk
             foreach(var file in _testfiles)
             {
                 if (!File.Exists(file))
-                    throw new FileNotFoundException(string.Format("Test file '{0}' could not be found!", file));
+                    throw new FileNotFoundException($"Test file '{file}' could not be found!");
             }
 
             // validation configuration file
@@ -148,7 +157,7 @@ namespace NBench.Sdk
                     ConfigurationFile = Path.Combine(GetBasePath(), ConfigurationFile);
 
                 if (!File.Exists(ConfigurationFile))
-                    throw new FileNotFoundException(string.Format("Configuration file '{0}' could not be found!", ConfigurationFile));
+                    throw new FileNotFoundException($"Configuration file '{ConfigurationFile}' could not be found!");
             }
         }
 

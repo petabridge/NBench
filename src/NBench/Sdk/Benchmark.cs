@@ -70,6 +70,7 @@ namespace NBench.Sdk
         public bool ShutdownCalled { get; private set; }
         protected IBenchmarkInvoker Invoker { get; }
         protected IBenchmarkOutput Output { get; }
+        protected IBenchmarkTrace Trace => Settings.Trace;
         protected IBenchmarkAssertionRunner BenchmarkAssertionRunner { get; }
 
         /// <summary>
@@ -88,19 +89,58 @@ namespace NBench.Sdk
         /// </summary>
         private void WarmUp()
         {
+            Trace.Debug($"Beginning Warmups for {BenchmarkName}");
             var warmupStopWatch = new Stopwatch();
             var targetTime = Settings.RunTime;
             Contract.Assert(targetTime != TimeSpan.Zero);
             var runCount = 0L;
 
             /* Pre-Warmup */
-            RunSingleBenchmark();
+           
+
+            Trace.Debug("----- BEGIN PRE-WARMUP -----");
+            /* Estimate */
+            Allocate(); // allocate all collectors needed
+            PreRun();
+
+            try
+            {
+                if (Settings.RunMode == RunMode.Throughput)
+                {
+                    Trace.Debug(
+                        $"Throughput mode: estimating how many invocations of {BenchmarkName} will take {targetTime.TotalSeconds}s");
+                    warmupStopWatch.Start();
+                    while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+                    {
+                        Invoker.InvokeRun(_currentRun.Context);
+                        runCount++;
+                    }
+                    warmupStopWatch.Stop();
+                    Trace.Debug(
+                        $"Throughput mode: executed {runCount} instances of {BenchmarkName} in roughly {targetTime.TotalSeconds}s. Using that figure for benchmark.");
+                }
+                else
+                {
+                    warmupStopWatch.Start();
+                    Invoker.InvokeRun(_currentRun.Context);
+                    runCount++;
+                    warmupStopWatch.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleBenchmarkRunException(ex, $"Error occurred during ${BenchmarkName} RUN.");
+            }
+
+            PostRun();
+            Complete(true);
 
             // check to see if pre-warmup threw an exception
             var faulted = _currentRun.IsFaulted;
 
             if (faulted)
             {
+                Trace.Error($"Error occurred during pre-warmup. Exiting and producing dump...");
                 /*
                  * Normally we don't ever queue up the warmup into the final stats, but we do it
                  * in failure cases so we can capture the exception thrown during warmup into
@@ -111,36 +151,14 @@ namespace NBench.Sdk
                 return;
             }
 
-            /* Estimate */
-            Allocate(); // allocate all collectors needed
-            PreRun();
-           
-            if (Settings.RunMode == RunMode.Throughput)
-            {
-                warmupStopWatch.Start();
-                while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
-                {
-                    Invoker.InvokeRun(_currentRun.Context);
-                    runCount++;
-                }
-                warmupStopWatch.Stop();
-            }
-            else
-            {
-                warmupStopWatch.Start();
-                Invoker.InvokeRun(_currentRun.Context);
-                runCount++;
-                warmupStopWatch.Stop();
-            }
-           
-            PostRun();
-            Complete(true);
+            Trace.Debug("----- END PRE-WARMUP -----");
 
             // elapsed time
             var runTime = warmupStopWatch.ElapsedTicks;
 
             WarmupData = new WarmupData(runTime, runCount);
 
+            Trace.Debug("----- BEGIN WARMUPS -----");
             var i = _warmupCount;
 
             /* Warmup to force CPU caching */
@@ -149,6 +167,8 @@ namespace NBench.Sdk
                 RunSingleBenchmark();
                 i--;
             }
+
+            Trace.Debug("----- END WARMUPS -----");
         }
 
         /// <summary>
@@ -195,7 +215,7 @@ namespace NBench.Sdk
             }
             catch (Exception ex)
             {
-                HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} RUN.");
+                HandleBenchmarkRunException(ex, $"Error occurred during ${BenchmarkName} RUN.");
             }
             PostRun();
             Complete(); // release previous collectors
@@ -203,6 +223,7 @@ namespace NBench.Sdk
 
         protected void PreRun()
         {
+            Trace.Info($"Invoking setup for {BenchmarkName}");
             try
             {
                 if (RunMode == RunMode.Throughput)
@@ -222,11 +243,11 @@ namespace NBench.Sdk
             }
             catch (Exception ex)
             {
-                HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} SETUP.");
+                HandleBenchmarkRunException(ex, $"Error occurred during ${BenchmarkName} SETUP.");
             }
         }
 
-        private void HandleBenchmarkRunExecption(Exception ex, string formatMsg)
+        private void HandleBenchmarkRunException(Exception ex, string formatMsg)
         {
             var nbe = new NBenchException(formatMsg, ex);
             _currentRun.WithException(nbe);
@@ -250,6 +271,7 @@ namespace NBench.Sdk
 
         protected void RunBenchmark()
         {
+            Trace.Info($"Invoking {BenchmarkName}");
             _currentRun.Sample(StopWatch.ElapsedTicks);
             StopWatch.Start();
             Invoker.InvokeRun(_currentRun.Context);
@@ -264,6 +286,7 @@ namespace NBench.Sdk
         /// </summary>
         protected void PostRun()
         {
+            Trace.Info($"Invoking cleanup for {BenchmarkName}");
             try
             {
                 // Invoke user-defined cleanup method, if any
@@ -271,7 +294,7 @@ namespace NBench.Sdk
             }
             catch (Exception ex)
             {
-                HandleBenchmarkRunExecption(ex, $"Error occurred during ${BenchmarkName} CLEANUP.");
+                HandleBenchmarkRunException(ex, $"Error occurred during ${BenchmarkName} CLEANUP.");
             }
         }
 
@@ -281,7 +304,7 @@ namespace NBench.Sdk
         private void Complete(bool isEstimate = false)
         {
             _currentRun.Dispose();
-
+            Trace.Info($"Generating report for run {_pendingIterations} of {BenchmarkName}");
             var report = _currentRun.ToReport(StopWatch.Elapsed);
             if(!isEstimate)
                 Output.WriteRun(report, _isWarmup);

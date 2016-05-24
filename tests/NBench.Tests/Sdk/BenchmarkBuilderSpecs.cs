@@ -12,6 +12,7 @@ using NBench.Metrics.GarbageCollection;
 using NBench.Metrics.Memory;
 using NBench.Sdk;
 using NBench.Sys;
+using NBench.Tracing;
 using Xunit;
 
 namespace NBench.Tests.Sdk

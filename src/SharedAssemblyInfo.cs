@@ -2,6 +2,6 @@
 using System.Reflection;
 
 [assembly: AssemblyCompanyAttribute("Petabridge")]
-[assembly: AssemblyCopyrightAttribute("Copyright © 2015")]
-[assembly: AssemblyVersionAttribute("0.2.0")]
-[assembly: AssemblyFileVersionAttribute("0.2.0")]
+[assembly: AssemblyCopyrightAttribute("Copyright © 2015-2016")]
+[assembly: AssemblyVersionAttribute("0.2.3")]
+[assembly: AssemblyFileVersionAttribute("0.2.3")]
