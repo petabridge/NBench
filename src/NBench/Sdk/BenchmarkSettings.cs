@@ -9,6 +9,7 @@ using NBench.Metrics;
 using NBench.Metrics.Counters;
 using NBench.Metrics.GarbageCollection;
 using NBench.Metrics.Memory;
+using NBench.Tracing;
 
 namespace NBench.Sdk
 {
@@ -41,13 +42,13 @@ namespace NBench.Sdk
             IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors)
             : this(
                 testMode, runMode, numberOfIterations, runTime, 
-                benchmarkSettings, collectors, string.Empty, string.Empty)
+                benchmarkSettings, collectors, string.Empty, string.Empty, NoOpBenchmarkTrace.Instance)
         {
         }
 
         public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTimeMilliseconds,
             IEnumerable<IBenchmarkSetting> benchmarkSettings,
-            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip)
+            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip, IBenchmarkTrace trace)
         {
             TestMode = testMode;
             RunMode = runMode;
@@ -64,6 +65,8 @@ namespace NBench.Sdk
             DistinctMeasurements = Measurements.Distinct(Comparer).ToList();
 
             Collectors = collectors;
+
+            Trace = trace;
         }
 
         /// <summary>
@@ -112,6 +115,11 @@ namespace NBench.Sdk
         /// The table of collectors we're going to use to gather the metrics configured in <see cref="Measurements"/>
         /// </summary>
         public IReadOnlyDictionary<MetricName, MetricsCollectorSelector> Collectors { get; private set; }
+
+       /// <summary>
+       /// The <see cref="IBenchmarkTrace"/> implementation we will use for each <see cref="BenchmarkRun"/>
+       /// </summary>
+        public IBenchmarkTrace Trace { get; private set; }
 
         /// <summary>
         ///     Total number of all metrics tracked in this benchmark

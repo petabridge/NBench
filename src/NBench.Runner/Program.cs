@@ -10,7 +10,7 @@ namespace NBench.Runner
 		/// <summary>
 		/// NBench Runner takes the following <see cref="args"/>
 		/// 
-		/// C:\> NBench.Runner.exe [assembly name] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
+		/// C:\> NBench.Runner.exe [assembly name] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}] [trace={true|false}]
 		/// 
 		/// </summary>
 		/// <param name="args">The commandline arguments</param>
@@ -19,15 +19,18 @@ namespace NBench.Runner
 			string[] include = null;
 			string[] exclude = null;
 		    bool concurrent = false;
+		    bool trace = false;
 			if (CommandLine.HasProperty("include"))
 				include = CommandLine.GetProperty("include").Split(',');
 			if (CommandLine.HasProperty("exclude"))
 				exclude = CommandLine.GetProperty("exclude").Split(',');
 		    if (CommandLine.HasProperty("concurrent"))
 		        concurrent = CommandLine.GetBool("concurrent");
+		    if (CommandLine.HasProperty("trace"))
+		        trace = CommandLine.GetBool("trace");
 
 
-			TestPackage package = new TestPackage(CommandLine.GetFiles(args), include, exclude, concurrent);
+			TestPackage package = new TestPackage(CommandLine.GetFiles(args), include, exclude, concurrent) {Tracing = trace};
 
 			if (CommandLine.HasProperty("output-directory"))
 				package.OutputDirectory = CommandLine.GetProperty("output-directory");
