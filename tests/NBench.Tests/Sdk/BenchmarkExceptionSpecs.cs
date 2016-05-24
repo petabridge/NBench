@@ -32,7 +32,7 @@ namespace NBench.Tests.Sdk
         public void Should_exit_on_first_iteration_where_Benchmark_throws_Exception()
         {
             var iterationCount = 0;
-            var expectedIterationCount = 1;
+            var expectedIterationCount = 0;
             bool finalOutputCalled = false;
             IBenchmarkInvoker faultyInvoker = new ActionBenchmarkInvoker("ExceptionThrower",
                 context =>
@@ -50,7 +50,7 @@ namespace NBench.Tests.Sdk
                 {
                     finalOutputCalled = true;
                     Assert.True(results.Data.IsFaulted);
-                });
+                }, ActionBenchmarkOutput.DefaultWriteLineAction);
 
             var benchmark = new Benchmark(_faultySettings, faultyInvoker, faultyOutput);
             benchmark.Run();

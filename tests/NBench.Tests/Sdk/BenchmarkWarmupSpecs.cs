@@ -67,5 +67,35 @@ namespace NBench.Tests.Sdk
 
             benchmark.Run();
         }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(31)]
+        [InlineData(1000)]
+        public void ShouldSkipWarmupsWhenSpecified(int iterationCount)
+        {
+            var observedWarmupCount = -1; //we have a pre-warmup that always happens no matter what. Need to account for it.
+            var assertionOutput = new ActionBenchmarkOutput((report, warmup) =>
+            {
+                if (warmup)
+                {
+                    observedWarmupCount++;
+                }
+            }, results =>
+            {
+                Assert.Equal(1, observedWarmupCount);
+            });
+
+            var counterBenchmark = new CounterBenchmarkSetting(CounterName.CounterName, AssertionType.Total, Assertion.Empty);
+
+            var settings = new BenchmarkSettings(TestMode.Measurement, RunMode.Iterations, iterationCount, 1000,
+               new List<IBenchmarkSetting>() { counterBenchmark }, new Dictionary<MetricName, MetricsCollectorSelector>() {
+                   { counterBenchmark.MetricName, new CounterSelector() } }) { SkipWarmups = true};
+
+            var benchmark = new Benchmark(settings, _benchmarkMethods, assertionOutput);
+
+            benchmark.Run();
+        }
     }
 }

@@ -65,7 +65,7 @@ namespace NBench.Sdk
 
             }
 
-            return new BenchmarkRun(measurements, counters);
+            return new BenchmarkRun(measurements, counters, Settings.Trace);
         }
     }
 }

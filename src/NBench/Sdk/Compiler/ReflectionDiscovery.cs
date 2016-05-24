@@ -10,6 +10,7 @@ using NBench.Collection;
 using NBench.Metrics;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
+using NBench.Tracing;
 
 namespace NBench.Sdk.Compiler
 {
@@ -22,15 +23,20 @@ namespace NBench.Sdk.Compiler
         public static readonly Type MeasurementAttributeType = typeof (MeasurementAttribute);
         public static readonly Type BenchmarkContextType = typeof (BenchmarkContext);
 
-        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance)
+        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance, new RunnerSettings())
         {
         }
 
 
-        public ReflectionDiscovery(IBenchmarkOutput output, IBenchmarkAssertionRunner benchmarkAssertions)
+        public ReflectionDiscovery(IBenchmarkOutput output, IBenchmarkAssertionRunner benchmarkAssertions, RunnerSettings settings)
         {
             Output = _reflectionOutput = output;
             BenchmarkAssertions = benchmarkAssertions;
+            RunnerSettings = settings;
+            if(RunnerSettings.TracingEnabled)
+                Trace = new BenchmarkOutputTrace(Output);
+            else
+                Trace = NoOpBenchmarkTrace.Instance;
         }
 
         /// <summary>
@@ -45,6 +51,8 @@ namespace NBench.Sdk.Compiler
 
         public IBenchmarkOutput Output { get; }
         public IBenchmarkAssertionRunner BenchmarkAssertions { get; }
+        public RunnerSettings RunnerSettings { get; }
+        public IBenchmarkTrace Trace { get; }
 
         public IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly)
         {
@@ -106,10 +114,12 @@ namespace NBench.Sdk.Compiler
                 }
             }
 
+            // TODO: need to start packing more of these settings in as propreties rather than constructor arguments
+            // it's becoming unsustainable, the number of different things we need to pass in here
             return new BenchmarkSettings(performanceTestAttribute.TestMode, performanceTestAttribute.RunMode,
                 performanceTestAttribute.NumberOfIterations, performanceTestAttribute.RunTimeMilliseconds,
                 measurements, collectors, performanceTestAttribute.Description,
-                performanceTestAttribute.Skip);
+                performanceTestAttribute.Skip, Trace, RunnerSettings.ConcurrentModeEnabled){ SkipWarmups = performanceTestAttribute.SkipWarmups };
         }
 
         public static IBenchmarkInvoker CreateInvokerForBenchmark(BenchmarkClassMetadata benchmarkClass)

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using NBench.Metrics;
 using NBench.Sys;
+using NBench.Tracing;
 using NBench.Util;
 
 namespace NBench.Reporting.Targets
@@ -23,6 +24,7 @@ namespace NBench.Reporting.Targets
         public const int MaxColumnSize = 18;
         public const string MarkdownTableColumnEnd = " |";
         private readonly string _outputDirectory;
+        private readonly Lazy<StringBuilder> _traceStringBuilder = new Lazy<StringBuilder>(() => new StringBuilder(), true);
 
         public MarkdownBenchmarkOutput(string outputDirectory)
         {
@@ -31,7 +33,8 @@ namespace NBench.Reporting.Targets
 
         public void WriteLine(string message)
         {
-            // no-op
+            if(message.StartsWith(TraceMessage.TraceIndicator))
+                _traceStringBuilder.Value.AppendLine(message);
         }
 
         public void Warning(string message)
@@ -79,8 +82,14 @@ namespace NBench.Reporting.Targets
             sb.AppendLine("### NBench Settings");
             sb.AppendLine("```ini");
             sb.AppendLine($"RunMode={results.Data.Settings.RunMode}, TestMode={results.Data.Settings.TestMode}");
+            if (results.Data.Settings.SkipWarmups)
+            {
+                sb.AppendLine($"SkipWarmups={results.Data.Settings.SkipWarmups}");
+            }
             sb.AppendLine(
                 $"NumberOfIterations={results.Data.Settings.NumberOfIterations}, MaximumRunTime={results.Data.Settings.RunTime}");
+            sb.AppendLine($"Concurrent={results.Data.Settings.ConcurrentMode}");
+            sb.AppendLine($"Tracing={results.Data.Settings.TracingEnabled}");
             sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("## Data");
@@ -96,7 +105,7 @@ namespace NBench.Reporting.Targets
             sb.AppendFormat(BuildRunTable(results.Data.Runs));
             if (results.AssertionResults.Count > 0)
             {
-                sb.AppendLine("## BenchmarkAssertions");
+                sb.AppendLine("## Benchmark Assertions");
                 sb.AppendLine();
                 foreach (var assertion in results.AssertionResults)
                 {
@@ -116,6 +125,17 @@ namespace NBench.Reporting.Targets
                     sb.AppendLine();
                 }
             }
+
+            if (_traceStringBuilder.IsValueCreated) // append trace values if the tracing system was used
+            {
+                sb.AppendLine("## Traces");
+                sb.AppendLine(_traceStringBuilder.Value.ToString());
+                sb.AppendLine();
+
+                // reset the string builder, since it may be re-used on the next benchmark
+                _traceStringBuilder.Value.Clear();
+            }
+
             var report = sb.ToString();
 
 			// ensure directory exists

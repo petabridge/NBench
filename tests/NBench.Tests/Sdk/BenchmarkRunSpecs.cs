@@ -7,6 +7,7 @@ using System.Linq;
 using NBench.Collection;
 using NBench.Metrics;
 using NBench.Metrics.Counters;
+using NBench.Tracing;
 using Xunit;
 
 namespace NBench.Tests.Sdk
@@ -26,7 +27,7 @@ namespace NBench.Tests.Sdk
             var testCollector2 = new TestMetricCollector(new CounterMetricName("foo"), "bar");
             var measureBucket2 = new MeasureBucket(testCollector2);
             var benchmarkRun = new BenchmarkRun(new List<MeasureBucket>(new[] {measureBucket1, measureBucket2}),
-                new List<Counter>());
+                new List<Counter>(), NoOpBenchmarkTrace.Instance);
 
             Assert.False(testCollector1.WasDisposed);
             Assert.False(testCollector2.WasDisposed);

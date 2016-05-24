@@ -82,11 +82,15 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Sdk\RunnerSettings.cs" />
+    <Compile Include="Tracing\NoOpBenchmarkTrace.cs" />
+    <Compile Include="Tracing\BenchmarkOutputTrace.cs" />
     <Compile Include="Collection\Counters\CounterSelector.cs" />
     <Compile Include="Collection\Timing\TimingCollector.cs" />
     <Compile Include="Collection\Timing\TimingSelector.cs" />
     <Compile Include="CounterMeasurementAttribute.cs" />
     <Compile Include="ByteConstants.cs" />
+    <Compile Include="IBenchmarkTrace.cs" />
     <Compile Include="MeasurementAttribute.cs" />
     <Compile Include="Metrics\Counters\CounterMetricName.cs" />
     <Compile Include="Metrics\GarbageCollection\GcMeasurementConfigurator.cs" />
@@ -159,12 +163,15 @@
     <Compile Include="Sdk\WarmupData.cs" />
     <Compile Include="Sys\SysInfo.cs" />
     <Compile Include="TimingMeasurementAttribute.cs" />
+    <Compile Include="Tracing\TraceEvent.cs" />
+    <Compile Include="Tracing\TraceLevel.cs" />
     <Compile Include="Util\AtomicCounter.cs" />
     <Compile Include="Util\FileNameGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NBench.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -12,21 +12,27 @@ namespace NBench.Reporting.Targets
     {
         private readonly Action<BenchmarkRunReport, bool> _runAction;
         private readonly Action<BenchmarkFinalResults> _benchmarkAction;
+        private readonly Action<string> _writeAction;
+
+        public static Action<BenchmarkRunReport, bool> DefaultRunAction = (report, b) => { };
+        public static Action<BenchmarkFinalResults> DefaultBenchmarkResultsAction = results => { };
+        public static Action<string> DefaultWriteLineAction = s => { };
 
         public ActionBenchmarkOutput(Action<BenchmarkRunReport> runAction, Action<BenchmarkFinalResults> benchmarkAction)
-            : this((report, b) => runAction(report), benchmarkAction)
+            : this((report, b) => runAction(report), benchmarkAction, DefaultWriteLineAction)
         {
         }
 
-        public ActionBenchmarkOutput(Action<BenchmarkRunReport, bool> runAction, Action<BenchmarkFinalResults> benchmarkAction)
+        public ActionBenchmarkOutput(Action<BenchmarkRunReport, bool> runAction = null, Action<BenchmarkFinalResults> benchmarkAction = null, Action<string> writeLineAction = null)
         {
-            _runAction = runAction;
-            _benchmarkAction = benchmarkAction;
+            _runAction = runAction ?? DefaultRunAction;
+            _benchmarkAction = benchmarkAction ?? DefaultBenchmarkResultsAction;
+            _writeAction = writeLineAction ?? DefaultWriteLineAction;
         }
 
         public void WriteLine(string message)
         {
-            //no-op
+            _writeAction(message);
         }
 
         public void Warning(string message)

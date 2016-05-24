@@ -9,6 +9,7 @@ using NBench.Metrics;
 using NBench.Metrics.Counters;
 using NBench.Metrics.GarbageCollection;
 using NBench.Metrics.Memory;
+using NBench.Tracing;
 
 namespace NBench.Sdk
 {
@@ -41,13 +42,13 @@ namespace NBench.Sdk
             IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors)
             : this(
                 testMode, runMode, numberOfIterations, runTime, 
-                benchmarkSettings, collectors, string.Empty, string.Empty)
+                benchmarkSettings, collectors, string.Empty, string.Empty, NoOpBenchmarkTrace.Instance)
         {
         }
 
         public BenchmarkSettings(TestMode testMode, RunMode runMode, int numberOfIterations, int runTimeMilliseconds,
             IEnumerable<IBenchmarkSetting> benchmarkSettings,
-            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip)
+            IReadOnlyDictionary<MetricName, MetricsCollectorSelector> collectors, string description, string skip, IBenchmarkTrace trace, bool concurrencyModeEnabled = false)
         {
             TestMode = testMode;
             RunMode = runMode;
@@ -64,6 +65,9 @@ namespace NBench.Sdk
             DistinctMeasurements = Measurements.Distinct(Comparer).ToList();
 
             Collectors = collectors;
+
+            Trace = trace;
+            ConcurrentMode = concurrencyModeEnabled;
         }
 
         /// <summary>
@@ -74,6 +78,16 @@ namespace NBench.Sdk
         ///     The mode in which the performance test will be executed.
         /// </summary>
         public RunMode RunMode { get; private set; }
+
+        /// <summary>
+        /// Indicates whether concurrency is enabled or not
+        /// </summary>
+        public bool ConcurrentMode { get; private set; }
+
+        /// <summary>
+        /// Indicates whether tracing is enabled or not
+        /// </summary>
+        public bool TracingEnabled => !(Trace is NoOpBenchmarkTrace);
 
         /// <summary>
         ///     Number of times this test will be run
@@ -113,6 +127,11 @@ namespace NBench.Sdk
         /// </summary>
         public IReadOnlyDictionary<MetricName, MetricsCollectorSelector> Collectors { get; private set; }
 
+       /// <summary>
+       /// The <see cref="IBenchmarkTrace"/> implementation we will use for each <see cref="BenchmarkRun"/>
+       /// </summary>
+        public IBenchmarkTrace Trace { get; private set; }
+
         /// <summary>
         ///     Total number of all metrics tracked in this benchmark
         /// </summary>
@@ -127,5 +146,10 @@ namespace NBench.Sdk
         ///     If populated, this benchmark will be skipped and the skip reason will be written into the report.
         /// </summary>
         public string Skip { get; private set; }
+
+        /// <summary>
+        /// Indicates whether or not we will skip warmups for our benchmarks
+        /// </summary>
+        public bool SkipWarmups { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NBench.Metrics;
 using NBench.Metrics.Counters;
+using NBench.Tracing;
 
 namespace NBench
 {
@@ -23,12 +24,14 @@ namespace NBench
         /// <summary>
         /// Empty context - used for unit testing.
         /// </summary>
-        internal static readonly BenchmarkContext Empty = new BenchmarkContext(new Dictionary<CounterMetricName, Counter>());
+        internal static readonly BenchmarkContext Empty = new BenchmarkContext(new Dictionary<CounterMetricName, Counter>(), NoOpBenchmarkTrace.Instance);
 
-        public BenchmarkContext(IReadOnlyDictionary<CounterMetricName, Counter> counters)
+        public BenchmarkContext(IReadOnlyDictionary<CounterMetricName, Counter> counters, IBenchmarkTrace trace)
         {
+            Trace = trace;
             _counters = counters.ToDictionary(k => k.Key.CounterName, v => v.Value);
         }
+
         /// <summary>
         /// Retrieves a named <see cref="Counter"/> instance that has already been registered via a <see cref="CounterMeasurementAttribute"/>, 
         /// <see cref="CounterThroughputAssertionAttribute"/>, or <see cref="CounterTotalAssertionAttribute"/> classes.
@@ -66,6 +69,11 @@ namespace NBench
         /// All available counters
         /// </summary>
         public IEnumerable<Counter> Counters => _counters.Values;
+
+        /// <summary>
+        /// Allows NBench users to write custom messages directly into the NBench output.
+        /// </summary>
+        public IBenchmarkTrace Trace { get; }
     }
 }
 

@@ -117,6 +117,7 @@
     <Compile Include="Sdk\BenchmarkBuilderSpecs.cs" />
     <Compile Include="Sdk\BenchmarkRunSpecs.cs" />
     <Compile Include="Sdk\Compiler\ReflectionDiscoverySpecs.cs" />
+    <Compile Include="Tracing\BenchmarkTraceSpecs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -93,7 +93,15 @@ namespace NBench.Sdk
              * Set priority
              */
             Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            if (!concurrent)
+            {
+                /*
+                 * If we're running in concurrent mode, don't give the foreground thread higher priority
+                 * over the other threads participating in NBench specs. Treat them all equally with the same
+                 * priority.
+                 */
+                Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            }
         }
 
         /// <summary>
@@ -106,8 +114,20 @@ namespace NBench.Sdk
             // But not if the user has specified that they're going to be running multi-threaded benchmarks
             SetProcessPriority(_package.Concurrent);
 
+            // pass in the runner settings so we can include them in benchmark reports
+            // also, toggles tracing on or off
+            var runnerSettings = new RunnerSettings()
+            {
+                ConcurrentModeEnabled = _package.Concurrent,
+                TracingEnabled = _package.Tracing
+            };
+
             IBenchmarkOutput output = CreateOutput();
-            var discovery = new ReflectionDiscovery(output);
+
+            
+            var discovery = new ReflectionDiscovery(output, 
+                DefaultBenchmarkAssertionRunner.Instance, // one day we might be able to pass in custom assertion runners, hence why this is here
+                runnerSettings);
             var result = new TestRunnerResult()
             {
                 AllTestsPassed = true
