@@ -158,17 +158,24 @@ namespace NBench.Sdk
 
             WarmupData = new WarmupData(runTime, runCount);
 
-            Trace.Debug("----- BEGIN WARMUPS -----");
-            var i = _warmupCount;
-
-            /* Warmup to force CPU caching */
-            while (i > 0 && !_currentRun.IsFaulted)
+            if (!Settings.SkipWarmups)
             {
-                RunSingleBenchmark();
-                i--;
-            }
+                Trace.Debug("----- BEGIN WARMUPS -----");
+                var i = _warmupCount;
 
-            Trace.Debug("----- END WARMUPS -----");
+                /* Warmup to force CPU caching */
+                while (i > 0 && !_currentRun.IsFaulted)
+                {
+                    RunSingleBenchmark();
+                    i--;
+                }
+
+                Trace.Debug("----- END WARMUPS -----");
+            }
+            else
+            {
+                Trace.Debug("----- SKIPPING WARMUPS -----");
+            }
         }
 
         /// <summary>

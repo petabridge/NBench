@@ -17,7 +17,8 @@ namespace NBench.Tests.End2End.SampleBenchmarks
         /// <summary>
         /// Run 3 tests, 1 second long each
         /// </summary>
-        [PerfBenchmark(Description = "Simple iteration collection test", RunMode = RunMode.Iterations, TestMode = TestMode.Test, RunTimeMilliseconds = 1000, NumberOfIterations = 30)]
+        [PerfBenchmark(Description = "Simple iteration collection test", RunMode = RunMode.Iterations, 
+            TestMode = TestMode.Test, RunTimeMilliseconds = 1000, NumberOfIterations = 30, SkipWarmups = true)]
         [CounterMeasurement(CounterName)]
         [MemoryAssertion(MemoryMetric.TotalBytesAllocated, MustBe.LessThan, ByteConstants.EightKb)]
         [GcTotalAssertion(GcMetric.TotalCollections, GcGeneration.Gen2, MustBe.ExactlyEqualTo, 0d)]

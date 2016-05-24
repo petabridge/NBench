@@ -146,5 +146,10 @@ namespace NBench.Sdk
         ///     If populated, this benchmark will be skipped and the skip reason will be written into the report.
         /// </summary>
         public string Skip { get; private set; }
+
+        /// <summary>
+        /// Indicates whether or not we will skip warmups for our benchmarks
+        /// </summary>
+        public bool SkipWarmups { get; set; }
     }
 }
