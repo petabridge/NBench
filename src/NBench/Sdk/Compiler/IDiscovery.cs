@@ -29,7 +29,7 @@ namespace NBench.Sdk.Compiler
         /// instances.
         /// </summary>
         /// <param name="targetAssembly">The assembly we're going to scan for benchmarks.</param>
-        /// <returns>A list of <see cref="Benchmark"/>s we can run based on the classes found inside <see cref="targetAssembly"/>.</returns>
+        /// <returns>A list of <see cref="Benchmark"/>s we can run based on the classes found inside <paramref name="targetAssembly"/>.</returns>
         IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly);
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace NBench.Sdk.Compiler
         /// instances.
         /// </summary>
         /// <param name="targetType">The type we're going to scan for benchmarks.</param>
-        /// <returns>A list of <see cref="Benchmark"/>s we can run based on the classes found inside <see cref="targetType"/>.</returns>
+        /// <returns>A list of <see cref="Benchmark"/>s we can run based on the classes found inside <paramref name="targetType"/>.</returns>
         IEnumerable<Benchmark> FindBenchmarks(Type targetType);
     }
 }

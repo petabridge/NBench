@@ -47,13 +47,13 @@ namespace NBench
         }
 
         /// <summary>
-        ///     The test we're going to perform against the collected value of <see cref="Metric" />
+        ///     The test we're going to perform against the collected value of <see cref="MemoryMetric" />
         ///     and <see cref="AverageBytes" />.
         /// </summary>
         public MustBe Condition { get; }
 
         /// <summary>
-        ///     The value that will be compared against the collected metric for <see cref="Metric" />.
+        ///     The value that will be compared against the collected metric for <see cref="MemoryMetric" />.
         /// </summary>
         public double AverageBytes { get; }
 

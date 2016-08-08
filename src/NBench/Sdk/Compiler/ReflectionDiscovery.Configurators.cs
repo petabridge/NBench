@@ -137,7 +137,7 @@ namespace NBench.Sdk.Compiler
         /// <param name="exact">
         ///     If <c>true</c>, then this method will look for an exact 1:1 type match. 
         ///     If <c>false</c>, which is the default then this method will return <c>true</c>
-        ///     when any applicable types are assignable from <see cref="measurementType"/>.
+        ///     when any applicable types are assignable from <paramref name="measurementType"/>.
         /// </param>
         /// <returns><c>true</c> if a match was found, <c>false</c> otherwise.</returns>
         public static bool ConfiguratorSupportsMeasurement(Type measurementType,
@@ -171,10 +171,10 @@ namespace NBench.Sdk.Compiler
         }
 
         /// <summary>
-        /// Check if a given <see cref="configuratorType"/> is a valid implementation of <see cref="IMeasurementConfigurator{T}"/>.
+        /// Check if a given <paramref name="configuratorType"/> is a valid implementation of <see cref="IMeasurementConfigurator{T}"/>.
         /// </summary>
         /// <param name="configuratorType">The <see cref="Type"/> we're going to test.</param>
-        /// <returns>true if <see cref="configuratorType"/> implements <see cref="IMeasurementConfigurator{T}"/>, false otherwise.</returns>
+        /// <returns>true if <paramref name="configuratorType"/> implements <see cref="IMeasurementConfigurator{T}"/>, false otherwise.</returns>
         public static bool IsValidConfiguratorType(Type configuratorType)
         {
             return GetConfiguratorInterfaces(configuratorType).Any();
