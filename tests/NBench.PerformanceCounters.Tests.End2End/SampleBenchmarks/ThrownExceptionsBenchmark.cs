@@ -2,9 +2,8 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
-using NBench.PerformanceCounters;
 
-namespace NBench.PeformanceCounters.Tests.End2End.SampleBenchmarks
+namespace NBench.PerformanceCounters.Tests.End2End.SampleBenchmarks
 {
     /// <summary>
     /// Track the number of exceptions thrown in a given benchmark

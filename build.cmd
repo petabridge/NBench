@@ -21,7 +21,7 @@ copy %CACHED_NUGET% .nuget\nuget.exe > nul
 
 .nuget\NuGet.exe install FAKE -OutputDirectory packages -Version 4.9.1 -ExcludeVersion
 
-.nuget\NuGet.exe install xunit.runner.console -ConfigFile .nuget\Nuget.Config -OutputDirectory packages\FAKE -ExcludeVersion -Version 2.0.0
+.nuget\NuGet.exe install xunit.runner.console -OutputDirectory packages\FAKE -ExcludeVersion -Version 2.0.0
 
 if not exist packages\SourceLink.Fake\tools\SourceLink.fsx ( 
   .nuget\nuget.exe install SourceLink.Fake -OutputDirectory packages -ExcludeVersion

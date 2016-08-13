@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
@@ -26,14 +27,17 @@ namespace NBench.Tests.End2End
         [Fact]
         public void ShouldPassAllBenchmarks()
         {
-            var benchmarks = _discovery.FindBenchmarks(GetType().Assembly).ToList();
-            Assert.True(benchmarks.Count >= 1);
-            Benchmark.PrepareForRun(); // force some GC here
-            for (var i = 0; i < benchmarks.Count; i++)
+            if (!TestRunner.IsMono) // this spec currently hits a runtime exception with Mono: https://bugzilla.xamarin.com/show_bug.cgi?id=43291
             {
+                var benchmarks = _discovery.FindBenchmarks(GetType().Assembly).ToList();
+                Assert.True(benchmarks.Count >= 1);
                 Benchmark.PrepareForRun(); // force some GC here
-                benchmarks[i].Run();
-                benchmarks[i].Finish();
+                for (var i = 0; i < benchmarks.Count; i++)
+                {
+                    Benchmark.PrepareForRun(); // force some GC here
+                    benchmarks[i].Run();
+                    benchmarks[i].Finish();
+                }
             }
         }
 
@@ -83,12 +87,12 @@ namespace NBench.Tests.End2End
 		private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
 		{
 #if DEBUG
-	var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Debug\NBench.Tests.Assembly.dll", include, exclude);
+	var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
 #else
-			var package = new TestPackage(@"..\..\..\NBench.Tests.Assembly\bin\Release\NBench.Tests.Assembly.dll", include, exclude);
+			var package = new TestPackage(".."+ Path.DirectorySeparatorChar +".."+ Path.DirectorySeparatorChar +".."+ Path.DirectorySeparatorChar +"NBench.Tests.Assembly"+ Path.DirectorySeparatorChar +"bin"+ Path.DirectorySeparatorChar +"Release"+ Path.DirectorySeparatorChar +"NBench.Tests.Assembly.dll", include, exclude);
 #endif
 
-			package.Validate();
+            package.Validate();
 			return package;
 		}
 	}

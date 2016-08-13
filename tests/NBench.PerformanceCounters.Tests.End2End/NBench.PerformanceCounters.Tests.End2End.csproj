@@ -7,8 +7,8 @@
     <ProjectGuid>{416A4BAD-459C-4896-A44C-4C2344EBE154}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NBench.PeformanceCounters.Tests.End2End</RootNamespace>
-    <AssemblyName>NBench.PeformanceCounters.Tests.End2End</AssemblyName>
+    <RootNamespace>NBench.PerformanceCounters.Tests.End2End</RootNamespace>
+    <AssemblyName>NBench.PerformanceCounters.Tests.End2End</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
