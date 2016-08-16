@@ -34,7 +34,7 @@ let preReleaseVersion = version + "-beta" //suffixes the assembly for pre-releas
 let isUnstableDocs = hasBuildParam "unstable"
 let isPreRelease = hasBuildParam "nugetprerelease"
 let release = if isPreRelease then ReleaseNotesHelper.ReleaseNotes.New(version, version + "-beta", parsedRelease.Notes) else parsedRelease
-
+let isMono = Type.GetType("Mono.Runtime") <> null;
 
 //--------------------------------------------------------------------------------
 // Directories
@@ -98,6 +98,7 @@ Target "CopyOutput" (fun _ ->
         let dst = binDir @@ project
         CopyDir dst src allFiles
     [ "NBench"
+      "NBench.PerformanceCounters"
       "NBench.Runner"
     ]
     |> List.iter copyOutput
@@ -110,8 +111,16 @@ Target "BuildRelease" DoNothing
 //--------------------------------------------------------------------------------
 
 open Fake.Testing
+let filterPlatformSpecificAssemblies (assembly:string) =
+    match assembly with
+    | assembly when (assembly.Contains("PerformanceCounters") && isMono) -> false
+    | _ -> true
+
 Target "RunTests" <| fun _ ->
-    let xunitTestAssemblies = !! "tests/**/bin/Release/*.Tests.dll" ++ "tests/**/bin/Release/*.Tests.End2End.dll"
+    let xunitTestAssemblies = Seq.filter filterPlatformSpecificAssemblies (!! "tests/**/bin/Release/*.Tests.dll" ++ "tests/**/bin/Release/*.Tests.End2End.dll")
+    printfn "Are we running on Mono? %b" isMono
+    for assembly in xunitTestAssemblies do
+         printfn "Executing: %s" assembly
 
     mkdir testOutput
     let xunitToolPath = findToolInSubPath "xunit.console.exe" "packages/xunit.runner.console*/tools"
@@ -137,9 +146,11 @@ Target "NBench" <| fun _ ->
         sprintf "tests/**/bin/Release/*%s*.Tests.Performance.dll" assemblyFilter
 
     mkdir perfOutput
-    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" "bin/NBench.Runner*"
-    let nbenchTestAssemblies = !! testSearchPath
+    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (currentDirectory @@ "bin" @@ "NBench.Runner")
+    let nbenchTestAssemblies = Seq.filter filterPlatformSpecificAssemblies (!! testSearchPath)
     printfn "Using NBench.Runner: %s" nbenchTestPath
+    for assembly in nbenchTestAssemblies do
+         printfn "Executing: %s" assembly
 
     let rec runNBench assembly trialsLeft =
         let spec = getBuildParam "spec"
