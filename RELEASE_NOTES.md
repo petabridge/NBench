@@ -1,3 +1,14 @@
+#### 0.3.1 August 15 2016
+NBench v0.3.1 introduces full Mono support for cross-platform benchmarks to both `NBench.Runner` as well as the core `NBench` library.
+
+No major new changes have been added feature wise, but we've worked around issues specific to Linux permissions and have tailored the core NBench package to be able to run benchmarks on any platform.
+
+Here's an example of some [side-by-side NBench benchmarks on Mono vs. .NET 4.6.2](https://gist.github.com/Aaronontheweb/228507db024fe00ee88b5e5f14e6d679).
+
+NBench.PerformanceCounters is platform-specific to Windows and thus can't be supported on Linux.
+
+[Read the full list of changes in NBench v0.3.1 here](https://github.com/petabridge/NBench/milestone/1).
+
 #### 0.3.0 May 24 2016
 This release introduces some breaking changes to NBench:
 
