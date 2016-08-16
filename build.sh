@@ -18,7 +18,7 @@ mono $SCRIPT_PATH/.nuget/nuget.exe update -self
 
 mono $SCRIPT_PATH/.nuget/nuget.exe install FAKE -OutputDirectory $SCRIPT_PATH/packages -ExcludeVersion -Version 4.9.1 
 
-mono $SCRIPT_PATH/.nuget/nuget.exe install xunit.runners -OutputDirectory $SCRIPT_PATH/packages/FAKE -ExcludeVersion -Version 2.0.0
+mono $SCRIPT_PATH/.nuget/nuget.exe install xunit.runner.console -OutputDirectory $SCRIPT_PATH/packages/FAKE -ExcludeVersion -Version 2.0.0
 
 if ! [ -e $SCRIPT_PATH/packages/SourceLink.Fake/tools/SourceLink.fsx ] ; then
 	mono $SCRIPT_PATH/.nuget/nuget.exe install SourceLink.Fake -OutputDirectory $SCRIPT_PATH/packages -ExcludeVersion

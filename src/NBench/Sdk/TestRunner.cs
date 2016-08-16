@@ -28,6 +28,11 @@ namespace NBench.Sdk
     /// <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
     public class TestRunner : MarshalByRefObject
     {
+        /// <summary>
+        /// Can't apply some of our optimization tricks if running Mono, due to need for elevated permissions
+        /// </summary>
+        public static readonly bool IsMono = Type.GetType("Mono.Runtime") != null;
+
         private readonly TestPackage _package;
 
         /// <summary>
@@ -92,7 +97,8 @@ namespace NBench.Sdk
             /*
              * Set priority
              */
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            if (!IsMono)
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
             if (!concurrent)
             {
                 /*
@@ -124,8 +130,8 @@ namespace NBench.Sdk
 
             IBenchmarkOutput output = CreateOutput();
 
-            
-            var discovery = new ReflectionDiscovery(output, 
+
+            var discovery = new ReflectionDiscovery(output,
                 DefaultBenchmarkAssertionRunner.Instance, // one day we might be able to pass in custom assertion runners, hence why this is here
                 runnerSettings);
             var result = new TestRunnerResult()

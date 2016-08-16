@@ -8,7 +8,7 @@ using NBench.Sdk;
 using NBench.Sdk.Compiler;
 using Xunit;
 
-namespace NBench.PeformanceCounters.Tests.End2End
+namespace NBench.PerformanceCounters.Tests.End2End
 {
     public class PerformanceCounterIntegrationTests
     {
