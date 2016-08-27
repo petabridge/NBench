@@ -129,7 +129,7 @@ namespace NBench.Sdk.Compiler
 
         /// <summary>
         ///     Finds all classes with at least one method decorated with a <see cref="PerfBenchmarkAttribute" />.
-        ///     inside <see cref="targetAssembly" />.
+        ///     inside <paramref name="targetAssembly" />.
         /// </summary>
         /// <param name="targetAssembly">The assembly we're scanning for benchmarks.</param>
         /// <returns>
