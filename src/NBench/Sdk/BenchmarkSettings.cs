@@ -16,6 +16,7 @@ namespace NBench.Sdk
     /// <summary>
     ///     Settings for how a particular <see cref="Benchmark" /> should be run and executed.
     /// </summary>
+    [Serializable]
     public class BenchmarkSettings
     {
         internal class BenchmarkEqualityComparer : IEqualityComparer<IBenchmarkSetting>

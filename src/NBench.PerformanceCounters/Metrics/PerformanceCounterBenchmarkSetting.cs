@@ -10,7 +10,7 @@ namespace NBench.PerformanceCounters.Metrics
     /// <summary>
     /// <see cref="IBenchmarkSetting"/> used to instrument performance counters inside a <see cref="Benchmark"/>
     /// </summary>
-    public sealed class PerformanceCounterBenchmarkSetting : IBenchmarkSetting, IEquatable<PerformanceCounterBenchmarkSetting>
+    public sealed class PerformanceCounterBenchmarkSetting : MarshalByRefObject, IBenchmarkSetting, IEquatable<PerformanceCounterBenchmarkSetting>
     {
         public PerformanceCounterBenchmarkSetting(PerformanceCounterMetricName performanceCounterMetric, AssertionType assertionType, Assertion assertion)
         {

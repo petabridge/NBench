@@ -7,6 +7,7 @@ using NBench.Metrics;
 
 namespace NBench.Sdk
 {
+    [Serializable]
     public struct AssertionResult
     {
         public AssertionResult(MetricName metricName, string message, bool passed)

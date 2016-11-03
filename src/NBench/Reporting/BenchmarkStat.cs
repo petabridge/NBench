@@ -11,6 +11,7 @@ namespace NBench.Reporting
     /// <summary>
     /// Represents aggregate statics for a benchmark across multiple runs
     /// </summary>
+    [Serializable]
     public struct BenchmarkStat
     {
         public static readonly double[] SafeValues = {0.0d};

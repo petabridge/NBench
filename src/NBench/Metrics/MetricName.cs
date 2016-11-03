@@ -8,7 +8,7 @@ namespace NBench.Metrics
     /// <summary>
     /// Used to uniquely represent the name of a metric in a manner-agnostic way.
     /// </summary>
-    public abstract class MetricName : IEquatable<MetricName>
+    public abstract class MetricName : MarshalByRefObject, IEquatable<MetricName>
     {
         public abstract bool Equals(MetricName other);
 

@@ -11,6 +11,7 @@ namespace NBench.Reporting
     /// <summary>
     /// All of the compiled values from one <see cref="BenchmarkRun"/> for a given <see cref="MeasureBucket"/>
     /// </summary>
+    [Serializable]
     public struct MetricRunReport
     {
         public MetricRunReport(MetricName name, string unit, double metricReading, long ticks)

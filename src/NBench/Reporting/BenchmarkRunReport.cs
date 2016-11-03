@@ -11,6 +11,7 @@ namespace NBench.Reporting
     /// <summary>
     ///     Compiled statistics for each <see cref="BenchmarkRun" />
     /// </summary>
+    [Serializable]
     public struct BenchmarkRunReport
     {
         public BenchmarkRunReport(TimeSpan elapsed, IEnumerable<MetricRunReport> metrics, IReadOnlyList<Exception> exceptions)

@@ -5,7 +5,7 @@ namespace NBench.Tracing
     /// <summary>
     /// Default no-op implementation of <see cref="IBenchmarkTrace"/>. Does nothing.
     /// </summary>
-    internal sealed class NoOpBenchmarkTrace : IBenchmarkTrace
+    internal sealed class NoOpBenchmarkTrace : MarshalByRefObject, IBenchmarkTrace
     {
         public static readonly NoOpBenchmarkTrace Instance = new NoOpBenchmarkTrace();
 

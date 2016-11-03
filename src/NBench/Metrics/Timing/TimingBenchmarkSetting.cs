@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using NBench.Sdk;
 
 namespace NBench.Metrics.Timing
@@ -9,7 +10,7 @@ namespace NBench.Metrics.Timing
     /// <see cref="IBenchmarkSetting"/> implementation for <see cref="TimingMeasurementAttribute"/>
     /// and other derived versions.
     /// </summary>
-    public sealed class TimingBenchmarkSetting : IBenchmarkSetting
+    public sealed class TimingBenchmarkSetting : MarshalByRefObject, IBenchmarkSetting
     {
         public TimingBenchmarkSetting(TimingMetricName metricName, Assertion assertion)
         {
