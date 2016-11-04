@@ -31,9 +31,7 @@ namespace NBench.Util
 
         public long GetAndIncrement()
         {
-            long current = Current;
-            Increment();
-            return current;
+            return Interlocked.Increment(ref Value) - 1;
         }
     }
 }
