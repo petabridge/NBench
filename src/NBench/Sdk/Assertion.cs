@@ -31,7 +31,7 @@ namespace NBench.Sdk
 
         public Assertion(MustBe condition, double value, double? maxValue)
         {
-            Contract.Requires(condition != MustBe.Between || (condition == MustBe.Between && maxValue.HasValue));
+            Contract.Requires(condition != MustBe.Between || maxValue.HasValue);
             Condition = condition;
             Value = value;
             MaxValue = maxValue;
