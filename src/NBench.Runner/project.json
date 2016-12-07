@@ -1,0 +1,45 @@
+﻿{
+  "version": "0.3.4",
+  "title": "NBench",
+  "description": "Cross-platform performance benchmarking and testing framework for .NET applications.",
+  "authors": [ "Petabridge" ],
+  "copyright": "Copyright (c) Petabridge https://petabridge.com/",
+
+  "packOptions": {
+    "licenseUrl": "https://github.com/petabridge/NBench/blob/master/LICENSE",
+    "projectUrl": "https://github.com/petabridge/NBench",
+    "iconUrl": "https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png",
+    "owners": [ "Petabridge" ],
+    "requireLicenseAcceptance": false,
+    "tags": [ "performance", "benchmarking", "benchmark", "perf", "testing", "NBench" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/petabridge/NBench"
+    }
+  },
+  "dependencies": {
+    "NBench": { "target": "project" }
+  },
+  "frameworks": {
+    "net45": {
+      "buildOptions": {
+        "define": [ "THREAD_POOL" ]
+      }
+    },
+    "netcoreapp1.0": {
+      "buildOptions": {
+        "define": [ "CORECLR" ]
+      },
+      "dependencies": {
+        "System.Collections": "4.3.0",
+        "System.Collections.Specialized": "4.3.0",
+        "System.Runtime": "4.3.0",
+        "System.Runtime.Extensions": "4.3.0",
+        "System.Runtime.InteropServices": "4.3.0"
+      },
+      "imports": [
+        "netstandard1.6"
+      ]
+    }
+  }
+}

@@ -91,7 +91,9 @@ namespace NBench.Reporting.Targets
             sb.AppendLine($"ProcessorCount={sysInfo.ProcessorCount}");
             sb.AppendLine(
                 $"CLR={sysInfo.ClrVersion},IsMono={sysInfo.IsMono},MaxGcGeneration={sysInfo.MaxGcGeneration}");
+#if THREAD_POOL
             sb.AppendLine($"WorkerThreads={sysInfo.WorkerThreads}, IOThreads={sysInfo.IOThreads}");
+#endif
             sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("### NBench Settings");

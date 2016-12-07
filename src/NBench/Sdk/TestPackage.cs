@@ -14,8 +14,13 @@ namespace NBench.Sdk
     /// <summary>
     /// A TestPackage contains one or more test files. It also holds settings how the tests should be loaded. 
     /// </summary>
+#if SERIALIZATION
     [Serializable]
-    public class TestPackage : MarshalByRefObject
+#endif
+    public class TestPackage
+#if APPDOMAIN
+        : MarshalByRefObject
+#endif
     {
 		/// <summary>
 		/// List of assemblies to be loaded and tested
@@ -178,14 +183,16 @@ namespace NBench.Sdk
             return Path.GetDirectoryName(_testfiles[0]);
         }
 
-		/// <summary>
-		/// Control the lifetime policy for this instance
-		/// </summary>
-		public override object InitializeLifetimeService()
+#if APPDOMAIN
+        /// <summary>
+        /// Control the lifetime policy for this instance
+        /// </summary>
+        public override object InitializeLifetimeService()
 		{
 			// Live forever
 			return null;
 		}
+#endif
 
 		/// <summary>
 		/// Adds a single file to the package

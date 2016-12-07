@@ -3,6 +3,9 @@
 
 using System.IO;
 using System.Reflection;
+#if  CORECLR
+using System.Runtime.Loader;
+#endif
 
 namespace NBench.Sdk.Compiler
 {
@@ -42,8 +45,12 @@ namespace NBench.Sdk.Compiler
         /// <returns>The assembly at the specified location</returns>
         public static Assembly LoadAssembly(string assemblyPath)
         {
+#if CORECLR
+            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+#else
             var targetAssembly = Assembly.LoadFrom(assemblyPath);
             return targetAssembly;
+#endif
         }
     }
 }

@@ -203,3 +203,7 @@ FakesAssemblies/
 
 # NuGet 
 nuget.exe
+project.lock.json
+.idea/*
+*.project.lock.json
+project.lock.json

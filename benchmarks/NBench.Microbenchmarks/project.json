@@ -1,0 +1,21 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "NETStandard.Library": "1.6.0"
+  },
+
+  "frameworks": {
+	"net45": {
+      "buildOptions": {
+        "define": [ "THREAD_POOL" ]
+      }
+    },
+    "netstandard1.6": {
+      "imports": "dnxcore50",
+	  "dependencies": {
+        "System.Diagnostics.Contracts": "4.0.0"       
+      }
+    }
+  }
+}

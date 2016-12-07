@@ -1,0 +1,58 @@
+{
+  "version": "0.3.4",
+  "title": "NBench",
+  "description": "Cross-platform performance benchmarking and testing framework for .NET applications.",
+  "authors": [ "Petabridge" ],
+  "copyright": "Copyright (c) Petabridge https://petabridge.com/",
+
+  "packOptions": {
+    "licenseUrl": "https://github.com/petabridge/NBench/blob/master/LICENSE",
+    "projectUrl": "https://github.com/petabridge/NBench",
+    "iconUrl": "https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png",
+    "owners": [ "Petabridge" ],
+    "requireLicenseAcceptance": false,
+    "tags": [ "performance", "benchmarking", "benchmark", "perf", "testing", "NBench" ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/petabridge/NBench"
+    }
+  },
+  "frameworks": {
+    "net45": {
+      "buildOptions": {
+        "define": [ "THREADPOOL", "APPDOMAIN", "SERIALIZATION" ]
+      }
+    },
+    "netcoreapp1.0": {
+      "buildOptions": {
+        "define": [ "CORECLR" ]
+      },
+      "dependencies": {
+        "System.Collections": "4.3.0",
+        "System.Collections.Concurrent": "4.3.0",
+        "System.Console": "4.0.0",
+        "System.Diagnostics.Contracts": "4.3.0",
+        "System.Diagnostics.Debug": "4.3.0",
+        "System.Diagnostics.Process": "4.3.0",
+        "System.IO.FileSystem": "4.3.0",
+        "System.Linq": "4.3.0",
+        "System.Reflection": "4.3.0",
+        "System.Reflection.Extensions": "4.3.0",
+        "System.Reflection.TypeExtensions": "4.3.0",
+        "System.Runtime": "4.3.0",
+        "System.Runtime.Extensions": "4.3.0",
+        "System.Runtime.InteropServices": "4.3.0",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.3.0",
+        "System.Runtime.Loader": "4.3.0",
+        "System.Text.Encoding": "4.3.0",
+        "System.Text.RegularExpressions": "4.3.0",
+        "System.Threading": "4.3.0",
+        "System.Threading.Thread": "4.3.0",
+        "Microsoft.NETCore.App": "1.1.0"
+      },
+      "imports": [
+        "netstandard1.6"
+      ]
+    }
+  }
+}
