@@ -37,6 +37,21 @@ namespace NBench.Reporting.Targets
             Console.ResetColor();
         }
 
+        public void StartBenchmark(string benchmarkName)
+        {
+            Console.WriteLine($"------------ STARTING {benchmarkName} ---------- ");
+        }
+
+        public void SkipBenchmark(string benchmarkName)
+        {
+            Console.WriteLine($"------------ NOTRUN {benchmarkName} ---------- ");
+        }
+
+        public void FinishBenchmark(string benchmarkName)
+        {
+            Console.WriteLine($"------------ FINISHED {benchmarkName} ---------- ");
+        }
+
         public void WriteRun(BenchmarkRunReport report, bool isWarmup = false)
         {
             if (isWarmup)

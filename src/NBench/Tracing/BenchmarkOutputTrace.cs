@@ -33,12 +33,12 @@ namespace NBench.Tracing
 
         public void Error(Exception ex, string message)
         {
-            WriteMessage(new Error(ex, message));
+            _benchmarkOutput.Error(ex, new Error(ex, message).ToString());
         }
 
         public void Error(string message)
         {
-            WriteMessage(new Error(message));
+            _benchmarkOutput.Error(null, (new Error(message)).ToString());
         }
 
         private void WriteMessage(TraceMessage message)
