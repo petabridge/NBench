@@ -113,7 +113,7 @@ namespace NBench.Reporting
 
             if (results.Data.IsFaulted || results.AssertionResults.Any(x => !x.Passed))
             {
-                _outputWriter.WriteLine($"##teamcity[testFailed name=\'{Escape(results.BenchmarkName)}\'");
+                _outputWriter.WriteLine($"##teamcity[testFailed name=\'{Escape(results.BenchmarkName)}\' message=\'Failed at least one assertion or threw exception.\']");
             }
         }
 
