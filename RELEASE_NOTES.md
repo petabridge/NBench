@@ -1,5 +1,5 @@
-#### 0.3.2 December 07 2016
-NBench v0.3.2 includes a handful of bug fixes, but also enables TeamCity output formatting for NBench specifications.
+#### 0.3.3 December 07 2016
+NBench v0.3.3 includes a handful of bug fixes, but also enables TeamCity output formatting for NBench specifications.
 
 To enable TeamCity output formatting explicitly, pass in the following argument to the `NBench.Runner.exe`
 
