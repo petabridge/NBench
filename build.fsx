@@ -158,6 +158,7 @@ Target "NBench" <| fun _ ->
         let enableTeamCity = 
             match teamcityStr with
             | null -> false
+            | "" -> false
             | _ -> bool.Parse teamcityStr
 
 
