@@ -34,6 +34,21 @@ namespace NBench.Reporting
             //no-op
         }
 
+        public void StartBenchmark(string benchmarkName)
+        {
+            // no-op
+        }
+
+        public void SkipBenchmark(string benchmarkName)
+        {
+            // no-op
+        }
+
+        public void FinishBenchmark(string benchmarkName)
+        {
+            // no-op
+        }
+
         public void WriteRun(BenchmarkRunReport report, bool isWarmup = false)
         {
             //no-op

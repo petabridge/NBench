@@ -39,6 +39,25 @@ namespace NBench.Reporting
         void Error(string message);
 
         /// <summary>
+        /// Signal that we're going to begin a new benchmark
+        /// </summary>
+        /// <param name="benchmarkName">The name of the benchmark.</param>
+        void StartBenchmark(string benchmarkName);
+
+        /// <summary>
+        /// Signal that we're going to be skipping a benchmark
+        /// </summary>
+        /// <param name="benchmarkName">The name of the benchmark.</param>
+        void SkipBenchmark(string benchmarkName);
+
+        /// <summary>
+        /// Signals that we've completed processing a benchmark, regardless
+        /// of how it finished.
+        /// </summary>
+        /// <param name="benchmarkName">The name of the benchmark.</param>
+        void FinishBenchmark(string benchmarkName);
+
+        /// <summary>
         ///     Write out an individual run to the console or file
         /// </summary>
         /// <param name="report">The report for an individual <see cref="BenchmarkRun" /></param>

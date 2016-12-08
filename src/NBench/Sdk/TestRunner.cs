@@ -152,18 +152,18 @@ namespace NBench.Sdk
                         // verify if the benchmark should be included/excluded from the list of benchmarks to be run
                         if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
                         {
-                            output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
+                            output.StartBenchmark(benchmark.BenchmarkName);
                             benchmark.Run();
                             benchmark.Finish();
 
                             // if one assert fails, all fail
                             result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
-                            output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
+                            output.FinishBenchmark(benchmark.BenchmarkName);
                             result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
                         }
                         else
                         {
-                            output.WriteLine($"------------ NOTRUN {benchmark.BenchmarkName} ---------- ");
+                            output.SkipBenchmark(benchmark.BenchmarkName);
                             result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
                         }
                     }
