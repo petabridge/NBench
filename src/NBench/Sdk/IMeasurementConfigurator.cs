@@ -41,14 +41,14 @@ namespace NBench.Sdk
         /// <summary>
         /// Produce a <see cref="IBenchmarkSetting"/> implementation that will be used to tell the
         /// <see cref="Benchmark"/> class which <see cref="Assertion"/>, if any, it should perform against the
-        /// <see cref="MetricCollector"/> data produced for this setting by the <see cref="MeasurementConfigurator{T}.GetMetricsProvider"/> method
+        /// <see cref="MetricCollector"/> data produced for this setting by the <see cref="MeasurementConfigurator{T}.GetMetricsProvider(NBench.MeasurementAttribute)"/> method
         /// on this configurator.
         /// </summary>
         /// <param name="instance">
         /// An instance of the <see cref="MeasurementAttribute"/> type that corresponds to this configurator. 
         /// Must not be <c>null</c>.
         /// </param>
-        /// <returns>An <see cref="IBenchmarkSetting"/> implementation instance built specifically for <see cref="T"/></returns>
+        /// <returns>An <see cref="IBenchmarkSetting"/> implementation instance built specifically for <typeparamref name="T"/></returns>
         IEnumerable<IBenchmarkSetting> GetBenchmarkSettings(T instance);
     }
 
@@ -84,14 +84,14 @@ namespace NBench.Sdk
         /// <summary>
         /// Produce a <see cref="IBenchmarkSetting"/> implementation that will be used to tell the
         /// <see cref="Benchmark"/> class which <see cref="Assertion"/>, if any, it should perform against the
-        /// <see cref="MetricCollector"/> data produced for this setting by the <see cref="MeasurementConfigurator{T}.GetMetricsProvider"/> method
+        /// <see cref="MetricCollector"/> data produced for this setting by the <see cref="MeasurementConfigurator{T}.GetMetricsProvider(NBench.MeasurementAttribute)"/> method
         /// on this configurator.
         /// </summary>
         /// <param name="instance">
         /// An instance of the <see cref="MeasurementAttribute"/> type that corresponds to this configurator. 
         /// Must not be <c>null</c>.
         /// </param>
-        /// <returns>A list of <see cref="IBenchmarkSetting"/> implementation instances built specifically for <see cref="T"/></returns>
+        /// <returns>A list of <see cref="IBenchmarkSetting"/> implementation instances built specifically for <paramref name="instance"/></returns>
         IEnumerable<IBenchmarkSetting> GetBenchmarkSettings(MeasurementAttribute instance);
     }
 }

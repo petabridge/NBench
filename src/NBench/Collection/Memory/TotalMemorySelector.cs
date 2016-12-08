@@ -10,7 +10,7 @@ using NBench.Sys;
 namespace NBench.Collection.Memory
 {
     /// <summary>
-    /// Allocator responsible for choosing between <see cref="GcTotalMemoryCollector"/> and <see cref="PerformanceCounterTotalMemoryCollector"/>,
+    /// Allocator responsible for choosing the appropriate memory collector implementation,
     /// depending on user settings and <see cref="SysInfo"/>.
     /// </summary>
     public class TotalMemorySelector : MetricsCollectorSelector

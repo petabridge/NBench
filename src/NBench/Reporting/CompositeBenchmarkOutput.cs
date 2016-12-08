@@ -48,6 +48,24 @@ namespace NBench.Reporting
                 o.Error(message);
         }
 
+        public void StartBenchmark(string benchmarkName)
+        {
+            foreach(var o in  _outputs)
+                o.StartBenchmark(benchmarkName);
+        }
+
+        public void SkipBenchmark(string benchmarkName)
+        {
+            foreach(var o in _outputs)
+                o.SkipBenchmark(benchmarkName);
+        }
+
+        public void FinishBenchmark(string benchmarkName)
+        {
+            foreach(var o in _outputs)
+                o.FinishBenchmark(benchmarkName);
+        }
+
         public void WriteRun(BenchmarkRunReport report, bool isWarmup = false)
         {
             foreach(var o in _outputs)

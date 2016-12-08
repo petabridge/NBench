@@ -152,18 +152,18 @@ namespace NBench.Sdk
                         // verify if the benchmark should be included/excluded from the list of benchmarks to be run
                         if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
                         {
-                            output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
+                            output.StartBenchmark(benchmark.BenchmarkName);
                             benchmark.Run();
                             benchmark.Finish();
 
                             // if one assert fails, all fail
                             result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
-                            output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
+                            output.FinishBenchmark(benchmark.BenchmarkName);
                             result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
                         }
                         else
                         {
-                            output.WriteLine($"------------ NOTRUN {benchmark.BenchmarkName} ---------- ");
+                            output.SkipBenchmark(benchmark.BenchmarkName);
                             result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
                         }
                     }
@@ -193,10 +193,13 @@ namespace NBench.Sdk
         /// <returns></returns>
         protected virtual IBenchmarkOutput CreateOutput()
         {
+            var consoleOutput = _package.TeamCity ? 
+                new TeamCityBenchmarkOutput() 
+                : (IBenchmarkOutput)new ConsoleBenchmarkOutput(); 
             if (string.IsNullOrEmpty(_package.OutputDirectory))
-                return new ConsoleBenchmarkOutput();
+                return consoleOutput;
             else
-                return new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput(_package.OutputDirectory));
+                return new CompositeBenchmarkOutput(consoleOutput, new MarkdownBenchmarkOutput(_package.OutputDirectory));
         }
     }
 }

@@ -121,14 +121,14 @@ namespace NBench.Sdk
         /// <summary>
         /// Produce a <see cref="IBenchmarkSetting"/> implementation that will be used to tell the
         /// <see cref="Benchmark"/> class which <see cref="Assertion"/>, if any, it should perform against the
-        /// <see cref="MetricCollector"/> data produced for this setting by the <see cref="GetMetricsProvider"/> method
+        /// <see cref="MetricCollector"/> data produced for this setting by the <see cref="GetMetricsProvider(NBench.MeasurementAttribute)"/> method
         /// on this configurator.
         /// </summary>
         /// <param name="instance">
         /// An instance of the <see cref="MeasurementAttribute"/> type that corresponds to this configurator. 
         /// Must not be <c>null</c>.
         /// </param>
-        /// <returns><see cref="IBenchmarkSetting"/> implementation instances built specifically for <see cref="T"/></returns>
+        /// <returns><see cref="IBenchmarkSetting"/> implementation instances built specifically for T</returns>
         public abstract IEnumerable<IBenchmarkSetting> GetBenchmarkSettings(T instance);
     }
 }

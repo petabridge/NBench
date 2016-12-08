@@ -126,7 +126,7 @@ Target "RunTests" <| fun _ ->
     let xunitToolPath = findToolInSubPath "xunit.console.exe" "packages/xunit.runner.console*/tools"
     printfn "Using XUnit runner: %s" xunitToolPath
     xUnit2
-        (fun p -> { p with XmlOutputPath = Some (testOutput + @"\XUnitTestResults.xml"); HtmlOutputPath = Some (testOutput + @"\XUnitTestResults.HTML"); ToolPath = xunitToolPath; TimeOut = System.TimeSpan.FromMinutes 30.0; Parallel = ParallelMode.NoParallelization })
+        (fun p -> { p with XmlOutputPath = Some (testOutput @@ @"XUnitTestResults.xml"); HtmlOutputPath = Some (testOutput @@ @"XUnitTestResults.HTML"); ToolPath = xunitToolPath; TimeOut = System.TimeSpan.FromMinutes 30.0; Parallel = ParallelMode.NoParallelization })
 
         xunitTestAssemblies
 
@@ -154,11 +154,19 @@ Target "NBench" <| fun _ ->
 
     let rec runNBench assembly trialsLeft =
         let spec = getBuildParam "spec"
+        let teamcityStr = (getBuildParam "teamcity")
+        let enableTeamCity = 
+            match teamcityStr with
+            | null -> false
+            | "" -> false
+            | _ -> bool.Parse teamcityStr
+
 
         let args = new StringBuilder()
                 |> append assembly
                 |> append (sprintf "output-directory=\"%s\"" perfOutput)
                 |> append (sprintf "trace=\"%b\"" true)
+                |> append (sprintf "teamcity=\"%b\"" enableTeamCity)
                 |> toText
         try
             let result = ExecProcess(fun info -> 

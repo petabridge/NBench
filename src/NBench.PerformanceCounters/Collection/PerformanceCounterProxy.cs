@@ -42,7 +42,7 @@ namespace NBench.PerformanceCounters.Collection
                     var value = counter.RawValue;
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 { 
                     return false;
                 }

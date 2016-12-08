@@ -75,6 +75,14 @@ namespace NBench.Sdk
         public bool Tracing { get; set; }
 
         /// <summary>
+        /// If <c>true</c>, NBench uses TeamCity formatting for all of its benchmark methods.
+        /// If <c>false</c>, NBench uses regular console logging for all of its benchmark methods.
+        /// 
+        /// Defaults to false.
+        /// </summary>
+        public bool TeamCity { get; set; }
+
+        /// <summary>
         /// Initializes a new test package with one test file.
         /// </summary>
         /// <param name="filePath">The path to a test file.</param>
