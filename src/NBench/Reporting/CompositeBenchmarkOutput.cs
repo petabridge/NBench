@@ -10,7 +10,7 @@ namespace NBench.Reporting
     /// <summary>
     /// Composition of multiple <see cref="IBenchmarkOutput"/> instances being run in parallel.
     /// </summary>
-    public class CompositeBenchmarkOutput : IBenchmarkOutput
+    public class CompositeBenchmarkOutput : MarshalByRefObject, IBenchmarkOutput
     {
         private readonly IReadOnlyList<IBenchmarkOutput> _outputs;
 

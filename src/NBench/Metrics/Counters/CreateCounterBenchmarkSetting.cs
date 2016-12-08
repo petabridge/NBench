@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using NBench.Collection;
 using NBench.Collection.Counters;
 using NBench.Sdk;
@@ -11,7 +12,7 @@ namespace NBench.Metrics.Counters
     /// <summary>
     /// Special internal class needed to pass in a <see cref="AtomicCounter"/> to a <see cref="CounterSelector"/>.
     /// </summary>
-    internal sealed class CreateCounterBenchmarkSetting : IBenchmarkSetting {
+    internal sealed class CreateCounterBenchmarkSetting : MarshalByRefObject, IBenchmarkSetting {
         public CreateCounterBenchmarkSetting(CounterBenchmarkSetting benchmarkSetting, AtomicCounter counter)
         {
             BenchmarkSetting = benchmarkSetting;

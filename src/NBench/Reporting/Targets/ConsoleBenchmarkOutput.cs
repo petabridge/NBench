@@ -8,7 +8,7 @@ namespace NBench.Reporting.Targets
     /// <summary>
     /// Output writer to the console for NBench
     /// </summary>
-    public class ConsoleBenchmarkOutput : IBenchmarkOutput
+    public class ConsoleBenchmarkOutput : MarshalByRefObject, IBenchmarkOutput
     {
         public void WriteLine(string message)
         {

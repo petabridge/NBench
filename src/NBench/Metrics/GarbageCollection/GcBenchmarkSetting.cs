@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using NBench.Sdk;
 
@@ -10,7 +11,7 @@ namespace NBench.Metrics.GarbageCollection
     /// Used inside a <see cref="BenchmarkSettings"/> class to indiciate that a specific <see cref="GcMetric"/>
     /// for a <see cref="GcGeneration"/> needs to be recorded and tested against <see cref="Assertion"/>.
     /// </summary>
-    public sealed class GcBenchmarkSetting : IBenchmarkSetting
+    public sealed class GcBenchmarkSetting : MarshalByRefObject, IBenchmarkSetting
     {
         public GcBenchmarkSetting(GcMetric metric, GcGeneration generation, AssertionType assertionType, Assertion assertion)
         {

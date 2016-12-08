@@ -13,6 +13,7 @@ namespace NBench.Reporting
     /// <summary>
     ///     The cumulative results for an entire <see cref="Benchmark" />
     /// </summary>
+    [Serializable]
     public class BenchmarkResults
     {
         public BenchmarkResults(string typeName, BenchmarkSettings settings, IReadOnlyList<BenchmarkRunReport> runs)

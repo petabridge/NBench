@@ -65,19 +65,8 @@ namespace NBench.Sdk
         /// <remarks>Creates a new AppDomain and executes the tests.</remarks>
         public static TestRunnerResult Run(TestPackage package)
         {
-            Contract.Requires(package != null);
-            // create the test app domain
-            var testDomain = DomainManager.CreateDomain(package);
-
-            try
-            {
-                var runner = TestRunner.CreateRunner(testDomain, package);
-                return runner.Execute();
-            }
-            finally
-            {
-                DomainManager.UnloadDomain(testDomain);
-            }
+            var runner = new TestRunner(package);
+            return runner.Execute();
         }
 
         /// <summary>
@@ -152,12 +141,22 @@ namespace NBench.Sdk
                         // verify if the benchmark should be included/excluded from the list of benchmarks to be run
                         if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
                         {
-                            output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
-                            benchmark.Run();
-                            benchmark.Finish();
+                            var testDomain = DomainManager.CreateDomain(_package);
+                            var benchmarkRunnerType = typeof(BenchmarkRunner);
+                            var benchMarkRunner = testDomain.CreateInstanceAndUnwrap(benchmarkRunnerType.Assembly.FullName, benchmarkRunnerType.FullName, false, 0, null, new object[] { output }, null, null) as BenchmarkRunner;
 
-                            // if one assert fails, all fail
-                            result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
+                            output.WriteLine($"------------ STARTING {benchmark.BenchmarkName} ---------- ");
+                            try
+                            {
+                                var benchMarkResult = benchMarkRunner.Run(testFile, benchmark.BenchmarkName);
+                                // if one assert fails, all fail
+                                result.AllTestsPassed = result.AllTestsPassed && benchMarkResult.AllTestsPassed;
+                            }
+                            finally
+                            {
+                                DomainManager.UnloadDomain(testDomain);
+                            }
+
                             output.WriteLine($"------------ FINISHED {benchmark.BenchmarkName} ---------- ");
                             result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
                         }

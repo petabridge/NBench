@@ -127,6 +127,7 @@
     <Compile Include="Reporting\Targets\MarkdownBenchmarkOutput.cs" />
     <Compile Include="Sdk\Assertion.cs" />
     <Compile Include="Sdk\AssertionResult.cs" />
+    <Compile Include="Sdk\BenchmarkRunner.cs" />
     <Compile Include="Sdk\DefaultBenchmarkAssertionRunner.cs" />
     <Compile Include="Sdk\AssertionType.cs" />
     <Compile Include="BenchmarkContext.cs" />

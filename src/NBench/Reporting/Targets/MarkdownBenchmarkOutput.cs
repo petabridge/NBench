@@ -18,7 +18,7 @@ namespace NBench.Reporting.Targets
     ///     completed benchmark to a markdown file. Uses <see cref="FileNameGenerator" />
     ///     to generate a file name unique to each test AND the time it was run.
     /// </summary>
-    public class MarkdownBenchmarkOutput : IBenchmarkOutput
+    public class MarkdownBenchmarkOutput : MarshalByRefObject, IBenchmarkOutput
     {
         public const string MarkdownFileExtension = ".md";
         public const int MaxColumnSize = 18;

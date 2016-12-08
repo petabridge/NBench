@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using NBench.Metrics;
 using NBench.Sdk;
@@ -12,7 +13,7 @@ namespace NBench.Collection
     ///     Strategy pattern that's used to determine how to pick the appropriate
     ///     <see cref="MetricCollector" /> based on platform dependencies and user-preferences.
     /// </summary>
-    public abstract class MetricsCollectorSelector
+    public abstract class MetricsCollectorSelector: MarshalByRefObject
     {
         protected MetricsCollectorSelector(MetricName name) : this(name, SysInfo.Instance)
         {
