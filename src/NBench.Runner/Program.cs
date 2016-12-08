@@ -35,7 +35,7 @@ namespace NBench.Runner
 		    else
 		    {
                 // try to auto-detect if not explicitly set
-                teamcity = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
+                teamcity = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_BUILD_PROPERTIES_FILE"));
             }
 
 
