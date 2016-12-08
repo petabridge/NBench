@@ -154,11 +154,18 @@ Target "NBench" <| fun _ ->
 
     let rec runNBench assembly trialsLeft =
         let spec = getBuildParam "spec"
+        let teamcityStr = (getBuildParam "teamcity")
+        let enableTeamCity = 
+            match teamcityStr with
+            | null -> false
+            | _ -> bool.Parse teamcityStr
+
 
         let args = new StringBuilder()
                 |> append assembly
                 |> append (sprintf "output-directory=\"%s\"" perfOutput)
                 |> append (sprintf "trace=\"%b\"" true)
+                |> append (sprintf "teamcity=\"%b\"" enableTeamCity)
                 |> toText
         try
             let result = ExecProcess(fun info -> 

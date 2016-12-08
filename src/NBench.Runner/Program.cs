@@ -35,7 +35,7 @@ namespace NBench.Runner
 		    else
 		    {
                 // try to auto-detect if not explicitly set
-                teamcity = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_BUILD_PROPERTIES_FILE"));
+                teamcity = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
             }
 
 
@@ -46,6 +46,8 @@ namespace NBench.Runner
 
 			if (CommandLine.HasProperty("configuration"))			
 				package.ConfigurationFile = CommandLine.GetProperty("configuration");
+
+		    package.TeamCity = teamcity;
 
 			package.Validate();
             var result = TestRunner.Run(package);

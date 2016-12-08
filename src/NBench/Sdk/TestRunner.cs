@@ -193,10 +193,13 @@ namespace NBench.Sdk
         /// <returns></returns>
         protected virtual IBenchmarkOutput CreateOutput()
         {
+            var consoleOutput = _package.TeamCity ? 
+                new TeamCityBenchmarkOutput() 
+                : (IBenchmarkOutput)new ConsoleBenchmarkOutput(); 
             if (string.IsNullOrEmpty(_package.OutputDirectory))
-                return new ConsoleBenchmarkOutput();
+                return consoleOutput;
             else
-                return new CompositeBenchmarkOutput(new ConsoleBenchmarkOutput(), new MarkdownBenchmarkOutput(_package.OutputDirectory));
+                return new CompositeBenchmarkOutput(consoleOutput, new MarkdownBenchmarkOutput(_package.OutputDirectory));
         }
     }
 }
