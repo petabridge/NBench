@@ -1,3 +1,12 @@
+#### 0.3.2 December 07 2016
+NBench v0.3.2 includes a handful of bug fixes, but also enables TeamCity output formatting for NBench specifications.
+
+To enable TeamCity output formatting explicitly, pass in the following argument to the `NBench.Runner.exe`
+
+```
+NBench.Runner.exe [assembly names] [teamcity=true]
+```
+
 #### 0.3.1 August 15 2016
 NBench v0.3.1 introduces full Mono support for cross-platform benchmarks to both `NBench.Runner` as well as the core `NBench` library.
 
