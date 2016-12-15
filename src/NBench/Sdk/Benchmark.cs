@@ -94,14 +94,14 @@ namespace NBench.Sdk
             var targetTime = Settings.RunTime;
             Contract.Assert(targetTime != TimeSpan.Zero);
             var runCount = 0L;
+            var runTime = 0L;
 
             /* Pre-Warmup */
 
 
             Trace.Debug("----- BEGIN PRE-WARMUP -----");
             /* Estimate */
-            Allocate(); // allocate all collectors needed
-            PreRun();
+            
 
             try
             {
@@ -110,10 +110,13 @@ namespace NBench.Sdk
                     Trace.Debug(
                         $"Throughput mode: estimating how many invocations of {BenchmarkName} will take {targetTime.TotalSeconds}s");
                     var numberOfEstimatorRuns = 3;
-                    var estimates = new long[numberOfEstimatorRuns - 1];
+                    var counts = new long[numberOfEstimatorRuns - 1];
+                    var times = new long[numberOfEstimatorRuns - 1];
 
                     for (var i = 0; i <= numberOfEstimatorRuns; i++)
                     {
+                        Allocate(); // allocate all collectors needed
+                        PreRun();
                         warmupStopWatch.Start();
                         while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
                         {
@@ -123,27 +126,36 @@ namespace NBench.Sdk
                         warmupStopWatch.Stop();
                         if (i > 0) // always discard the first warmup value
                         {
-                            estimates[i - 1] = runCount;
+                            counts[i - 1] = runCount;
+                            times[i - 1] = warmupStopWatch.ElapsedTicks;
                         }
                         if (i < numberOfEstimatorRuns-1)
                         {
                             warmupStopWatch.Reset();
                         }
+                        PostRun();
+                        Complete(true);
                         runCount = 0;
                     }
 
                     // Once the 3 estimator rounds have run, go ahead and take the average observed value
-                    runCount = (long) estimates.Average();
+                    runCount = (long)Math.Ceiling(counts.Average());
+                    runTime = (long)Math.Ceiling(times.Average());
 
                     Trace.Debug(
                         $"Throughput mode: executed {runCount} instances of {BenchmarkName} in roughly {targetTime.TotalSeconds}s. Using that figure for benchmark.");
                 }
                 else
                 {
+                    Allocate(); // allocate all collectors needed
+                    PreRun();
                     warmupStopWatch.Start();
                     Invoker.InvokeRun(_currentRun.Context);
                     runCount++;
                     warmupStopWatch.Stop();
+                    PostRun();
+                    runTime = warmupStopWatch.ElapsedTicks;
+                    Complete(true);
                 }
             }
             catch (Exception ex)
@@ -151,8 +163,6 @@ namespace NBench.Sdk
                 HandleBenchmarkRunException(ex, $"Error occurred during ${BenchmarkName} RUN.");
             }
 
-            PostRun();
-            Complete(true);
 
             // check to see if pre-warmup threw an exception
             var faulted = _currentRun.IsFaulted;
@@ -173,8 +183,6 @@ namespace NBench.Sdk
             Trace.Debug("----- END PRE-WARMUP -----");
 
             // elapsed time
-            var runTime = warmupStopWatch.ElapsedTicks;
-
             WarmupData = new WarmupData(runTime, runCount);
 
             if (!Settings.SkipWarmups)

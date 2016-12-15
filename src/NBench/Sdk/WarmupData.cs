@@ -17,7 +17,7 @@ namespace NBench.Sdk
         /// <summary>
         /// The default sample size we use during JIT warmups
         /// </summary>
-        public const int PreWarmupSampleSize = 2;
+        public const int PreWarmupSampleSize = 1;
 
         public const int WarmupSampleSize = 1 << 10;
 
