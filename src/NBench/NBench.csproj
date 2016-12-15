@@ -49,7 +49,7 @@
     <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
     <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
     <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
-    <CodeContractsEmitXMLDocs>True</CodeContractsEmitXMLDocs>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
     <CodeContractsCustomRewriterAssembly />
     <CodeContractsCustomRewriterClass />
     <CodeContractsLibPaths />
@@ -58,7 +58,7 @@
     <CodeContractsSQLServerOption />
     <CodeContractsBaseLineFile />
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
+    <CodeContractsSkipAnalysisIfCannotConnectToCache>True</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
     <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>

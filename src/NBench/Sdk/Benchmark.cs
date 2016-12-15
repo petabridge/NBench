@@ -43,7 +43,7 @@ namespace NBench.Sdk
         /// <param name="invoker">The invoker used to execute benchmark and setup / cleanup methods.</param>
         /// <param name="writer">The output target this benchmark will write to.</param>
         /// <remarks>Uses the <see cref="DefaultBenchmarkAssertionRunner"/> to assert benchmark data.</remarks>
-        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer) 
+        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer)
             : this(settings, invoker, writer, DefaultBenchmarkAssertionRunner.Instance) { }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace NBench.Sdk
             var runCount = 0L;
 
             /* Pre-Warmup */
-           
+
 
             Trace.Debug("----- BEGIN PRE-WARMUP -----");
             /* Estimate */
@@ -109,13 +109,32 @@ namespace NBench.Sdk
                 {
                     Trace.Debug(
                         $"Throughput mode: estimating how many invocations of {BenchmarkName} will take {targetTime.TotalSeconds}s");
-                    warmupStopWatch.Start();
-                    while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+                    var numberOfEstimatorRuns = 3;
+                    var estimates = new long[numberOfEstimatorRuns - 1];
+
+                    for (var i = 0; i <= numberOfEstimatorRuns; i++)
                     {
-                        Invoker.InvokeRun(_currentRun.Context);
-                        runCount++;
+                        warmupStopWatch.Start();
+                        while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+                        {
+                            Invoker.InvokeRun(_currentRun.Context);
+                            runCount++;
+                        }
+                        warmupStopWatch.Stop();
+                        if (i > 0) // always discard the first warmup value
+                        {
+                            estimates[i - 1] = runCount;
+                        }
+                        if (i < numberOfEstimatorRuns-1)
+                        {
+                            warmupStopWatch.Reset();
+                        }
+                        runCount = 0;
                     }
-                    warmupStopWatch.Stop();
+
+                    // Once the 3 estimator rounds have run, go ahead and take the average observed value
+                    runCount = (long) estimates.Average();
+
                     Trace.Debug(
                         $"Throughput mode: executed {runCount} instances of {BenchmarkName} in roughly {targetTime.TotalSeconds}s. Using that figure for benchmark.");
                 }
@@ -202,7 +221,7 @@ namespace NBench.Sdk
             {
                 Output.Warning($"Error during previous run of {BenchmarkName}. Aborting run...");
             }
-            
+
         }
 
         public void Shutdown()
@@ -239,12 +258,12 @@ namespace NBench.Sdk
                     // the invoker with an inlined loop
                     Invoker.InvokePerfSetup(WarmupData.EstimatedRunsPerSecond, _currentRun.Context);
                 }
-                    else
+                else
                 {
                     // Invoke user-defined setup method, if any
                     Invoker.InvokePerfSetup(_currentRun.Context);
                 }
-                
+
 
                 PrepareForRun();
             }
@@ -321,7 +340,7 @@ namespace NBench.Sdk
             _currentRun.Dispose();
             Trace.Info($"Generating report for {PrintWarmupOrRun(_isWarmup)} {1 + Settings.NumberOfIterations - _pendingIterations} of {BenchmarkName}");
             var report = _currentRun.ToReport(StopWatch.Elapsed);
-            if(!isEstimate)
+            if (!isEstimate)
                 Output.WriteRun(report, _isWarmup);
 
             // Change runs, but not on warmup
