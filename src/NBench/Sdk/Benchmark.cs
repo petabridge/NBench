@@ -94,6 +94,7 @@ namespace NBench.Sdk
             var targetTime = Settings.RunTime;
             Contract.Assert(targetTime != TimeSpan.Zero);
             var runCount = 0L;
+            var runTime = 0L;
 
             /* Pre-Warmup */
            
@@ -109,6 +110,8 @@ namespace NBench.Sdk
                 {
                     Trace.Debug(
                         $"Throughput mode: estimating how many invocations of {BenchmarkName} will take {targetTime.TotalSeconds}s");
+
+                    
                     warmupStopWatch.Start();
                     while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
                     {
@@ -118,6 +121,9 @@ namespace NBench.Sdk
                     warmupStopWatch.Stop();
                     Trace.Debug(
                         $"Throughput mode: executed {runCount} instances of {BenchmarkName} in roughly {targetTime.TotalSeconds}s. Using that figure for benchmark.");
+
+                    // elapsed time
+                    runTime = warmupStopWatch.ElapsedTicks;
                 }
                 else
                 {
@@ -125,6 +131,9 @@ namespace NBench.Sdk
                     Invoker.InvokeRun(_currentRun.Context);
                     runCount++;
                     warmupStopWatch.Stop();
+
+                    // elapsed time
+                    runTime = warmupStopWatch.ElapsedTicks;
                 }
             }
             catch (Exception ex)
@@ -153,8 +162,6 @@ namespace NBench.Sdk
 
             Trace.Debug("----- END PRE-WARMUP -----");
 
-            // elapsed time
-            var runTime = warmupStopWatch.ElapsedTicks;
 
             WarmupData = new WarmupData(runTime, runCount);
 
