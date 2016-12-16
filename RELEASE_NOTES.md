@@ -1,3 +1,6 @@
+#### v0.3.4  December 15 2016
+NBench v0.3.4 is a bugfix for [`RunMode.ThroughPut` benchmarks where we regularly had false negatives on asserting number of operations per second.](https://github.com/petabridge/NBench/issues/153). This patch fixes this issue.
+
 #### 0.3.3 December 07 2016
 NBench v0.3.3 includes a handful of bug fixes, but also enables TeamCity output formatting for NBench specifications.
 
