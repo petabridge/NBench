@@ -94,6 +94,7 @@ namespace NBench.Sdk
             var targetTime = Settings.RunTime;
             Contract.Assert(targetTime != TimeSpan.Zero);
             var runCount = 0L;
+            var runTime = 0L;
 
             /* Pre-Warmup */
            
@@ -109,13 +110,34 @@ namespace NBench.Sdk
                 {
                     Trace.Debug(
                         $"Throughput mode: estimating how many invocations of {BenchmarkName} will take {targetTime.TotalSeconds}s");
-                    warmupStopWatch.Start();
-                    while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+
+                    var estimateCount = 3;
+                    var runEstimates = new long[estimateCount];
+                    var timeEstimates = new long[estimateCount];
+                    for (var i = 0; i <= estimateCount; i++)
                     {
-                        Invoker.InvokeRun(_currentRun.Context);
-                        runCount++;
+                        warmupStopWatch.Start();
+                        while (warmupStopWatch.ElapsedTicks < targetTime.Ticks)
+                        {
+                            Invoker.InvokeRun(_currentRun.Context);
+                            runCount++;
+                        }
+                        warmupStopWatch.Stop();
+
+                        if (i > 0)
+                        {
+                            runEstimates[i - 1] = runCount;
+                            timeEstimates[i - 1] = warmupStopWatch.ElapsedTicks;
+                            
+                        }
+
+                        runCount = 0;
+                        warmupStopWatch.Reset();
                     }
-                    warmupStopWatch.Stop();
+
+                    runCount = (long)Math.Ceiling(runEstimates.Average());
+                    runTime = (long) Math.Ceiling(timeEstimates.Average());
+                       
                     Trace.Debug(
                         $"Throughput mode: executed {runCount} instances of {BenchmarkName} in roughly {targetTime.TotalSeconds}s. Using that figure for benchmark.");
                 }
@@ -125,6 +147,9 @@ namespace NBench.Sdk
                     Invoker.InvokeRun(_currentRun.Context);
                     runCount++;
                     warmupStopWatch.Stop();
+
+                    // elapsed time
+                    runTime = warmupStopWatch.ElapsedTicks;
                 }
             }
             catch (Exception ex)
@@ -153,8 +178,6 @@ namespace NBench.Sdk
 
             Trace.Debug("----- END PRE-WARMUP -----");
 
-            // elapsed time
-            var runTime = warmupStopWatch.ElapsedTicks;
 
             WarmupData = new WarmupData(runTime, runCount);
 

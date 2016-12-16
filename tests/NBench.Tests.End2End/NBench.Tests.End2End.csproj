@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BugFix153Spec.cs" />
     <Compile Include="SampleBenchmarks\CounterThroughputBenchmark.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NBenchIntregrationTest.cs" />
