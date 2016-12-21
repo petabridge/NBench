@@ -21,7 +21,7 @@
     "NBench": { "target": "project" }
   },
   "frameworks": {
-    "net45": {
+    "net452": {
       "buildOptions": {
         "define": [ "THREADPOOL", "APPDOMAIN", "SERIALIZATION" ]
       },
