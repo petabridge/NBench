@@ -49,7 +49,7 @@ let nugetExe = FullName @".nuget\NuGet.exe"
 
 open Fake.RestorePackageHelper
 Target "RestorePackages" (fun _ -> 
-     "./NBench.sln"
+     "./NBench.NetCore.sln"
      |> RestoreMSSolutionPackages (fun p ->
          { p with
              OutputPath = "./packages"
@@ -83,7 +83,7 @@ Target "AssemblyInfo" (fun _ ->
 // Build the solution
 
 Target "Build" (fun _ ->
-    !!"NBench.sln"
+    !!"NBench.NetCore.sln"
     |> MSBuildRelease "" "Rebuild"
     |> ignore
 )
