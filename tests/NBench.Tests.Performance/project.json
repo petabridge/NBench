@@ -56,7 +56,7 @@
         }
       },
       "imports": [
-        "netstandard1.6"
+        "netstandard1.2"
       ]
     }
   }
