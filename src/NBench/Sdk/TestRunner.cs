@@ -72,7 +72,7 @@ namespace NBench.Sdk
         /// <returns></returns>
         public static TestRunner CreateRunner(TestPackage package)
         {
-            return (TestRunner) Activator.CreateInstance(typeof(TestPackage), new object[] {package});
+            return (TestRunner) Activator.CreateInstance(typeof(TestRunner), new object[] {package});
         }
 #endif
 
