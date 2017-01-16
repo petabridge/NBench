@@ -48,7 +48,9 @@
         "System.Text.RegularExpressions": "4.3.0",
         "System.Threading": "4.3.0",
         "System.Threading.Thread": "4.3.0",
-        "Microsoft.NETCore.App": "1.1.0"
+        "Microsoft.NETCore.App": "1.1.0",
+        "Microsoft.Extensions.PlatformAbstractions": "1.1.0",
+        "Microsoft.Extensions.DependencyModel": "1.0.0"
       },
       "imports": [
         "netstandard1.2"

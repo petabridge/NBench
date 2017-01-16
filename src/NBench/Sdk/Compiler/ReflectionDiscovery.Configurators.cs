@@ -8,6 +8,9 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+#if CORECLR
+using Microsoft.Extensions.DependencyModel;
+#endif
 
 namespace NBench.Sdk.Compiler
 {
@@ -76,17 +79,35 @@ namespace NBench.Sdk.Compiler
         public static IEnumerable<Type> LoadAllTypeConfigurators()
         {
 #if  CORECLR
-            var assembliesNames = Assembly.GetEntryAssembly().GetReferencedAssemblies();
-            var assemblies = assembliesNames.Select(Assembly.Load);
-            var types = assemblies.SelectMany(AssemblyExtensions.GetTypes);
+            var assemblies = GetAssemblies();
+            var types = assemblies.SelectMany( AssemblyExtensions.GetTypes);
 #else
             var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
             var types = assemblies.SelectMany(a => a.DefinedTypes);
 #endif
-
             return
                 types.Where(IsConfigurationType);
         }
+#if CORECLR
+        private static Assembly[] GetAssemblies()
+        {
+            var assemblies = new List<Assembly>();
+            var dependencies = DependencyContext.Default.RuntimeLibraries;
+            foreach (var library in dependencies)
+            {
+                try
+                {
+                    var assembly = Assembly.Load(new AssemblyName(library.Name));
+                    assemblies.Add(assembly);
+                }
+                catch (Exception e)
+                {
+                    //do nothing cant't if can't load assembly
+                }
+            }
+            return assemblies.ToArray();
+        }
+#endif
 
         public static Type FindBestMatchingConfiguratorForMeasurement(Type measurementType,
             IEnumerable<Type> knownConfigurators)
