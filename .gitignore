@@ -21,9 +21,10 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-
-# FAKE output
 .fake/
+TestResults/
+PerfResults/
+*.lock.json
 
 # Visual Studo 2015 cache/options directory
 .vs/
@@ -31,9 +32,6 @@ bld/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
-
-# NBench
-[Pp]erf[Rr]esult*/
 
 # NUNIT
 *.VisualState.xml
@@ -201,9 +199,7 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
-# NuGet 
-nuget.exe
-project.lock.json
-.idea/*
-*.project.lock.json
-project.lock.json
+tools/
+build/
+.nuget/
+.dotnet/
