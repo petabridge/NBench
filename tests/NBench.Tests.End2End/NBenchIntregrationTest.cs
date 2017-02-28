@@ -87,10 +87,16 @@ namespace NBench.Tests.End2End
 
 		private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
 		{
-#if DEBUG
-	var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
+#if CORECLR
+		    var assemblySubfolder = "netcoreapp1.0";
 #else
-			var package = new TestPackage(".."+ Path.DirectorySeparatorChar +".."+ Path.DirectorySeparatorChar +".."+ Path.DirectorySeparatorChar +"NBench.Tests.Assembly"+ Path.DirectorySeparatorChar +"bin"+ Path.DirectorySeparatorChar +"Release"+ Path.DirectorySeparatorChar +"NBench.Tests.Assembly.dll", include, exclude);
+		    var assemblySubfolder = "net451";
+#endif
+
+#if DEBUG
+	        var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
+#else
+            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
 #endif
 
             package.Validate();

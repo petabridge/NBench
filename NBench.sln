@@ -16,9 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests", "tests\NBench.Tests\NBench.Tests.csproj", "{5716EAF7-ABA1-434F-9AFA-51693A73C627}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.End2End", "tests\NBench.Tests.End2End\NBench.Tests.End2End.csproj", "{B7F38539-67A1-42B8-A5E5-CB592B6E3233}"
-	ProjectSection(ProjectDependencies) = postProject
-		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C} = {96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Runner", "src\NBench.Runner\NBench.Runner.csproj", "{5C586501-4E91-4007-B23F-02E20014DA51}"
 EndProject
