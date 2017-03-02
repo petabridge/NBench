@@ -90,7 +90,7 @@ namespace NBench.Tests.End2End
 #if CORECLR
 		    var assemblySubfolder = "netcoreapp1.0";
 #else
-		    var assemblySubfolder = "net451";
+		    var assemblySubfolder = "net452";
 #endif
 
 #if DEBUG

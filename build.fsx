@@ -89,13 +89,27 @@ Target "RunTests" (fun _ ->
                 (fun p -> 
                     { p with
                         Project = project
-                        Configuration = configuration })
+                        Configuration = configuration })      
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj"
                         -- "./tests/**/*NBench.Tests.Assembly.csproj")
+                        //-- "./tests/**/*NBench.Tests.End2End.csproj")
 
         projects |> Seq.iter (log)
         projects |> Seq.iter (runSingleProject)
+
+        //let runSingleProjectNet452 project =
+        //    DotNetCli.Test
+        //        (fun p -> 
+        //            { p with
+        //                Project = project
+        //                Framework = "net452"
+        //                Configuration = configuration })
+
+        //let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
+
+        //runSingleProjectNet452 end2EndProject
+
     else
         let runSingleProjectNetCore project =
             DotNetCli.Test
@@ -104,6 +118,7 @@ Target "RunTests" (fun _ ->
                         Project = project
                         Framework = "netcoreapp1.0"
                         Configuration = configuration })
+
         let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
                         -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
                         -- "./tests/**/*NBench.Tests.Assembly.csproj")
