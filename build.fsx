@@ -89,7 +89,7 @@ Target "RunTests" (fun _ ->
                 (fun p -> 
                     { p with
                         Project = project
-                        Configuration = configuration })      
+                        Configuration = configuration})      
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj"
                         -- "./tests/**/*NBench.Tests.Assembly.csproj"
@@ -104,7 +104,7 @@ Target "RunTests" (fun _ ->
                     { p with
                         Project = project
                         Framework = "net46"
-                        Configuration = configuration })
+                        Configuration = configuration})
 
         let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
 
@@ -117,7 +117,7 @@ Target "RunTests" (fun _ ->
                     { p with
                         Project = project
                         Framework = "netcoreapp1.0"
-                        Configuration = configuration })
+                        Configuration = configuration})
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
                         -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
