@@ -119,23 +119,15 @@ namespace NBench.Sdk
         /// </summary>
         public void SetProcessPriority(bool concurrent)
         {
-            /*
-            * Set processor affinity
-            */
-            if (!concurrent)
-            {
-                var proc = Process.GetCurrentProcess();
-                proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
-            }
-
-            /*
-             * Set priority
-             */
-            if (!IsMono)
-                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 #if !CORECLR
             if (!concurrent)
             {
+                /*
+                * Set processor affinity
+                */
+                var proc = Process.GetCurrentProcess();
+                proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
+
                 /*
                  * If we're running in concurrent mode, don't give the foreground thread higher priority
                  * over the other threads participating in NBench specs. Treat them all equally with the same
@@ -143,6 +135,11 @@ namespace NBench.Sdk
                  */
                 Thread.CurrentThread.Priority = ThreadPriority.Highest;
             }
+
+            /*
+            * Set priority
+            */
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 #endif
         }
 

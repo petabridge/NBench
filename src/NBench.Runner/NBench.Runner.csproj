@@ -6,9 +6,11 @@
     <AssemblyTitle>NBench</AssemblyTitle>
     <VersionPrefix>0.3.4</VersionPrefix>
     <Authors>Petabridge</Authors>
-    <TargetFrameworks>netcoreapp1.0</TargetFrameworks>
-    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net452;netcoreapp1.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>   
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <AssemblyName>NBench.Runner</AssemblyName>
+    <AssemblyName Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">dotnet-nbench</AssemblyName>
     <PackageId>NBench.Runner</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
     <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
@@ -27,6 +29,7 @@
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.10-x64;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64</RuntimeIdentifiers>
     <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
   </PropertyGroup>
 
