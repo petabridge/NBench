@@ -98,17 +98,17 @@ Target "RunTests" (fun _ ->
         projects |> Seq.iter (log)
         projects |> Seq.iter (runSingleProject)
 
-        let runSingleProjectNet452 project =
+        let runSingleProjectNet46 project =
             DotNetCli.Test
                 (fun p -> 
                     { p with
                         Project = project
-                        Framework = "net452"
+                        Framework = "net46"
                         Configuration = configuration })
 
         let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
 
-        runSingleProjectNet452 end2EndProject
+        runSingleProjectNet46 end2EndProject
 
     else
         let runSingleProjectNetCore project =
