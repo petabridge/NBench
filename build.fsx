@@ -18,7 +18,7 @@ let outputTests = output @@ "TestResults"
 let outputPerfTests = output @@ "PerfResults"
 let outputBinaries = output @@ "binaries"
 let outputNuGet = output @@ "nuget"
-let outputBinariesNet45 = outputBinaries @@ "net45"
+let outputBinariesNet45 = outputBinaries @@ "net452"
 let outputBinariesNetStandard = outputBinaries @@ "netstandard1.6"
 
 Target "Clean" (fun _ ->
@@ -92,23 +92,23 @@ Target "RunTests" (fun _ ->
                         Configuration = configuration })      
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj"
-                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
-                        //-- "./tests/**/*NBench.Tests.End2End.csproj")
+                        -- "./tests/**/*NBench.Tests.Assembly.csproj"
+                        -- "./tests/**/*NBench.Tests.End2End.csproj")
 
         projects |> Seq.iter (log)
         projects |> Seq.iter (runSingleProject)
 
-        //let runSingleProjectNet452 project =
-        //    DotNetCli.Test
-        //        (fun p -> 
-        //            { p with
-        //                Project = project
-        //                Framework = "net452"
-        //                Configuration = configuration })
+        let runSingleProjectNet46 project =
+            DotNetCli.Test
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Framework = "net46"
+                        Configuration = configuration })
 
-        //let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
+        let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
 
-        //runSingleProjectNet452 end2EndProject
+        runSingleProjectNet46 end2EndProject
 
     else
         let runSingleProjectNetCore project =
@@ -157,7 +157,7 @@ Target "CopyOutput" (fun _ ->
             (fun p -> 
                 { p with
                     Project = "./src/NBench/NBench.csproj"
-                    Framework = "net45"
+                    Framework = "net452"
                     Output = outputBinariesNet45
                     Configuration = configuration })
 
