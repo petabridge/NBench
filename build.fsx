@@ -92,23 +92,23 @@ Target "RunTests" (fun _ ->
                         Configuration = configuration })      
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj"
-                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
-                        //-- "./tests/**/*NBench.Tests.End2End.csproj")
+                        -- "./tests/**/*NBench.Tests.Assembly.csproj"
+                        -- "./tests/**/*NBench.Tests.End2End.csproj")
 
         projects |> Seq.iter (log)
         projects |> Seq.iter (runSingleProject)
 
-        //let runSingleProjectNet452 project =
-        //    DotNetCli.Test
-        //        (fun p -> 
-        //            { p with
-        //                Project = project
-        //                Framework = "net452"
-        //                Configuration = configuration })
+        let runSingleProjectNet452 project =
+            DotNetCli.Test
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Framework = "net452"
+                        Configuration = configuration })
 
-        //let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
+        let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
 
-        //runSingleProjectNet452 end2EndProject
+        runSingleProjectNet452 end2EndProject
 
     else
         let runSingleProjectNetCore project =
