@@ -18,7 +18,7 @@ let outputTests = output @@ "TestResults"
 let outputPerfTests = output @@ "PerfResults"
 let outputBinaries = output @@ "binaries"
 let outputNuGet = output @@ "nuget"
-let outputBinariesNet45 = outputBinaries @@ "net45"
+let outputBinariesNet45 = outputBinaries @@ "net452"
 let outputBinariesNetStandard = outputBinaries @@ "netstandard1.6"
 
 Target "Clean" (fun _ ->
@@ -157,7 +157,7 @@ Target "CopyOutput" (fun _ ->
             (fun p -> 
                 { p with
                     Project = "./src/NBench/NBench.csproj"
-                    Framework = "net45"
+                    Framework = "net452"
                     Output = outputBinariesNet45
                     Configuration = configuration })
 
