@@ -121,7 +121,8 @@ Target "RunTests" (fun _ ->
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
                         -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
-                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
+                        -- "./tests/**/*NBench.Tests.Assembly.csproj"
+                        -- "./tests/**/*NBench.Tests.End2End.csproj")
 
         projects |> Seq.iter (log)
         projects |> Seq.iter (runSingleProjectNetCore)
