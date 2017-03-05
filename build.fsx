@@ -121,7 +121,7 @@ Target "RunTests" (fun _ ->
 
         let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
                         -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
-                        -- "./tests/**/*NBench.Performance.Tests.csproj"
+                        -- "./tests/**/*NBench.Tests.Performance.csproj"
                         -- "./tests/**/*NBench.Tests.Assembly.csproj"
                         -- "./tests/**/*NBench.Tests.End2End.csproj")
 
