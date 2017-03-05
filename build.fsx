@@ -9,8 +9,33 @@ open Fake
 open Fake.DotNetCli
 open Fake.FileUtils
 
-// Variables
+//--------------------------------------------------------------------------------
+// Information about the project for Nuget and Assembly info files
+//-------------------------------------------------------------------------------
+
+let product = "NBench"
+let authors = [ "Aaron Stannard" ]
+let copyright = "Copyright © 2015-2016"
+let company = "Petabridge"
+let description = "X-Platform .NET Performance Testing and Measuring Framework"
+let tags = ["performance";"benchmarking";"benchmark";"perf testing";"NBench";]
 let configuration = "Release"
+
+// Read release notes and version
+let parsedRelease =
+    File.ReadLines "RELEASE_NOTES.md"
+    |> ReleaseNotesHelper.parseReleaseNotes
+
+let envBuildNumber = System.Environment.GetEnvironmentVariable("BUILD_NUMBER") //populated by TeamCity build agent
+let buildNumber = if String.IsNullOrWhiteSpace(envBuildNumber) then "0" else envBuildNumber
+
+let version = parsedRelease.AssemblyVersion + "." + buildNumber
+let preReleaseVersion = version + "-beta" //suffixes the assembly for pre-releases
+
+let isUnstableDocs = hasBuildParam "unstable"
+let isPreRelease = hasBuildParam "nugetprerelease"
+let release = if isPreRelease then ReleaseNotesHelper.ReleaseNotes.New(version, version + "-beta", parsedRelease.Notes) else parsedRelease
+let isMono = Type.GetType("Mono.Runtime") <> null;
 
 // Directories
 let output = __SOURCE_DIRECTORY__  @@ "build"
@@ -154,7 +179,7 @@ Target "CopyOutput" (fun _ ->
             (fun p -> 
                 { p with
                     Project = "./src/NBench/NBench.csproj"
-                    Framework = "net45"
+                    Framework = "net452"
                     Output = outputBinariesNet45
                     Configuration = configuration })
 
