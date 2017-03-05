@@ -61,12 +61,6 @@ Target "Build" (fun _ ->
                     Project = "./src/NBench/NBench.csproj"
                     Framework = "netstandard1.6"
                     Configuration = configuration })
-        DotNetCli.Build
-            (fun p ->
-                { p with 
-                    Project = "./src/NBench.Runner/NBench.Runner.csproj"
-                    Framework = "netcoreapp1.0"
-                    Configuration = configuration })
         
         let runSingleProjectNetCore project =
             DotNetCli.Build
@@ -76,10 +70,11 @@ Target "Build" (fun _ ->
                         Framework = "netcoreapp1.0"
                         Configuration = configuration })
 
-        let testProjects = (!! "./tests/**/*NBench.Tests*.csproj" 
+        let netCoreProjects = (!! "./src/**/*NBench.Runner.csproj"
+                            ++ "./tests/**/*NBench.Tests*.csproj" 
                             -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
 
-        testProjects |> Seq.iter (runSingleProjectNetCore)
+        netCoreProjects |> Seq.iter (runSingleProjectNetCore)
 )
 
 Target "RunTests" (fun _ ->
