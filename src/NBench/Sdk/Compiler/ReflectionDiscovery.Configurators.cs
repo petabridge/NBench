@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+#if CORECLR
+using Microsoft.Extensions.DependencyModel;
+#endif
 
 namespace NBench.Sdk.Compiler
 {
@@ -38,7 +42,7 @@ namespace NBench.Sdk.Compiler
 
             // search for a match
             var match = FindBestMatchingConfiguratorForMeasurement(measurementType, 
-                specificAssembly == null ? LoadAllTypeConfigurators() : LoadAllTypeConfigurators().Where(x=> x.Assembly.Equals(specificAssembly)));
+                specificAssembly == null ? LoadAllTypeConfigurators() : LoadAllTypeConfigurators().Where(x=> x.GetTypeInfo().Assembly.Equals(specificAssembly)));
 
             // cache the result
             _measurementConfiguratorTypes[measurementType] = match;
@@ -74,16 +78,36 @@ namespace NBench.Sdk.Compiler
 
         public static IEnumerable<Type> LoadAllTypeConfigurators()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            IEnumerable<Type> seedTypes = new List<Type>();
-            return assemblies.Aggregate(seedTypes,
-                (types, assembly) =>
-                    types.Concat(
-                        assembly.DefinedTypes.Where(
-                            y => y.IsClass
-                            && !y.IsGenericTypeDefinition
-                            && IsValidConfiguratorType(y))));
+#if  CORECLR
+            var assemblies = GetAssemblies();
+            var types = assemblies.SelectMany( AssemblyExtensions.GetTypes);
+#else
+            var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+            var types = assemblies.SelectMany(a => a.DefinedTypes);
+#endif
+            return
+                types.Where(IsConfigurationType);
         }
+#if CORECLR
+        private static Assembly[] GetAssemblies()
+        {
+            var assemblies = new List<Assembly>();
+            var dependencies = DependencyContext.Default.RuntimeLibraries;
+            foreach (var library in dependencies)
+            {
+                try
+                {
+                    var assembly = Assembly.Load(new AssemblyName(library.Name));
+                    assemblies.Add(assembly);
+                }
+                catch (Exception e)
+                {
+                    //do nothing cant't if can't load assembly
+                }
+            }
+            return assemblies.ToArray();
+        }
+#endif
 
         public static Type FindBestMatchingConfiguratorForMeasurement(Type measurementType,
             IEnumerable<Type> knownConfigurators)
@@ -110,7 +134,7 @@ namespace NBench.Sdk.Compiler
                     if (ConfiguratorSupportsMeasurement(currentType, configurator, true))
                         return configurator;
                 }
-                currentType = currentType.BaseType; //descend down the inheritance chain
+                currentType = currentType.GetTypeInfo().BaseType; //descend down the inheritance chain
             }
 
             // check interfaces next
@@ -152,7 +176,7 @@ namespace NBench.Sdk.Compiler
                 var configurators = GetConfiguratorInterfaces(currentType).ToList<Type>();
                 if (configurators.Count == 0)
                 {
-                    currentType = currentType.BaseType;
+                    currentType = currentType.GetTypeInfo().BaseType;
                     continue; //move down the inheritance chain
                 }
 
@@ -163,6 +187,14 @@ namespace NBench.Sdk.Compiler
 
             return false;
 
+        }
+
+        private static bool IsConfigurationType(Type type)
+        {
+            var tpInfo = type.GetTypeInfo();
+
+            return tpInfo.IsClass && !tpInfo.IsGenericTypeDefinition &&
+                   IsValidConfiguratorType(type);
         }
 
         private static bool SupportsType(Type measurementType, Type configuratorType, bool exact)
@@ -182,7 +214,7 @@ namespace NBench.Sdk.Compiler
 
         private static IEnumerable<Type> GetConfiguratorInterfaces(Type type)
         {
-            var genericInterfaceDefinitions = type.GetTypeInfo().ImplementedInterfaces.Where(x => x.IsGenericType);
+            var genericInterfaceDefinitions = type.GetTypeInfo().ImplementedInterfaces.Where(x => x.GetTypeInfo().IsGenericType);
             return genericInterfaceDefinitions.Where(x => x.GetGenericTypeDefinition() == MeasurementConfiguratorType);
         }
 

@@ -1,30 +1,92 @@
-#!/bin/bash
+#!/usr/bin/env bash
+##########################################################################
+# This is the Fake bootstrapper script for Linux and OS X.
+##########################################################################
 
-SCRIPT_PATH="${BASH_SOURCE[0]}";
-if ([ -h "${SCRIPT_PATH}" ]) then
-  while([ -h "${SCRIPT_PATH}" ]) do SCRIPT_PATH=`readlink "${SCRIPT_PATH}"`; done
+# Define directories.
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+TOOLS_DIR=$SCRIPT_DIR/tools
+NUGET_EXE=$TOOLS_DIR/nuget.exe
+NUGET_URL=https://dist.nuget.org/win-x86-commandline/v3.5.0/nuget.exe
+FAKE_VERSION=4.50.0
+FAKE_EXE=$TOOLS_DIR/FAKE/tools/FAKE.exe
+
+# Define default arguments.
+TARGET="Default"
+CONFIGURATION="Release"
+VERBOSITY="verbose"
+DRYRUN=
+SCRIPT_ARGUMENTS=()
+
+# Parse arguments.
+for i in "$@"; do
+    case $1 in
+        -t|--target) TARGET="$2"; shift ;;
+        -c|--configuration) CONFIGURATION="$2"; shift ;;
+        -v|--verbosity) VERBOSITY="$2"; shift ;;
+        -d|--dryrun) DRYRUN="-dryrun" ;;
+        --) shift; SCRIPT_ARGUMENTS+=("$@"); break ;;
+        *) SCRIPT_ARGUMENTS+=("$1") ;;
+    esac
+    shift
+done
+
+# Make sure the tools folder exist.
+if [ ! -d "$TOOLS_DIR" ]; then
+  mkdir "$TOOLS_DIR"
 fi
-pushd . > /dev/null
-cd `dirname ${SCRIPT_PATH}` > /dev/null
-SCRIPT_PATH=`pwd`;
-popd  > /dev/null
 
-if ! [ -f $SCRIPT_PATH/.nuget/nuget.exe ] 
-    then
-        wget "https://www.nuget.org/nuget.exe" -P $SCRIPT_PATH/.nuget/
+###########################################################################
+# INSTALL .NET CORE CLI
+###########################################################################
+
+echo "Installing .NET CLI..."
+if [ ! -d "$SCRIPT_DIR/.dotnet" ]; then
+  mkdir "$SCRIPT_DIR/.dotnet"
+fi
+curl -Lsfo "$SCRIPT_DIR/.dotnet/dotnet-install.sh" https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh
+bash "$SCRIPT_DIR/.dotnet/dotnet-install.sh" --version 1.0.0-rc4-004771 --install-dir .dotnet --no-path
+export PATH="$SCRIPT_DIR/.dotnet":$PATH
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+chmod -R 0755 ".dotnet"
+"$SCRIPT_DIR/.dotnet/dotnet" --info
+
+###########################################################################
+# INSTALL NUGET
+###########################################################################
+
+# Download NuGet if it does not exist.
+if [ ! -f "$NUGET_EXE" ]; then
+    echo "Downloading NuGet..."
+    curl -Lsfo "$NUGET_EXE" $NUGET_URL
+    if [ $? -ne 0 ]; then
+        echo "An error occured while downloading nuget.exe."
+        exit 1
+    fi
 fi
 
-mono $SCRIPT_PATH/.nuget/nuget.exe update -self
+###########################################################################
+# INSTALL FAKE
+###########################################################################
 
-mono $SCRIPT_PATH/.nuget/nuget.exe install FAKE -OutputDirectory $SCRIPT_PATH/packages -ExcludeVersion -Version 4.9.1 
-
-mono $SCRIPT_PATH/.nuget/nuget.exe install xunit.runner.console -OutputDirectory $SCRIPT_PATH/packages/FAKE -ExcludeVersion -Version 2.0.0
-
-if ! [ -e $SCRIPT_PATH/packages/SourceLink.Fake/tools/SourceLink.fsx ] ; then
-	mono $SCRIPT_PATH/.nuget/nuget.exe install SourceLink.Fake -OutputDirectory $SCRIPT_PATH/packages -ExcludeVersion
-
+if [ ! -f "$FAKE_EXE" ]; then
+    mono "$NUGET_EXE" install Fake -ExcludeVersion -Version $FAKE_VERSION -OutputDirectory "$TOOLS_DIR"
+    if [ $? -ne 0 ]; then
+        echo "An error occured while installing Cake."
+        exit 1
+    fi
 fi
 
-export encoding=utf-8
+# Make sure that Fake has been installed.
+if [ ! -f "$FAKE_EXE" ]; then
+    echo "Could not find Fake.exe at '$FAKE_EXE'."
+    exit 1
+fi
 
-mono $SCRIPT_PATH/packages/FAKE/tools/FAKE.exe build.fsx "$@"
+###########################################################################
+# RUN BUILD SCRIPT
+###########################################################################
+
+# Start Fake
+exec mono "$FAKE_EXE" build.fsx "${SCRIPT_ARGUMENTS[@]}" --verbosity=$VERBOSITY --configuration=$CONFIGURATION --target=$TARGET $DRYRUN

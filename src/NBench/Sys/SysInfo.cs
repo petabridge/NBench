@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace NBench.Sys
@@ -11,16 +12,23 @@ namespace NBench.Sys
     /// </summary>
     public class SysInfo
     {
-        private SysInfo(OperatingSystem os, Version clrVersion, int processorCount, int workerThreads, int ioThreads, int maxGcGeneration, bool isMono)
+        private SysInfo(string os, string clrVersion, int processorCount, int workerThreads, int ioThreads, int maxGcGeneration, bool isMono)
         {
+            
             OS = os;
             ProcessorCount = processorCount;
             WorkerThreads = workerThreads;
+#if THREADPOOL
             IOThreads = ioThreads;
+#endif
             IsMono = isMono;
             ClrVersion = clrVersion;
             MaxGcGeneration = maxGcGeneration;
+#if CORECLR
+            NBenchAssemblyVersion = this.GetType().AssemblyQualifiedName;
+#else
             NBenchAssemblyVersion = this.GetType().Assembly.FullName;
+#endif
         }
 
         public string NBenchAssemblyVersion { get; private set; }
@@ -28,12 +36,12 @@ namespace NBench.Sys
         /// <summary>
         /// Current version of the OS
         /// </summary>
-        public OperatingSystem OS { get; private set; }
+        public string OS { get; private set; }
 
         /// <summary>
         /// Current version of the CLR
         /// </summary>
-        public Version ClrVersion { get; private set; }
+        public string ClrVersion { get; private set; }
 
         /// <summary>
         /// Number of logical processors
@@ -45,10 +53,12 @@ namespace NBench.Sys
         /// </summary>
         public int WorkerThreads { get; private set; }
 
+#if THREADPOOL
         /// <summary>
         /// Number of I/O completion port threads in <see cref="ThreadPool"/>
         /// </summary>
         public int IOThreads { get; private set; }
+#endif
 
         /// <summary>
         /// Maximum number of GC generations
@@ -65,19 +75,21 @@ namespace NBench.Sys
         /// Singleton instance of <see cref="SysInfo"/>
         /// </summary>
         public readonly static SysInfo Instance = GetInstance();
-
+   
         private static SysInfo GetInstance()
         {
-            OperatingSystem os = Environment.OSVersion;
-            int processorCount = Environment.ProcessorCount;
-            Version clrVersion = Environment.Version;
             int maxGcGeneration = GC.MaxGeneration;
-            int workerThreads;
-            int completionPortThreads;
-            ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
             bool isMono = Type.GetType("Mono.Runtime") != null;
+            int workerThreads = 0;
+
+#if !CORECLR
+            int completionPortThreads = 0;
+            ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+            return new SysInfo(Environment.OSVersion.ToString(), Environment.Version.ToString(), Environment.ProcessorCount, workerThreads, Environment.ProcessorCount, GC.MaxGeneration, isMono);
+#else
             
-            return new SysInfo(os, clrVersion, processorCount, workerThreads, processorCount, maxGcGeneration, isMono);
+            return new SysInfo(RuntimeInformation.OSDescription, RuntimeInformation.FrameworkDescription, Environment.ProcessorCount, workerThreads, Environment.ProcessorCount, maxGcGeneration, isMono);
+#endif
         }
     }
 }

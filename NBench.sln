@@ -1,43 +1,41 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{C8104500-2C0F-46A2-AE84-A3D74CC55697}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{85C9F790-0322-4B2E-97EC-3581DA58A0AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench", "src\NBench\NBench.csproj", "{4E0B1852-7B6D-49E7-9939-A315D086B094}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench", "src\NBench\NBench.csproj", "{4E0B1852-7B6D-49E7-9939-A315D086B094}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Microbenchmarks", "benchmarks\NBench.Microbenchmarks\NBench.Microbenchmarks.csproj", "{FDA04BAB-34FD-4E5D-91F4-0503090973A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Microbenchmarks", "benchmarks\NBench.Microbenchmarks\NBench.Microbenchmarks.csproj", "{FDA04BAB-34FD-4E5D-91F4-0503090973A6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1F1914B9-8F67-4B51-9738-CDE5AFB2F8DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests", "tests\NBench.Tests\NBench.Tests.csproj", "{5716EAF7-ABA1-434F-9AFA-51693A73C627}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Tests", "tests\NBench.Tests\NBench.Tests.csproj", "{5716EAF7-ABA1-434F-9AFA-51693A73C627}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.End2End", "tests\NBench.Tests.End2End\NBench.Tests.End2End.csproj", "{B7F38539-67A1-42B8-A5E5-CB592B6E3233}"
-	ProjectSection(ProjectDependencies) = postProject
-		{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C} = {96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Tests.End2End", "tests\NBench.Tests.End2End\NBench.Tests.End2End.csproj", "{B7F38539-67A1-42B8-A5E5-CB592B6E3233}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Runner", "src\NBench.Runner\NBench.Runner.csproj", "{5C586501-4E91-4007-B23F-02E20014DA51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Runner", "src\NBench.Runner\NBench.Runner.csproj", "{5C586501-4E91-4007-B23F-02E20014DA51}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{97444074-C626-443F-BE96-374AD2E43604}"
 	ProjectSection(SolutionItems) = preProject
 		build.cmd = build.cmd
 		build.fsx = build.fsx
+		build.ps1 = build.ps1
 		build.sh = build.sh
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.Performance", "tests\NBench.Tests.Performance\NBench.Tests.Performance.csproj", "{E3730D65-70AE-4055-A291-800044C48FDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Tests.Performance", "tests\NBench.Tests.Performance\NBench.Tests.Performance.csproj", "{E3730D65-70AE-4055-A291-800044C48FDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Tests.Assembly", "tests\NBench.Tests.Assembly\NBench.Tests.Assembly.csproj", "{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Tests.Assembly", "tests\NBench.Tests.Assembly\NBench.Tests.Assembly.csproj", "{96FCB3AB-8C76-4BD0-B97F-1239E5FF5C5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.PerformanceCounters", "src\NBench.PerformanceCounters\NBench.PerformanceCounters.csproj", "{3112B845-6A64-4AD2-9FA9-88F47BE980C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.PerformanceCounters", "src\NBench.PerformanceCounters\NBench.PerformanceCounters.csproj", "{3112B845-6A64-4AD2-9FA9-88F47BE980C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.PerformanceCounters.Tests.Performance", "tests\NBench.PerformanceCounters.Tests.Performance\NBench.PerformanceCounters.Tests.Performance.csproj", "{FD7BE8F5-460F-4A3D-A479-E4AF36C4EED5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.PerformanceCounters.Tests.Performance", "tests\NBench.PerformanceCounters.Tests.Performance\NBench.PerformanceCounters.Tests.Performance.csproj", "{FD7BE8F5-460F-4A3D-A479-E4AF36C4EED5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.PerformanceCounters.Tests.End2End", "tests\NBench.PerformanceCounters.Tests.End2End\NBench.PerformanceCounters.Tests.End2End.csproj", "{416A4BAD-459C-4896-A44C-4C2344EBE154}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.PerformanceCounters.Tests.End2End", "tests\NBench.PerformanceCounters.Tests.End2End\NBench.PerformanceCounters.Tests.End2End.csproj", "{416A4BAD-459C-4896-A44C-4C2344EBE154}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

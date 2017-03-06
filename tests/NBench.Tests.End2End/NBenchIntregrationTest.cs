@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
@@ -29,7 +30,7 @@ namespace NBench.Tests.End2End
         {
             if (!TestRunner.IsMono) // this spec currently hits a runtime exception with Mono: https://bugzilla.xamarin.com/show_bug.cgi?id=43291
             {
-                var benchmarks = _discovery.FindBenchmarks(GetType().Assembly).ToList();
+                var benchmarks = _discovery.FindBenchmarks(GetType().GetTypeInfo().Assembly).ToList();
                 Assert.True(benchmarks.Count >= 1);
                 Benchmark.PrepareForRun(); // force some GC here
                 for (var i = 0; i < benchmarks.Count; i++)
@@ -86,10 +87,16 @@ namespace NBench.Tests.End2End
 
 		private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
 		{
-#if DEBUG
-	var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
+#if CORECLR
+		    var assemblySubfolder = "netcoreapp1.0";
 #else
-			var package = new TestPackage(".."+ Path.DirectorySeparatorChar +".."+ Path.DirectorySeparatorChar +".."+ Path.DirectorySeparatorChar +"NBench.Tests.Assembly"+ Path.DirectorySeparatorChar +"bin"+ Path.DirectorySeparatorChar +"Release"+ Path.DirectorySeparatorChar +"NBench.Tests.Assembly.dll", include, exclude);
+		    var assemblySubfolder = "net452";
+#endif
+
+#if DEBUG
+	        var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
+#else
+            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Assembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.Tests.Assembly.dll", include, exclude);
 #endif
 
             package.Validate();
