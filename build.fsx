@@ -125,8 +125,9 @@ Target "RunTests" (fun _ ->
                         Project = project
                         Framework = "net46"
                         Configuration = configuration})
-
-        let end2EndProject = "./tests/NBench.Tests.End2End/NBench.Tests.End2End.csproj"
+        
+        // End2End tests depend on PerformanceCounters and therefore can't be run on netcoreapp1.0
+        let end2EndProject = "./tests/**/*NBench.Tests.End2End.csproj"
 
         runSingleProjectNet46 end2EndProject
 
@@ -155,7 +156,7 @@ Target "RunTests" (fun _ ->
 Target "NBench" <| fun _ ->
     if (isWindows) then
         let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
-        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net451/NBench.Tests.Performance.dll"
+        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
         
         let spec = getBuildParam "spec"
 
