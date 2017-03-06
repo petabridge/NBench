@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using NBench.Collection;
 using NBench.Metrics;
 using NBench.Metrics.Counters;
@@ -133,7 +134,7 @@ namespace NBench.Tests.Sdk.Compiler
             var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
 
             // limit our search to the declaring assembly
-            var actualConfiguratorType = discovery.GetConfiguratorTypeForMeasurement(measurementType, measurementType.Assembly);
+            var actualConfiguratorType = discovery.GetConfiguratorTypeForMeasurement(measurementType, measurementType.GetTypeInfo().Assembly);
             Assert.Equal(expectedConfiguratorType, actualConfiguratorType);
         }
         

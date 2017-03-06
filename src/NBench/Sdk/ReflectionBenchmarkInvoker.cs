@@ -77,7 +77,7 @@ namespace NBench.Sdk
         {
             var del =
                 (Action<BenchmarkContext>)
-                    Delegate.CreateDelegate(typeof (Action<BenchmarkContext>), target, invocationMethod);
+                    invocationMethod.CreateDelegate(typeof(Action<BenchmarkContext>), target);
             return del;
         }
 
@@ -85,7 +85,7 @@ namespace NBench.Sdk
         {
             var del =
                 (Action)
-                    Delegate.CreateDelegate(typeof (Action), target, invocationMethod);
+                    invocationMethod.CreateDelegate(typeof(Action), target);
 
             Action<BenchmarkContext> wrappedDelegate = context => del();
             return wrappedDelegate;

@@ -7,6 +7,7 @@ using NBench.Sdk.Compiler;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 using System.Threading;
 
 namespace NBench.Sdk
@@ -14,7 +15,9 @@ namespace NBench.Sdk
     /// <summary>
     /// Results collected by the test runner
     /// </summary>
+#if SERIALIZATION
     [Serializable]
+#endif
     public class TestRunnerResult
     {
         public bool AllTestsPassed { get; set; }
@@ -26,7 +29,10 @@ namespace NBench.Sdk
     /// Executor of tests
     /// </summary>
     /// <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
-    public class TestRunner : MarshalByRefObject
+    public class TestRunner
+#if APPDOMAIN
+        : MarshalByRefObject
+#endif
     {
         /// <summary>
         /// Can't apply some of our optimization tricks if running Mono, due to need for elevated permissions
@@ -44,19 +50,33 @@ namespace NBench.Sdk
             _package = package;
         }
 
+
+#if APPDOMAIN
         /// <summary>
         /// Creates a new instance of the test runner in the given app domain.
         /// </summary>
         /// <param name="domain">The app domain to create the runner into.</param>
         /// <param name="package">The test package to execute.</param>
         /// <returns></returns>
-        public static TestRunner CreateRunner(AppDomain domain, TestPackage package)
+        public static TestRunner CreateRunner(System.AppDomain domain, TestPackage package)
         {
             Contract.Requires(domain != null);
             var runnerType = typeof(TestRunner);
             return domain.CreateInstanceAndUnwrap(runnerType.Assembly.FullName, runnerType.FullName, false, 0, null, new object[] { package }, null, null) as TestRunner;
         }
+#else
+        /// <summary>
+        /// Creates a new instance of the test runner in the given app domain.
+        /// </summary>
+        /// <param name="package">The test package to execute.</param>
+        /// <returns></returns>
+        public static TestRunner CreateRunner(TestPackage package)
+        {
+            return (TestRunner) Activator.CreateInstance(typeof(TestRunner), new object[] {package});
+        }
+#endif
 
+#if APPDOMAIN
         /// <summary>
         /// Executes the test package.
         /// </summary>
@@ -79,28 +99,35 @@ namespace NBench.Sdk
                 DomainManager.UnloadDomain(testDomain);
             }
         }
+#else
+
+        /// <summary>
+        /// Executes the test package.
+        /// </summary>
+        /// <param name="package">The test package to execute.</param>
+        /// <remarks>Creates a new instance of <see cref="TestRunner"/> and executes the tests.</remarks>
+        public static TestRunnerResult Run(TestPackage package)
+        {
+            Contract.Requires(package != null);
+            var runner = TestRunner.CreateRunner(package);
+            return runner.Execute();
+        }
+#endif
 
         /// <summary>
         /// Initializes the process and thread
         /// </summary>
         public void SetProcessPriority(bool concurrent)
         {
-            /*
-            * Set processor affinity
-            */
+#if !CORECLR
             if (!concurrent)
             {
+                /*
+                * Set processor affinity
+                */
                 var proc = Process.GetCurrentProcess();
                 proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
-            }
 
-            /*
-             * Set priority
-             */
-            if (!IsMono)
-                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-            if (!concurrent)
-            {
                 /*
                  * If we're running in concurrent mode, don't give the foreground thread higher priority
                  * over the other threads participating in NBench specs. Treat them all equally with the same
@@ -108,6 +135,12 @@ namespace NBench.Sdk
                  */
                 Thread.CurrentThread.Priority = ThreadPriority.Highest;
             }
+
+            /*
+            * Set priority
+            */
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+#endif
         }
 
         /// <summary>
@@ -178,6 +211,7 @@ namespace NBench.Sdk
             return result;
         }
 
+#if APPDOMAIN
         /// <summary>
         /// Control the lifetime policy for this instance
         /// </summary>
@@ -186,6 +220,7 @@ namespace NBench.Sdk
             // Live forever
             return null;
         }
+#endif
 
         /// <summary>
         /// Creates the benchmark output writer
