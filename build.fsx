@@ -93,9 +93,9 @@ Target "Build" (fun _ ->
                         Framework = "netcoreapp1.0"
                         Configuration = configuration })
 
-        let netCoreProjects = (!! "./src/**/*NBench.Runner.csproj"
-                            ++ "./tests/**/*NBench.Tests*.csproj" 
-                            -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
+        let netCoreProjects = (!! "./src/**/*NBench.Runner.DotNetCli.csproj"
+                               ++ "./tests/**/*NBench.Tests*.csproj" 
+                               -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
 
         netCoreProjects |> Seq.iter (runSingleProjectNetCore)
 )
@@ -152,6 +152,14 @@ Target "NBench" <| fun _ ->
             info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
             info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
+    
+    let netCoreNbenchRunner = __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/NBench.Runner.DotNetCli.dll"
+    let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
+    DotNetCli.RunCommand
+        (fun p ->
+            { p with
+                TimeOut = TimeSpan.FromMinutes 25.0 })
+        (sprintf "%s %s output-directory=\"%s\" concurrent=\"%b\" trace=\"%b\"" netCoreNbenchRunner netCoreAssembly outputPerfTests true true)
 
 Target "CopyOutput" (fun _ ->    
     // .NET 4.5
@@ -174,7 +182,7 @@ Target "CopyOutput" (fun _ ->
         projects |> List.iter (fun p -> publishSingleProjectNet45 p)
     
     let netCoreProjects = [ ("NBench", "./src/NBench/NBench.csproj", "netstandard1.6");
-                            ("NBench.Runner", "./src/NBench.Runner/NBench.Runner.csproj", "netcoreapp1.0") ]
+                            ("NBench.Runner.DotNetCli", "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj", "netcoreapp1.0") ]
 
     let publishSingleProjectNetCoreApp project = 
         let projectName, projectPath, projectFramework = project
@@ -192,7 +200,8 @@ Target "CopyOutput" (fun _ ->
 Target "CreateNuget" (fun _ ->
     let nugetProjects = [ "./src/NBench/NBench.csproj"; 
                           "./src/NBench.PerformanceCounters/NBench.PerformanceCounters.csproj";
-                          "./src/NBench.Runner/NBench.Runner.csproj" ]
+                          "./src/NBench.Runner/NBench.Runner.csproj" 
+                          "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj" ]
 
     nugetProjects |> List.iter (fun proj ->
         DotNetCli.Pack
@@ -201,7 +210,8 @@ Target "CreateNuget" (fun _ ->
                     Project = proj
                     Configuration = configuration
                     AdditionalArgs = ["--include-symbols"]
-                    OutputPath = outputNuGet })
+                    OutputPath = outputNuGet
+                    VersionSuffix = version })
         )
 )
 
@@ -250,7 +260,7 @@ Target "All" DoNothing
 Target "AllTests" DoNothing
 
 // build dependencies
-"Clean" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
+"Clean" ==> "AssemblyInfo" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
 
 // tests dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
