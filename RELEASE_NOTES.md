@@ -1,3 +1,8 @@
+#### v1.0.0 March 3 2017
+NBench v1.0.0 represents support for .NET Standard 1.6 for the NBench core library and a .NET Core 1.0 version of the NBench runner.
+
+You can [see the full list of changes in NBench 1.0.0 here](https://github.com/petabridge/NBench/milestone/2)
+
 #### v0.3.4  December 15 2016
 NBench v0.3.4 is a bugfix for [`RunMode.ThroughPut` benchmarks where we regularly had false negatives on asserting number of operations per second.](https://github.com/petabridge/NBench/issues/153). This patch fixes this issue.
 
