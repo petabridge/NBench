@@ -201,7 +201,8 @@ Target "CreateNuget" (fun _ ->
                     Project = proj
                     Configuration = configuration
                     AdditionalArgs = ["--include-symbols"]
-                    OutputPath = outputNuGet })
+                    OutputPath = outputNuGet
+                    VersionSuffix = version })
         )
 )
 
@@ -250,7 +251,7 @@ Target "All" DoNothing
 Target "AllTests" DoNothing
 
 // build dependencies
-"Clean" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
+"Clean" ==> "AssemblyInfo" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
 
 // tests dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
