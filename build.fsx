@@ -210,8 +210,7 @@ Target "CreateNuget" (fun _ ->
                     Project = proj
                     Configuration = configuration
                     AdditionalArgs = ["--include-symbols"]
-                    OutputPath = outputNuGet
-                    VersionSuffix = version })
+                    OutputPath = outputNuGet })
         )
 )
 
