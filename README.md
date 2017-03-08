@@ -55,6 +55,8 @@ After defining some NBench `PerfBenchmark` methods and declaring some measuremen
 
 ### .NET 4.5.2 Runner
 
+To install the .NET 4.5.2 NBench runner via NuGet:
+
 ```
 PS> Install-Package NBench.Runner
 PS> .\packages\NBench.Runner\NBench.Runner.exe .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
