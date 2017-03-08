@@ -153,7 +153,7 @@ Target "NBench" <| fun _ ->
             info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
     
-    let netCoreNbenchRunner = __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/NBench.Runner.DotNetCli.dll"
+    let netCoreNbenchRunner = __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/dotnet-nbench.dll"
     let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
     DotNetCli.RunCommand
         (fun p ->
