@@ -7,8 +7,14 @@ This release introduces a breaking change to NBench:
 
 How to use the .NET Core NBench runner:
 
-- Install via NuGet: `Install-Package NBench.Runner.DotNetCli`
-- Locate `NBench.Runner.DotNetCli.dll`
+- In your .NET Core performance test project, add the following dependency element to the .csproj file:
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="NBench.Runner.DotNetCli" Version="1.0.0" />
+  </ItemGroup>
+
+- Save the .csproj file (if using Visual Studio 2017) or run `dotnet restore` in the project location.
+- From a command prompt within the project's parent directory, run `dotnet nbench project_name.dll arguments...`
 
 You can [see the full list of changes in NBench 1.0.0 here](https://github.com/petabridge/NBench/milestone/2)
 
