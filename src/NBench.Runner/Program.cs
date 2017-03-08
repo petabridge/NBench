@@ -22,6 +22,12 @@ namespace NBench.Runner
 		    bool concurrent = false;
 		    bool trace = false;
 		    bool teamcity = false;
+
+		    if (args.Length == 1 && args[0] == "--help")
+		    {
+		        CommandLine.ShowHelp();
+		    }
+
 			if (CommandLine.HasProperty("include"))
 				include = CommandLine.GetProperty("include").Split(',');
 			if (CommandLine.HasProperty("exclude"))
@@ -38,22 +44,30 @@ namespace NBench.Runner
                 teamcity = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
             }
 
+		    var files = CommandLine.GetFiles(args);
+		    if (files.Count == 0)
+		    {
+                Console.WriteLine("Please provide assemblies for which to run NBench tests\n");
+		        CommandLine.ShowHelp();
+		        return 1;
+		    }
 
-            TestPackage package = new TestPackage(CommandLine.GetFiles(args), include, exclude, concurrent) {Tracing = trace};
+		    TestPackage package =
+		        new TestPackage(files, include, exclude, concurrent) {Tracing = trace};
 
-			if (CommandLine.HasProperty("output-directory"))
-				package.OutputDirectory = CommandLine.GetProperty("output-directory");
+		    if (CommandLine.HasProperty("output-directory"))
+		        package.OutputDirectory = CommandLine.GetProperty("output-directory");
 
-			if (CommandLine.HasProperty("configuration"))			
-				package.ConfigurationFile = CommandLine.GetProperty("configuration");
+		    if (CommandLine.HasProperty("configuration"))
+		        package.ConfigurationFile = CommandLine.GetProperty("configuration");
 
 		    package.TeamCity = teamcity;
 
-			package.Validate();
-            var result = TestRunner.Run(package);
-       
-            return result.AllTestsPassed ? 0 : -1;
-        }
+		    package.Validate();
+		    var result = TestRunner.Run(package);
+
+		    return result.AllTestsPassed ? 0 : -1;
+		}
     }
 }
 
