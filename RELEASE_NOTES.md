@@ -1,6 +1,15 @@
 #### v1.0.0 March 3 2017
 NBench v1.0.0 represents support for .NET Standard 1.6 for the NBench core library and a .NET Core 1.0 version of the NBench runner.
 
+This release introduces a breaking change to NBench:
+
+- NBench core library .NET Framework target increased from **4.5 -> 4.5.2**.  Client projects must target 4.5.2 or greater.
+
+How to use the .NET Core NBench runner:
+
+- Install via NuGet: `Install-Package NBench.Runner.DotNetCli`
+- Locate `NBench.Runner.DotNetCli.dll`
+
 You can [see the full list of changes in NBench 1.0.0 here](https://github.com/petabridge/NBench/milestone/2)
 
 #### v0.3.4  December 15 2016
