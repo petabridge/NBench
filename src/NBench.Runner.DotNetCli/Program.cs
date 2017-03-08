@@ -26,6 +26,7 @@ namespace NBench.Runner.DotNetCli
             if (args.Length == 1 && args[0] == "--help")
             {
                 CommandLine.ShowHelp();
+                return 0;
             }
 
             if (CommandLine.HasProperty("include"))
