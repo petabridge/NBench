@@ -135,23 +135,23 @@ Target "RunTests" (fun _ ->
 
 Target "NBench" <| fun _ ->
     if (isWindows) then
-        //let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
-        //let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
+        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
+        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
         
-        //let spec = getBuildParam "spec"
+        let spec = getBuildParam "spec"
 
-        //let args = new StringBuilder()
-        //            |> append assembly
-        //            |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-        //            |> append (sprintf "concurrent=\"%b\"" true)
-        //            |> append (sprintf "trace=\"%b\"" true)
-        //            |> toText
+        let args = new StringBuilder()
+                    |> append assembly
+                    |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                    |> append (sprintf "concurrent=\"%b\"" true)
+                    |> append (sprintf "trace=\"%b\"" true)
+                    |> toText
 
-        //let result = ExecProcess(fun info -> 
-        //    info.FileName <- nbenchRunner
-        //    info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchRunner))
-        //    info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-        //if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
+        let result = ExecProcess(fun info -> 
+            info.FileName <- nbenchRunner
+            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchRunner))
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
     
         let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
         DotNetCli.Restore
@@ -184,7 +184,7 @@ Target "NBench" <| fun _ ->
             info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" netCoreNbenchRunner netCoreNbenchRunnerArgs
     else
-        let netCoreNbenchRunnerLinux = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/win7-x64/"
+        let netCoreNbenchRunnerLinux = "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/dotnet-nbench.dll"
         let netCoreAssemblyLinux = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
         DotNetCli.RunCommand
             (fun p ->
