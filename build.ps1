@@ -31,7 +31,7 @@ Param(
 
 $FakeVersion = "4.50.0"
 $NBenchVersion = "0.3.4"
-$DotNetChannel = "preview";
+$DotNetChannel = "production";
 $DotNetVersion = "1.0.0";
 $DotNetInstallerUri = "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1";
 $NugetVersion = "3.5.0";

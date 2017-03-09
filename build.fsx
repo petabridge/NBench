@@ -171,12 +171,6 @@ Target "NBench" <| fun _ ->
         let netCoreNbenchRunner = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/win7-x64/"
         let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
         
-        //DotNetCli.RunCommand
-        //    (fun p ->
-        //        { p with
-        //            TimeOut = TimeSpan.FromMinutes 25.0 })
-        //    (sprintf "%s %s output-directory=\"%s\" concurrent=\"%b\" trace=\"%b\"" netCoreNbenchRunner netCoreAssembly outputPerfTests true true)
-
         let netCoreNbenchRunnerArgs = new StringBuilder()
                                         |> append netCoreAssembly
                                         |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
@@ -189,6 +183,14 @@ Target "NBench" <| fun _ ->
             info.WorkingDirectory <- (Path.GetDirectoryName (FullName netCoreNbenchRunner))
             info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" netCoreNbenchRunner netCoreNbenchRunnerArgs
+    else
+        let netCoreNbenchRunnerLinux = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/win7-x64/"
+        let netCoreAssemblyLinux = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
+        DotNetCli.RunCommand
+            (fun p ->
+                { p with
+                    TimeOut = TimeSpan.FromMinutes 25.0 })
+            (sprintf "%s %s output-directory=\"%s\" concurrent=\"%b\" trace=\"%b\"" netCoreNbenchRunnerLinux netCoreAssemblyLinux outputPerfTests true true)
 
 Target "CopyOutput" (fun _ ->    
     // .NET 4.5
