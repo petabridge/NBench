@@ -32,7 +32,7 @@ Param(
 $FakeVersion = "4.50.0"
 $NBenchVersion = "0.3.4"
 $DotNetChannel = "preview";
-$DotNetVersion = "1.0.0";
+$DotNetVersion = "1.0.1";
 $DotNetInstallerUri = "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1";
 $NugetVersion = "3.5.0";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/v$NugetVersion/nuget.exe"
@@ -78,7 +78,7 @@ if($FoundDotNetCliVersion -ne $DotNetVersion) {
         mkdir -Force $InstallPath | Out-Null;
     }
     (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, "$InstallPath\dotnet-install.ps1");
-    & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath;
+    & $InstallPath\dotnet-install.ps1 -Channel $DotNetChannel -Version $DotNetVersion -InstallDir $InstallPath -Architecture x64;
 
     Remove-PathVariable "$InstallPath"
     $env:PATH = "$InstallPath;$env:PATH"
