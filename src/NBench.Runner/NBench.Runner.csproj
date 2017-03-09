@@ -10,7 +10,6 @@
     <TargetFramework>net452</TargetFramework>
     <OutputType>Exe</OutputType>   
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <Prefer32Bit>false</Prefer32Bit>
     <PackageId>NBench.Runner</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
     <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
