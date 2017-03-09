@@ -160,7 +160,8 @@ Target "NBench" <| fun _ ->
                 { p with
                     Project = netCoreNbenchRunnerProject
                     Configuration = configuration 
-                    Runtime = "win7-x64" })   
+                    Runtime = "win7-x64"
+                    Framework = "netcoreapp1.0"})   
 
         let netCoreNbenchRunner = __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/win7-x64/dotnet-nbench.dll"
         let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
