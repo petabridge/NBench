@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.PerformanceCounters.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.PerformanceCounters.Tests.End2End", "tests\NBench.PerformanceCounters.Tests.End2End\NBench.PerformanceCounters.Tests.End2End.csproj", "{416A4BAD-459C-4896-A44C-4C2344EBE154}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBench.Runner.DotNetCli", "src\NBench.Runner.DotNetCli\NBench.Runner.DotNetCli.csproj", "{552BA093-1A4A-455D-8186-B8018C9972D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Runner.DotNetCli", "src\NBench.Runner.DotNetCli\NBench.Runner.DotNetCli.csproj", "{552BA093-1A4A-455D-8186-B8018C9972D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
