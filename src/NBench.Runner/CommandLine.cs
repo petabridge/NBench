@@ -68,12 +68,22 @@ Arguments:
                                 or .exe at the end of each assembly name.
     [output-directory=path]     Folder where a Markdown report will be exported.
     [configuration=path]        Folder with a config file to be used when loading the assembly names.
-    [include=name test pattern] A "","" (comma) separted list of wildcard pattern to be mached and 
+    [include=name test pattern] A comma separted list of wildcard pattern to be mached and 
                                 included in the tests.  Default value is * (all).  The test is executed
                                 on the complete name of the benchmark Namespace.Class+MethodName.
-    [exclude=name test pattern] A "","" (comma) separted list of wildcard pattern to be mached and 
+                                Examples: 
+                                    include=\""*MyBenchmarkClass*\"" (include all benchmarks in MyBenchmarkClass)
+                                    include=\""*MyBenchmarkClass+MyBenchmark\"" (include MyBenchmark in MyBenchmarkClass)
+                                    include=\""*MyBenchmarkClass*\"",*MyOtherBenchmarkClass*\"" (include all benchmarks
+                                            in MyBenchmarkClass and MyOtherBenchmarkClass)
+    [exclude=name test pattern] A comma separted list of wildcard pattern to be mached and 
                                 excluded in the tests.  Default value is (none).  The test is executed 
                                 on the complete name of the benchmarkNamespace.Class+MethodName.
+                                Examples: 
+                                    exclude=\""*MyBenchmarkClass*\"" (exclude all benchmarks in MyBenchmarkClass)
+                                    exclude=\""*MyBenchmarkClass+MyBenchmark\"" (exclude MyBenchmark in MyBenchmarkClass)
+                                    exclude=\""*MyBenchmarkClass*\"",*MyOtherBenchmarkClass*\"" (exclude all benchmarks
+                                            in MyBenchmarkClass and MyOtherBenchmarkClass)
     [concurrent=true|false]     Disables thread priority and processor affinity operations for all 
                                 benchmarks.  Used only when running multi-threaded benchmarks.  
                                 Set to false (single-threaded) by default.
