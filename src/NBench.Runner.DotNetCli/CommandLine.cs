@@ -72,17 +72,17 @@ Arguments:
                                 included in the tests.  Default value is * (all).  The test is executed
                                 on the complete name of the benchmark Namespace.Class+MethodName.
                                 Examples: 
-                                    include=\""*MyBenchmarkClass*\"" (include all benchmarks in MyBenchmarkClass)
-                                    include=\""*MyBenchmarkClass+MyBenchmark\"" (include MyBenchmark in MyBenchmarkClass)
-                                    include=\""*MyBenchmarkClass*\"",*MyOtherBenchmarkClass*\"" (include all benchmarks
+                                    include=""*MyBenchmarkClass*"" (include all benchmarks in MyBenchmarkClass)
+                                    include=""*MyBenchmarkClass+MyBenchmark"" (include MyBenchmark in MyBenchmarkClass)
+                                    include=""*MyBenchmarkClass*,*MyOtherBenchmarkClass*"" (include all benchmarks
                                             in MyBenchmarkClass and MyOtherBenchmarkClass)
     [exclude=name test pattern] A comma separted list of wildcard pattern to be mached and 
                                 excluded in the tests.  Default value is (none).  The test is executed 
                                 on the complete name of the benchmarkNamespace.Class+MethodName.
                                 Examples: 
-                                    exclude=\""*MyBenchmarkClass*\"" (exclude all benchmarks in MyBenchmarkClass)
-                                    exclude=\""*MyBenchmarkClass+MyBenchmark\"" (exclude MyBenchmark in MyBenchmarkClass)
-                                    exclude=\""*MyBenchmarkClass*\"",*MyOtherBenchmarkClass*\"" (exclude all benchmarks
+                                    exclude=""*MyBenchmarkClass*"" (exclude all benchmarks in MyBenchmarkClass)
+                                    exclude=""*MyBenchmarkClass+MyBenchmark"" (exclude MyBenchmark in MyBenchmarkClass)
+                                    exclude=""*MyBenchmarkClass*,*MyOtherBenchmarkClass*"" (exclude all benchmarks
                                             in MyBenchmarkClass and MyOtherBenchmarkClass)
     [concurrent=true|false]     Disables thread priority and processor affinity operations for all 
                                 benchmarks.  Used only when running multi-threaded benchmarks.  
