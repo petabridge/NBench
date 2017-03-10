@@ -8,7 +8,9 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Win32;
 
 namespace NBench.Sdk
 {
@@ -120,14 +122,22 @@ namespace NBench.Sdk
         public void SetProcessPriority(bool concurrent)
         {
 #if !CORECLR
+            /*
+            * Set processor affinity
+            */
             if (!concurrent)
             {
-                /*
-                * Set processor affinity
-                */
                 var proc = Process.GetCurrentProcess();
                 proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
+            }
 
+            /*
+             * Set priority
+             */
+            if (!IsMono)
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            if (!concurrent)
+            {
                 /*
                  * If we're running in concurrent mode, don't give the foreground thread higher priority
                  * over the other threads participating in NBench specs. Treat them all equally with the same
@@ -135,11 +145,32 @@ namespace NBench.Sdk
                  */
                 Thread.CurrentThread.Priority = ThreadPriority.Highest;
             }
+#else
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {  
+                /*
+                * Set processor affinity
+                */
+                if (!concurrent)
+                {
+                    var proc = Process.GetCurrentProcess();
+                    proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
+                }
 
-            /*
-            * Set priority
-            */
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+                /*
+                 * Set priority
+                 */
+                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+                if (!concurrent)
+                {
+                    /*
+                     * If we're running in concurrent mode, don't give the foreground thread higher priority
+                     * over the other threads participating in NBench specs. Treat them all equally with the same
+                     * priority.
+                     */
+                    //Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                }
+            }
 #endif
         }
 
