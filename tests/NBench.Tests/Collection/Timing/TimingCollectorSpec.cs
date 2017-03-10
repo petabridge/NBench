@@ -22,8 +22,9 @@ namespace NBench.Tests.Collection.Timing
         public void TimingCollector_should_report_time_deltas_accurately(long waitTime, long maxAllowedTime)
         {
             var timingCollector = new TimingCollector();
+            var delay = TimeSpan.FromMilliseconds(waitTime);
             var initial = timingCollector.Collect();
-            Task.Delay(TimeSpan.FromMilliseconds(waitTime)).Wait();
+            Task.Delay(delay).Wait(delay);
             var next = timingCollector.Collect();
             var delta = next - initial;
             Assert.True(delta < maxAllowedTime, $"Expected a time between {waitTime} ms and {maxAllowedTime} ms - got {delta} ms instead.");

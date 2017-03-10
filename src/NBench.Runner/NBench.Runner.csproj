@@ -4,12 +4,12 @@
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <Copyright>Copyright (c) Petabridge https://petabridge.com/</Copyright>
     <AssemblyTitle>NBench</AssemblyTitle>
+    <AssemblyName>NBench.Runner</AssemblyName>
     <VersionPrefix>0.3.4</VersionPrefix>
     <Authors>Petabridge</Authors>
     <TargetFramework>net452</TargetFramework>
     <OutputType>Exe</OutputType>   
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <AssemblyName>NBench.Runner</AssemblyName>
     <PackageId>NBench.Runner</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
     <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
