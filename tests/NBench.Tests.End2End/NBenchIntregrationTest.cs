@@ -74,7 +74,19 @@ namespace NBench.Tests.End2End
 			Assert.Equal(1, result.ExecutedTestsCount);
 			Assert.NotEqual(0, result.IgnoredTestsCount);
 		}
-		[Fact]
+
+        [Fact]
+        public void RunnerIncludeMultiplePattern()
+        {
+            var package = LoadPackage(new[] { "*CounterThroughputBenchmark*", "*SimpleCounterBenchmark*" });
+
+            var result = TestRunner.Run(package);
+            Assert.True(result.AllTestsPassed);
+            Assert.Equal(2, result.ExecutedTestsCount);
+            Assert.NotEqual(0, result.IgnoredTestsCount);
+        }
+
+        [Fact]
 		public void RunnerExcludePattern()
 		{
 			var package = LoadPackage(null, new [] { "*CounterThroughputBenchmark*", "*SimpleCounterBenchmark*" });

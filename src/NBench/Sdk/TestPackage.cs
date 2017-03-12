@@ -237,7 +237,7 @@ namespace NBench.Sdk
 	    public bool ShouldRunBenchmark(string benchmarkName)
 	    {
 		    PreparePatterns();
-		    return _includePatterns.All(p => p.IsMatch(benchmarkName)) && !_excludePatterns.Any(p => p.IsMatch(benchmarkName));
+		    return _includePatterns.Any(p => p.IsMatch(benchmarkName)) && !_excludePatterns.Any(p => p.IsMatch(benchmarkName));
 	    }
 
 	    private void PreparePatterns()
