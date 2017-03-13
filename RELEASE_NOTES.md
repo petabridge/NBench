@@ -1,3 +1,26 @@
+#### v1.0.0 March 3 2017
+NBench v1.0.0 represents support for .NET Standard 1.6 for the NBench core library and a .NET Core 1.0 version of the NBench runner.
+
+This release introduces a breaking change to NBench:
+
+- NBench core library .NET Framework target increased from **4.5 -> 4.5.2**.  Client projects must target 4.5.2 or greater.
+
+How to use the .NET Core NBench runner:
+
+- In your .NET Core performance test project, add the following dependency element to the .csproj file:
+
+  ```
+  <ItemGroup>
+    <DotNetCliToolReference Include="NBench.Runner.DotNetCli" Version="1.0.0" />
+  </ItemGroup>
+  ```
+
+- Save the .csproj file (if using Visual Studio 2017) or run `dotnet restore` in the project location.
+
+- From a command prompt within the project's parent directory, run `dotnet nbench project_name.dll arguments...`
+
+You can [see the full list of changes in NBench 1.0.0 here](https://github.com/petabridge/NBench/milestone/2)
+
 #### v0.3.4  December 15 2016
 NBench v0.3.4 is a bugfix for [`RunMode.ThroughPut` benchmarks where we regularly had false negatives on asserting number of operations per second.](https://github.com/petabridge/NBench/issues/153). This patch fixes this issue.
 
