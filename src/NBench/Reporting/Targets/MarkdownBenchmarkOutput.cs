@@ -84,7 +84,7 @@ namespace NBench.Reporting.Targets
             {
                 sb.AppendLine($"__{results.Data.Settings.Description}__");
             }
-            sb.AppendLine($"_{DateTime.UtcNow}_");
+            sb.AppendLine($"_{SystemTime.UtcNow()}_");
             sb.AppendLine("### System Info");
             sb.AppendLine("```ini");
             sb.AppendLine($"NBench={sysInfo.NBenchAssemblyVersion}");
@@ -292,5 +292,13 @@ namespace NBench.Reporting.Targets
             }
             sb.AppendLine();
         }
+    }
+
+    // used in header of benchmark output markdown file
+    // defaults to DateTime.UtcNow but can be replaced for testing purposes
+    // e.g. NBench.Tests.End2End.Reporting.MarkdownBenchmarkOutputSpec
+    public static class SystemTime
+    {
+        public static Func<DateTime> UtcNow = () => DateTime.UtcNow;
     }
 }
