@@ -77,6 +77,17 @@ The test is executed on the complete name of the benchmark `Namespace.Class+Meth
 Supported wildcard patterns are `*` any string and `?` any char. In order to include a class with all its tests in the benchmark
 you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass.*`.
 
+Example patterns:
+
+```
+include="*MyBenchmarkClass*" (include all benchmarks in MyBenchmarkClass)
+include="*MyBenchmarkClass+MyBenchmark" (include MyBenchmark in MyBenchmarkClass)
+include="*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (include all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
+
+exclude=*"MyBenchmarkClass* "(exclude all benchmarks in MyBenchmarkClass)
+exclude="*MyBenchmarkClass+MyBenchmark" (exclude MyBenchmark in MyBenchmarkClass)
+exclude="*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (exclude all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
+```
 
 ## API
 Every NBench performance test is created by decorating a method on a POCO class with a `PerfBenchmark` attribute and at least one type of "measurement" attribute.
