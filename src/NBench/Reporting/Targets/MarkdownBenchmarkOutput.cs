@@ -297,7 +297,7 @@ namespace NBench.Reporting.Targets
     // used in header of benchmark output markdown file
     // defaults to DateTime.UtcNow but can be replaced for testing purposes
     // e.g. NBench.Tests.End2End.Reporting.MarkdownBenchmarkOutputSpec
-    public static class SystemTime
+    internal static class SystemTime
     {
         public static Func<DateTime> UtcNow = () => DateTime.UtcNow;
     }
