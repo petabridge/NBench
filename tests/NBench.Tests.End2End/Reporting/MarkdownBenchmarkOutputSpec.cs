@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -60,9 +61,9 @@ namespace NBench.Tests.End2End.Reporting
                     new BenchmarkRunReport(TimeSpan.FromSeconds(3),
                         new List<MetricRunReport>()
                         {
-                            new MetricRunReport(new CounterMetricName("FakeCounterMetric"), "bytes", 0.0, 0L),
-                            new MetricRunReport(new GcMetricName(GcMetric.TotalCollections, GcGeneration.Gen2), "collections", 0.0, 0L),
-                            new MetricRunReport(new MemoryMetricName(MemoryMetric.TotalBytesAllocated), "operations", 0.00, 0L),
+                            new MetricRunReport(new CounterMetricName("FakeCounterMetric"), "bytes", 0d, Stopwatch.Frequency),
+                            new MetricRunReport(new GcMetricName(GcMetric.TotalCollections, GcGeneration.Gen2), "collections", 0d, Stopwatch.Frequency),
+                            new MetricRunReport(new MemoryMetricName(MemoryMetric.TotalBytesAllocated), "operations", 0d, Stopwatch.Frequency),
                         },
                         new List<Exception>())
                 });

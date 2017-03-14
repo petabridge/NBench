@@ -32,17 +32,17 @@ Tracing=False
 #### [Counter] FakeCounterMetric
 |           Run # |           bytes |       bytes / s |      ns / bytes |
 |---------------- |---------------- |---------------- |---------------- |
-|               1 |            0.00 |            0.00 |          364.67 |
+|               1 |            0.00 |            0.00 |1,000,000,000.00 |
 
 #### TotalCollections [Gen2]
 |           Run # |     collections | collections / s |ns / collections |
 |---------------- |---------------- |---------------- |---------------- |
-|               1 |            0.00 |            0.00 |          364.67 |
+|               1 |            0.00 |            0.00 |1,000,000,000.00 |
 
 #### TotalBytesAllocated
 |           Run # |      operations |  operations / s | ns / operations |
 |---------------- |---------------- |---------------- |---------------- |
-|               1 |            0.00 |            0.00 |          364.67 |
+|               1 |            0.00 |            0.00 |1,000,000,000.00 |
 
 
 ## Benchmark Assertions
