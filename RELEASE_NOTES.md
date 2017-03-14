@@ -1,4 +1,5 @@
-#### v1.0.0 March 3 2017
+#### v1.0.0 March 14 2017
+
 NBench v1.0.0 represents support for .NET Standard 1.6 for the NBench core library and a .NET Core 1.0 version of the NBench runner.
 
 This release introduces a breaking change to NBench:
