@@ -1,0 +1,53 @@
+﻿# NBench.FakeBenchmark
+_3/13/2017 12:00:00 AM_
+### System Info
+
+
+### NBench Settings
+```ini
+RunMode=Iterations, TestMode=Test
+NumberOfIterations=30, MaximumRunTime=00:00:01
+Concurrent=False
+Tracing=False
+```
+
+## Data
+-------------------
+
+### Totals
+|          Metric |           Units |             Max |         Average |             Min |          StdDev |
+|---------------- |---------------- |---------------- |---------------- |---------------- |---------------- |
+|[Counter] FakeCounterMetric |           bytes |            0.00 |            0.00 |            0.00 |            0.00 |
+|TotalCollections [Gen2] |     collections |            0.00 |            0.00 |            0.00 |            0.00 |
+|TotalBytesAllocated |      operations |            0.00 |            0.00 |            0.00 |            0.00 |
+
+### Per-second Totals
+|          Metric |       Units / s |         Max / s |     Average / s |         Min / s |      StdDev / s |
+|---------------- |---------------- |---------------- |---------------- |---------------- |---------------- |
+|[Counter] FakeCounterMetric |           bytes |            0.00 |            0.00 |            0.00 |            0.00 |
+|TotalCollections [Gen2] |     collections |            0.00 |            0.00 |            0.00 |            0.00 |
+|TotalBytesAllocated |      operations |            0.00 |            0.00 |            0.00 |            0.00 |
+
+### Raw Data
+#### [Counter] FakeCounterMetric
+|           Run # |           bytes |       bytes / s |      ns / bytes |
+|---------------- |---------------- |---------------- |---------------- |
+|               1 |            0.00 |            0.00 |1,000,000,000.00 |
+
+#### TotalCollections [Gen2]
+|           Run # |     collections | collections / s |ns / collections |
+|---------------- |---------------- |---------------- |---------------- |
+|               1 |            0.00 |            0.00 |1,000,000,000.00 |
+
+#### TotalBytesAllocated
+|           Run # |      operations |  operations / s | ns / operations |
+|---------------- |---------------- |---------------- |---------------- |
+|               1 |            0.00 |            0.00 |1,000,000,000.00 |
+
+
+## Benchmark Assertions
+
+* [Counter] FakeCounterMetric Assertion Result
+* TotalCollections [Gen2] Assertion Result
+* TotalBytesAllocated Assertion Result
+
