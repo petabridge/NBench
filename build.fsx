@@ -272,19 +272,34 @@ Target "CreateNuget" (fun _ ->
 )
 
 Target "PublishNuget" (fun _ ->
-    let projects = !! "./build/nuget/*.nupkg" -- "./build/nuget/*.symbols.nupkg"
+    let projects = !! "./bin/nuget/*.nupkg" -- "./bin/nuget/*.symbols.nupkg"
+    let symbols = !! "./bin/nuget/*.symbols.nupkg"
+
     let apiKey = getBuildParamOrDefault "nugetkey" ""
     let source = getBuildParamOrDefault "nugetpublishurl" ""
+
+    let shouldPushSymbolsPackages = (hasBuildParam "symbolspublishurl") && (hasBuildParam "symbolskey")
     let symbolSource = getBuildParamOrDefault "symbolspublishurl" ""
+    let symbolsApiKey = getBuildParamOrDefault "symbolskey" ""
 
-    let runSingleProject project =
-        DotNetCli.RunCommand
-            (fun p -> 
-                { p with 
-                    TimeOut = TimeSpan.FromMinutes 10. })
-            (sprintf "nuget push %s --api-key %s --source %s --symbol-source %s" project apiKey source symbolSource)
+    if (shouldPushSymbolsPackages) then
+        let runSingleProject project =
+            DotNetCli.RunCommand
+                (fun p -> 
+                    { p with 
+                        TimeOut = TimeSpan.FromMinutes 10. })
+                (sprintf "nuget push %s --source %s --api-key %s --symbol-source %s --symbol-api-key %s" project source apiKey symbolSource symbolsApiKey)
 
-    projects |> Seq.iter (runSingleProject)
+        symbols |> Seq.iter (runSingleProject)
+    else
+        let runSingleProject project =
+            DotNetCli.RunCommand
+                (fun p -> 
+                    { p with 
+                        TimeOut = TimeSpan.FromMinutes 10. })
+                (sprintf "nuget push %s --api-key %s --source %s" project apiKey source)
+
+        projects |> Seq.iter (runSingleProject)
 )
 
 //--------------------------------------------------------------------------------
