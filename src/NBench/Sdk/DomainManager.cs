@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace NBench.Sdk
 {
+
+#if APPDOMAIN
     /// <summary>
     /// Handles the creation and unloading of AppDomains used for each test file
     /// </summary>
@@ -20,22 +21,22 @@ namespace NBench.Sdk
         /// </summary>
         /// <param name="package">The test package to be run</param>
         /// <returns></returns>
-        public static AppDomain CreateDomain(TestPackage package)
+        public static System.AppDomain CreateDomain(TestPackage package)
         {
             AppDomainSetup setup = CreateAppDomainSetup(package);
 
             string domainName = "test-domain-" + package.Name;           
 
-            return AppDomain.CreateDomain(domainName, null, setup);
+            return System.AppDomain.CreateDomain(domainName, null, setup);
         }
 
         /// <summary>
         /// Unloads the test runner app domain.
         /// </summary>
         /// <param name="domain">The domain to unload.</param>
-        public static void UnloadDomain(AppDomain domain)
+        public static void UnloadDomain(System.AppDomain domain)
         {
-            AppDomain.Unload(domain);
+            System.AppDomain.Unload(domain);
         }
 
         /// <summary>
@@ -56,5 +57,6 @@ namespace NBench.Sdk
             return setup;
         }
     }
+#endif
 }
 

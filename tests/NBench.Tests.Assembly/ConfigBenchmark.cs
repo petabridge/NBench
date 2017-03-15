@@ -3,10 +3,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if  CORECLR
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Xml;
+#else
+using System.Configuration;
+#endif
 
 namespace NBench.Tests.Assembly
 {
@@ -23,8 +29,21 @@ namespace NBench.Tests.Assembly
         {
             _counter = context.GetCounter(CounterName);
 
+#if CORECLR
+            // This has to be skipped for now as the App.config isn't being loaded the right way here
+
+            //var builder = new ConfigurationBuilder();
+            //builder.AddXmlFile("App.config");
+
+            //var config = builder.Build();
+            //var testKeyValue = config.GetSection("appSettings")["TestKey"];
+
+            //if (testKeyValue != "42")
+            //    throw new InvalidOperationException(String.Format("TestKey from AppSettings could not be loaded! {0}", testKeyValue));
+#else
             if (ConfigurationManager.AppSettings["TestKey"] != "42")
                 throw new InvalidOperationException("TestKey from AppSettings could not be loaded!");
+#endif
         }
 
         /// <summary>

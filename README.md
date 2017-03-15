@@ -53,11 +53,31 @@ public class CounterPerfSpecs
 
 After defining some NBench `PerfBenchmark` methods and declaring some measurements, you can run your benchmark by downloading the `NBench.Runner.exe` via NuGet.
 
+### .NET 4.5.2 Runner
+
+To install the .NET 4.5.2 NBench runner via NuGet:
+
 ```
 PS> Install-Package NBench.Runner
 PS> .\packages\NBench.Runner\NBench.Runner.exe .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
 ```
 And this command will run your `PerfBenchmark` and write output [that looks like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf) to a markdown file in the `output-directory`.
+
+### .NET Core Runner
+
+NBench 1.0.0 has a separate runner for projects that target .NET Core 1.0.  It is installed on a per-project basis via NuGet by adding a `<DotNetCliToolReference>` to your test project's `.csproj` file:
+
+```
+<ItemGroup>
+    <DotNetCliToolReference Include="NBench.Runner.DotNetCli" Version="1.0.0" />
+</ItemGroup>
+```
+
+After adding this reference, run `dotnet restore` and the NBench .NET Core runner will be installed for your project.  To run the tests, open a command prompt and navigate to the project's parent folder.  You can now run the following command, passing the same arguments as `NBench.Runner.exe`:
+
+```
+PS> dotnet nbench .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
+```
 
 ## Command Line Parameters
 ```
@@ -77,6 +97,17 @@ The test is executed on the complete name of the benchmark `Namespace.Class+Meth
 Supported wildcard patterns are `*` any string and `?` any char. In order to include a class with all its tests in the benchmark
 you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass.*`.
 
+Example patterns:
+
+```
+include="*MyBenchmarkClass*" (include all benchmarks in MyBenchmarkClass)
+include="*MyBenchmarkClass+MyBenchmark" (include MyBenchmark in MyBenchmarkClass)
+include="*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (include all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
+
+exclude=*"MyBenchmarkClass* "(exclude all benchmarks in MyBenchmarkClass)
+exclude="*MyBenchmarkClass+MyBenchmark" (exclude MyBenchmark in MyBenchmarkClass)
+exclude="*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (exclude all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
+```
 
 ## API
 Every NBench performance test is created by decorating a method on a POCO class with a `PerfBenchmark` attribute and at least one type of "measurement" attribute.

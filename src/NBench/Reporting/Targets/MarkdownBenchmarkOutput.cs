@@ -23,6 +23,7 @@ namespace NBench.Reporting.Targets
         public const string MarkdownFileExtension = ".md";
         public const int MaxColumnSize = 18;
         public const string MarkdownTableColumnEnd = " |";
+        public const string MarkdownTableColumnStart = "|";
         private readonly string _outputDirectory;
         private readonly Lazy<StringBuilder> _traceStringBuilder = new Lazy<StringBuilder>(() => new StringBuilder(), true);
 
@@ -83,7 +84,7 @@ namespace NBench.Reporting.Targets
             {
                 sb.AppendLine($"__{results.Data.Settings.Description}__");
             }
-            sb.AppendLine($"_{DateTime.UtcNow}_");
+            sb.AppendLine($"_{SystemTime.UtcNow()}_");
             sb.AppendLine("### System Info");
             sb.AppendLine("```ini");
             sb.AppendLine($"NBench={sysInfo.NBenchAssemblyVersion}");
@@ -91,7 +92,9 @@ namespace NBench.Reporting.Targets
             sb.AppendLine($"ProcessorCount={sysInfo.ProcessorCount}");
             sb.AppendLine(
                 $"CLR={sysInfo.ClrVersion},IsMono={sysInfo.IsMono},MaxGcGeneration={sysInfo.MaxGcGeneration}");
+#if THREAD_POOL
             sb.AppendLine($"WorkerThreads={sysInfo.WorkerThreads}, IOThreads={sysInfo.IOThreads}");
+#endif
             sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("### NBench Settings");
@@ -165,7 +168,7 @@ namespace NBench.Reporting.Targets
         private static string BuildStatTable(IEnumerable<AggregateMetrics> metrics, int columnWidth = MaxColumnSize)
         {
             var sb = new StringBuilder();
-            sb.Append(("Metric" + MarkdownTableColumnEnd).PadLeft(columnWidth))
+            sb.Append(MarkdownTableColumnStart + ("Metric" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Units" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Max" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Average" + MarkdownTableColumnEnd).PadLeft(columnWidth))
@@ -175,7 +178,7 @@ namespace NBench.Reporting.Targets
             AddMarkdownTableHeaderRow(sb, columnWidth);
             foreach (var metric in metrics)
             {
-                sb.Append((metric.Name + MarkdownTableColumnEnd).PadLeft(columnWidth));
+                sb.Append(MarkdownTableColumnStart + (metric.Name + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.Unit + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.Stats.Max.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.Stats.Average.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
@@ -191,7 +194,7 @@ namespace NBench.Reporting.Targets
             int columnWidth = MaxColumnSize)
         {
             var sb = new StringBuilder();
-            sb.Append(("Metric" + MarkdownTableColumnEnd).PadLeft(columnWidth))
+            sb.Append(MarkdownTableColumnStart + ("Metric" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Units / s" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Max / s" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                 .Append(("Average / s" + MarkdownTableColumnEnd).PadLeft(columnWidth))
@@ -201,7 +204,7 @@ namespace NBench.Reporting.Targets
             AddMarkdownTableHeaderRow(sb, columnWidth);
             foreach (var metric in metrics)
             {
-                sb.Append((metric.Name + MarkdownTableColumnEnd).PadLeft(columnWidth));
+                sb.Append(MarkdownTableColumnStart + (metric.Name + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.Unit + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.PerSecondStats.Max.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
                 sb.Append((metric.PerSecondStats.Average.ToString("N") + MarkdownTableColumnEnd).PadLeft(columnWidth));
@@ -251,7 +254,7 @@ namespace NBench.Reporting.Targets
 
                 var unitOfMeasure = metric.Value.First().Unit;
 
-                sb.Append(("Run #" + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                sb.Append(MarkdownTableColumnStart + ("Run #" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                     .Append((unitOfMeasure + MarkdownTableColumnEnd).PadLeft(columnWidth))
                     .Append(($"{unitOfMeasure} / s" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                     .Append(($"ns / {unitOfMeasure}" + MarkdownTableColumnEnd).PadLeft(columnWidth));
@@ -260,7 +263,7 @@ namespace NBench.Reporting.Targets
                 var i = 1;
                 foreach (var record in metric.Value)
                 {
-                    sb.Append((i + MarkdownTableColumnEnd).PadLeft(columnWidth))
+                    sb.Append(MarkdownTableColumnStart + (i + MarkdownTableColumnEnd).PadLeft(columnWidth))
                         .Append(
                             ($"{record.MetricValue:n}" + MarkdownTableColumnEnd).PadLeft(columnWidth))
                         .Append(
@@ -282,11 +285,20 @@ namespace NBench.Reporting.Targets
 
         private static void AddMarkdownTableHeaderRow(StringBuilder sb, int columnWidth = MaxColumnSize, int columns = 6)
         {
+            sb.Append(MarkdownTableColumnStart);
             for (var i = 0; i < columns; i++)
             {
                 sb.Append(MarkdownTableColumnEnd.PadLeft(columnWidth, '-'));
             }
             sb.AppendLine();
         }
+    }
+
+    // used in header of benchmark output markdown file
+    // defaults to DateTime.UtcNow but can be replaced for testing purposes
+    // e.g. NBench.Tests.End2End.Reporting.MarkdownBenchmarkOutputSpec
+    internal static class SystemTime
+    {
+        public static Func<DateTime> UtcNow = () => DateTime.UtcNow;
     }
 }

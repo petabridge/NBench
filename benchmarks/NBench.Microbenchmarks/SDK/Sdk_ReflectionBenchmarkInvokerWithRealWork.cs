@@ -2,16 +2,17 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System.Linq;
-using BenchmarkDotNet.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Jobs;
 using NBench.Sdk;
 using NBench.Util;
 using static NBench.Sdk.Compiler.ReflectionDiscovery;
 
 namespace NBench.Microbenchmarks.SDK
 {
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X86, jitVersion: BenchmarkJitVersion.LegacyJit)]
-    [BenchmarkTask(platform: BenchmarkPlatform.X64, jitVersion: BenchmarkJitVersion.RyuJit)]
+    [LegacyJitX64Job]
+    [LegacyJitX86Job]
+    [RyuJitX64Job]
     public class Sdk_ReflectionBenchmarkInvokerWithRealWork
     {
         public class AtomicCounterBenchmark
@@ -47,7 +48,7 @@ namespace NBench.Microbenchmarks.SDK
             _contextInvoker.InvokePerfSetup(BenchmarkContext.Empty);
         }
 
-        [BenchmarkDotNet.Benchmark("How quickly can we invoke when injecting context into a ReflectionBenchmarkInvoker")]
+        [Benchmark(Description = "How quickly can we invoke when injecting context into a ReflectionBenchmarkInvoker")]
         public void InvokeRunWithContext()
         {
             _contextInvoker.InvokeRun(BenchmarkContext.Empty);

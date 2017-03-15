@@ -1,20 +1,18 @@
-﻿#I @"packages/FAKE/tools"
+#I @"tools/FAKE/tools"
 #r "FakeLib.dll"
 
 open System
 open System.IO
 open System.Text
+
 open Fake
+open Fake.DotNetCli
 open Fake.FileUtils
-open Fake.TaskRunnerHelper
 
-//--------------------------------------------------------------------------------
 // Information about the project for Nuget and Assembly info files
-//-------------------------------------------------------------------------------
-
 let product = "NBench"
 let authors = [ "Aaron Stannard" ]
-let copyright = "Copyright © 2015-2016"
+let copyright = "Copyright � 2015-2016"
 let company = "Petabridge"
 let description = "X-Platform .NET Performance Testing and Measuring Framework"
 let tags = ["performance";"benchmarking";"benchmark";"perf testing";"NBench";]
@@ -24,51 +22,22 @@ let configuration = "Release"
 let parsedRelease =
     File.ReadLines "RELEASE_NOTES.md"
     |> ReleaseNotesHelper.parseReleaseNotes
-
 let envBuildNumber = System.Environment.GetEnvironmentVariable("BUILD_NUMBER") //populated by TeamCity build agent
 let buildNumber = if String.IsNullOrWhiteSpace(envBuildNumber) then "0" else envBuildNumber
-
 let version = parsedRelease.AssemblyVersion + "." + buildNumber
 let preReleaseVersion = version + "-beta" //suffixes the assembly for pre-releases
-
 let isUnstableDocs = hasBuildParam "unstable"
 let isPreRelease = hasBuildParam "nugetprerelease"
 let release = if isPreRelease then ReleaseNotesHelper.ReleaseNotes.New(version, version + "-beta", parsedRelease.Notes) else parsedRelease
 let isMono = Type.GetType("Mono.Runtime") <> null;
 
-//--------------------------------------------------------------------------------
 // Directories
-
-let binDir = "bin"
-let testOutput = FullName "TestResults"
-let perfOutput = FullName "PerfResults"
-
-let nugetDir = binDir @@ "nuget"
-let workingDir = binDir @@ "build"
-let nugetExe = FullName @".nuget\NuGet.exe"
-
-open Fake.RestorePackageHelper
-Target "RestorePackages" (fun _ -> 
-     "./NBench.sln"
-     |> RestoreMSSolutionPackages (fun p ->
-         { p with
-             OutputPath = "./packages"
-             Retries = 4 })
- )
-
-//--------------------------------------------------------------------------------
-// Clean build results
-
-Target "Clean" (fun _ ->
-    DeleteDir binDir
-)
-
-//--------------------------------------------------------------------------------
-// Generate AssemblyInfo files with the version for release notes 
-
+let output = __SOURCE_DIRECTORY__  @@ "bin"
+let outputTests = __SOURCE_DIRECTORY__ @@ "TestResults"
+let outputPerfTests = __SOURCE_DIRECTORY__ @@ "PerfResults"
+let outputNuGet = output @@ "nuget"
 
 open AssemblyInfoFile
-
 Target "AssemblyInfo" (fun _ ->
     let version = release.AssemblyVersion
 
@@ -79,279 +48,259 @@ Target "AssemblyInfo" (fun _ ->
         Attribute.FileVersion version ] <| AssemblyInfoFileConfig(false)
 )
 
-//--------------------------------------------------------------------------------
-// Build the solution
-
-Target "Build" (fun _ ->
-    !!"NBench.sln"
-    |> MSBuildRelease "" "Rebuild"
-    |> ignore
+Target "Clean" (fun _ ->
+    CleanDir output
+    CleanDir outputTests
+    CleanDir outputPerfTests
+    CleanDir outputNuGet
+    CleanDirs !! "./**/bin"
+    CleanDirs !! "./**/obj"
 )
 
-//--------------------------------------------------------------------------------
-// Copy the build output to bin directory
-//--------------------------------------------------------------------------------
-
-Target "CopyOutput" (fun _ ->    
-    let copyOutput project =
-        let src = "src" @@ project @@ "bin" @@ "Release" 
-        let dst = binDir @@ project
-        CopyDir dst src allFiles
-    [ "NBench"
-      "NBench.PerformanceCounters"
-      "NBench.Runner"
-    ]
-    |> List.iter copyOutput
+Target "RestorePackages" (fun _ ->
+    DotNetCli.Restore
+        (fun p -> 
+            { p with
+                Project = "./NBench.sln"
+                NoCache = false })
 )
 
-Target "BuildRelease" DoNothing
+Target "Build" (fun _ ->          
+    if (isWindows) then
+        let runSingleProject project =
+            DotNetCli.Build
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Configuration = configuration })   
 
-//--------------------------------------------------------------------------------
-// Tests targets
-//--------------------------------------------------------------------------------
-
-open Fake.Testing
-let filterPlatformSpecificAssemblies (assembly:string) =
-    match assembly with
-    | assembly when (assembly.Contains("PerformanceCounters") && isMono) -> false
-    | _ -> true
-
-Target "RunTests" <| fun _ ->
-    let xunitTestAssemblies = Seq.filter filterPlatformSpecificAssemblies (!! "tests/**/bin/Release/*.Tests.dll" ++ "tests/**/bin/Release/*.Tests.End2End.dll")
-    printfn "Are we running on Mono? %b" isMono
-    for assembly in xunitTestAssemblies do
-         printfn "Executing: %s" assembly
-
-    mkdir testOutput
-    let xunitToolPath = findToolInSubPath "xunit.console.exe" "packages/xunit.runner.console*/tools"
-    printfn "Using XUnit runner: %s" xunitToolPath
-    xUnit2
-        (fun p -> { p with XmlOutputPath = Some (testOutput @@ @"XUnitTestResults.xml"); HtmlOutputPath = Some (testOutput @@ @"XUnitTestResults.HTML"); ToolPath = xunitToolPath; TimeOut = System.TimeSpan.FromMinutes 30.0; Parallel = ParallelMode.NoParallelization })
-
-        xunitTestAssemblies
-
-//--------------------------------------------------------------------------------
-// Clean test output
-
-Target "CleanTests" <| fun _ ->
-    DeleteDir testOutput
-
-
-//--------------------------------------------------------------------------------
-// NBench targets
-//--------------------------------------------------------------------------------
-Target "NBench" <| fun _ ->
-    let testSearchPath =
-        let assemblyFilter = getBuildParamOrDefault "spec-assembly" String.Empty
-        sprintf "tests/**/bin/Release/*%s*.Tests.Performance.dll" assemblyFilter
-
-    mkdir perfOutput
-    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (currentDirectory @@ "bin" @@ "NBench.Runner")
-    let nbenchTestAssemblies = Seq.filter filterPlatformSpecificAssemblies (!! testSearchPath)
-    printfn "Using NBench.Runner: %s" nbenchTestPath
-    for assembly in nbenchTestAssemblies do
-         printfn "Executing: %s" assembly
-
-    let rec runNBench assembly trialsLeft =
-        let spec = getBuildParam "spec"
-        let teamcityStr = (getBuildParam "teamcity")
-        let enableTeamCity = 
-            match teamcityStr with
-            | null -> false
-            | "" -> false
-            | _ -> bool.Parse teamcityStr
-
-
-        let args = new StringBuilder()
-                |> append assembly
-                |> append (sprintf "output-directory=\"%s\"" perfOutput)
-                |> append (sprintf "trace=\"%b\"" true)
-                |> append (sprintf "teamcity=\"%b\"" enableTeamCity)
-                |> toText
-        try
-            let result = ExecProcess(fun info -> 
-                info.FileName <- nbenchTestPath
-                info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
-                info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-            if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
-        with exn -> 
-            if (trialsLeft > 0) then (runNBench assembly (trialsLeft-1))
-            else raise exn
-    
-    for assembly in (nbenchTestAssemblies |> Seq.rev) do
-        runNBench assembly 2
-
-//--------------------------------------------------------------------------------
-// Clean NBench output
-Target "CleanPerf" <| fun _ ->
-    DeleteDir perfOutput
-
-
-//--------------------------------------------------------------------------------
-// Nuget targets 
-//--------------------------------------------------------------------------------
-module Nuget = 
-     // add NBench dependency for other projects
-    let getDependencies project =
-        match project with
-        | "NBench.PerformanceCounters" -> ["NBench", release.NugetVersion]
-        | _ -> []
-
-     // used to add -pre suffix to pre-release packages
-    let getProjectVersion project =
-      match project with
-      | _ -> release.NugetVersion
-
-open Nuget
-
-//--------------------------------------------------------------------------------
-// Clean nuget directory
-Target "CleanNuget" (fun _ ->
-    CleanDir nugetDir
-)
-
-//--------------------------------------------------------------------------------
-// Pack nuget for all projects
-// Publish to nuget.org if nugetkey is specified
-
-let createNugetPackages _ =
-    let mutable dirName = 1
-    let removeDir dir = 
-        let del _ = 
-            DeleteDir dir
-            not (directoryExists dir)
-        runWithRetries del 3 |> ignore
-
-    let getDirName workingDir dirCount =
-        workingDir + dirCount.ToString()
-
-    let getReleaseFiles project releaseDir =
-        match project with
-        | "NBench.Runner" -> 
-            !! (releaseDir @@ project + ".dll")
-            ++ (releaseDir @@ "NBench.dll")
-            ++ (releaseDir @@ project + ".exe")
-            ++ (releaseDir @@ project + ".pdb")
-            ++ (releaseDir @@ "NBench.pdb")
-            ++ (releaseDir @@ project + ".xml")
-        | _ ->
-            !! (releaseDir @@ project + ".dll")
-            ++ (releaseDir @@ project + ".exe")
-            ++ (releaseDir @@ project + ".pdb")
-            ++ (releaseDir @@ project + ".xml")
-
-    CleanDir workingDir
-
-    ensureDirectory nugetDir
-    for nuspec in !! "src/**/*.nuspec" do
-        printfn "Creating nuget packages for %s" nuspec
+        let projects = !! "./src/**/*.csproj" ++ "./tests/**/*.csproj"
+     
+        projects |> Seq.iter (runSingleProject)
+    else
+        DotNetCli.Build
+            (fun p ->
+                { p with 
+                    Project = "./src/NBench/NBench.csproj"
+                    Framework = "netstandard1.6"
+                    Configuration = configuration })
         
-        let project = Path.GetFileNameWithoutExtension nuspec 
-        let projectDir = Path.GetDirectoryName nuspec
-        let projectFile = (!! (projectDir @@ project + ".*sproj")) |> Seq.head
-        let releaseDir = projectDir @@ @"bin\Release"
-        let packages = projectDir @@ "packages.config"
-        let packageDependencies = if (fileExists packages) then (getDependencies packages) else []
-        let dependencies = packageDependencies @ getDependencies project
-        let releaseVersion = getProjectVersion project
-
-        let pack outputDir symbolPackage =
-            NuGetHelper.NuGet
+        let runSingleProjectNetCore project =
+            DotNetCli.Build
                 (fun p ->
                     { p with
-                        Description = description
-                        Authors = authors
-                        Copyright = copyright
-                        Project =  project
-                        Properties = ["Configuration", "Release"]
-                        ReleaseNotes = release.Notes |> String.concat "\n"
-                        Version = releaseVersion
-                        Tags = tags |> String.concat " "
-                        OutputPath = outputDir
-                        WorkingDir = workingDir
-                        SymbolPackage = symbolPackage
-                        Dependencies = dependencies })
-                nuspec
+                        Project = project
+                        Framework = "netcoreapp1.0"
+                        Configuration = configuration })
 
-        // Copy dll, pdb and xml to libdir = workingDir/lib/net45/
-        let libDir = workingDir @@ @"lib\net45"
-        printfn "Creating output directory %s" libDir
-        ensureDirectory libDir
-        CleanDir libDir
-        getReleaseFiles project releaseDir
-        |> CopyFiles libDir
+        let netCoreProjects = (!! "./src/**/*NBench.Runner.DotNetCli.csproj"
+                               ++ "./tests/**/*NBench.Tests*.csproj" 
+                               -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
 
-        // Copy all src-files (.cs and .fs files) to workingDir/src
-        let nugetSrcDir = workingDir @@ @"src/"
-        CleanDir nugetSrcDir
+        netCoreProjects |> Seq.iter (runSingleProjectNetCore)
+)
 
-        let isCs = hasExt ".cs"
-        let isFs = hasExt ".fs"
-        let isAssemblyInfo f = (filename f).Contains("AssemblyInfo")
-        let isSrc f = (isCs f || isFs f) && not (isAssemblyInfo f) 
-        CopyDir nugetSrcDir projectDir isSrc
+Target "RunTests" (fun _ ->
+    if (isWindows) then
+        let runSingleProject project =
+            DotNetCli.Test
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Configuration = configuration})      
+
+        let projects = (!! "./tests/**/*NBench.Tests*.csproj"
+                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
+
+        projects |> Seq.iter (log)
+        projects |> Seq.iter (runSingleProject)
+
+    else
+        let runSingleProjectNetCore project =
+            DotNetCli.Test
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Framework = "netcoreapp1.0"
+                        Configuration = configuration})
+
+        let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
+                        -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
+                        -- "./tests/**/*NBench.Tests.Performance.csproj"
+                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
+
+        projects |> Seq.iter (log)
+        projects |> Seq.iter (runSingleProjectNetCore)
+)
+
+Target "NBench" <| fun _ ->
+    if (isWindows) then
+        // .NET 4.5.2
+        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
+        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
         
-        //Remove workingDir/src/obj and workingDir/src/bin
-        removeDir (nugetSrcDir @@ "obj")
-        removeDir (nugetSrcDir @@ "bin")
+        let spec = getBuildParam "spec"
 
-        // Create both normal nuget package and symbols nuget package. 
-        // Uses the files we copied to workingDir and outputs to nugetdir
-        pack nugetDir NugetSymbolPackage.Nuspec
+        let args = new StringBuilder()
+                    |> append assembly
+                    |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                    |> append (sprintf "concurrent=\"%b\"" true)
+                    |> append (sprintf "trace=\"%b\"" true)
+                    |> toText
 
-
-let publishNugetPackages _ = 
-    let rec publishPackage url accessKey trialsLeft packageFile =
-        let tracing = enableProcessTracing
-        enableProcessTracing <- false
-        let args p =
-            match p with
-            | (pack, key, "") -> sprintf "push \"%s\" %s" pack key
-            | (pack, key, url) -> sprintf "push \"%s\" %s -source %s" pack key url
-
-        tracefn "Pushing %s Attempts left: %d" (FullName packageFile) trialsLeft
-        try 
-            let result = ExecProcess (fun info -> 
-                    info.FileName <- nugetExe
-                    info.WorkingDirectory <- (Path.GetDirectoryName (FullName packageFile))
-                    info.Arguments <- args (packageFile, accessKey,url)) (System.TimeSpan.FromMinutes 1.0)
-            enableProcessTracing <- tracing
-            if result <> 0 then failwithf "Error during NuGet symbol push. %s %s" nugetExe (args (packageFile, "key omitted",url))
-        with exn -> 
-            if (trialsLeft > 0) then (publishPackage url accessKey (trialsLeft-1) packageFile)
-            else raise exn
-    let shouldPushNugetPackages = hasBuildParam "nugetkey"
-    let shouldPushSymbolsPackages = (hasBuildParam "symbolspublishurl") && (hasBuildParam "symbolskey")
+        let result = ExecProcess(fun info -> 
+            info.FileName <- nbenchRunner
+            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchRunner))
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
     
-    if (shouldPushNugetPackages || shouldPushSymbolsPackages) then
-        printfn "Pushing nuget packages"
-        if shouldPushNugetPackages then
-            let normalPackages= 
-                !! (nugetDir @@ "*.nupkg") 
-                -- (nugetDir @@ "*.symbols.nupkg") |> Seq.sortBy(fun x -> x.ToLower())
-            for package in normalPackages do
-                try
-                    publishPackage (getBuildParamOrDefault "nugetpublishurl" "") (getBuildParam "nugetkey") 3 package
-                with exn ->
-                    printfn "%s" exn.Message
+        // .NET Core
+        let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    AdditionalArgs = ["-r win7-x64"] })
+        // build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
+        DotNetCli.Build
+            (fun p -> 
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    Configuration = configuration 
+                    Runtime = "win7-x64"
+                    Framework = "netcoreapp1.0"})   
 
-        if shouldPushSymbolsPackages then
-            let symbolPackages= !! (nugetDir @@ "*.symbols.nupkg") |> Seq.sortBy(fun x -> x.ToLower())
-            for package in symbolPackages do
-                try
-                    publishPackage (getBuildParam "symbolspublishurl") (getBuildParam "symbolskey") 3 package
-                with exn ->
-                    printfn "%s" exn.Message
+        let netCoreNbenchRunner = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/win7-x64/"
+        let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
+        
+        let netCoreNbenchRunnerArgs = new StringBuilder()
+                                        |> append netCoreAssembly
+                                        |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                                        |> append (sprintf "concurrent=\"%b\"" true)
+                                        |> append (sprintf "trace=\"%b\"" true)
+                                        |> toText
 
-Target "Nuget" <| fun _ -> 
-    createNugetPackages()
-    publishNugetPackages()
+        let result = ExecProcess(fun info -> 
+            info.FileName <- netCoreNbenchRunner
+            info.WorkingDirectory <- (Path.GetDirectoryName (FullName netCoreNbenchRunner))
+            info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" netCoreNbenchRunner netCoreNbenchRunnerArgs
+    else
+        // .NET Core
+        let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    AdditionalArgs = ["-r debian.8-x64"] })
+        // build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
+        DotNetCli.Build
+            (fun p -> 
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    Configuration = configuration 
+                    Runtime = "debian.8-x64"
+                    Framework = "netcoreapp1.0"})   
+        
+        let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/debian.8-x64/dotnet-nbench"
+        let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.0/NBench.Tests.Performance.dll"
+        
+        let linuxNbenchRunnerArgs = new StringBuilder()
+                                        |> append linuxPerfAssembly
+                                        |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                                        |> append (sprintf "concurrent=\"%b\"" true)
+                                        |> append (sprintf "trace=\"%b\"" true)
+                                        |> toText
 
-Target "CreateNuget" <| fun _ -> 
-    createNugetPackages()
+        let result = ExecProcess(fun info -> 
+            info.FileName <- linuxNbenchRunner
+            info.WorkingDirectory <- __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.0/debian.8-x64/"
+            info.Arguments <- linuxNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" linuxNbenchRunner linuxNbenchRunnerArgs
 
-Target "PublishNuget" <| fun _ -> 
-    publishNugetPackages()
+Target "CopyOutput" (fun _ ->    
+    // .NET 4.5
+    if (isWindows) then 
+        let projects = [ ("NBench", "./src/NBench/NBench.csproj", "net452");
+                         ("NBench.PerformanceCounters", "./src/NBench.PerformanceCounters/NBench.PerformanceCounters.csproj", "net452"); 
+                         ("NBench.Runner", "./src/NBench.Runner/NBench.Runner.csproj", "net452") ]
+
+        let publishSingleProjectNet45 project =
+            let projectName, projectPath, projectFramework = project
+            DotNetCli.Publish
+                (fun p -> 
+                    { p with
+                        Project = projectPath
+                        Framework = projectFramework
+                        Output = output @@ projectName @@ projectFramework
+                        Configuration = configuration })       
+
+    
+        projects |> List.iter (fun p -> publishSingleProjectNet45 p)
+    
+    let netCoreProjects = [ ("NBench", "./src/NBench/NBench.csproj", "netstandard1.6");
+                            ("NBench.Runner.DotNetCli", "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj", "netcoreapp1.0") ]
+
+    let publishSingleProjectNetCoreApp project = 
+        let projectName, projectPath, projectFramework = project
+        DotNetCli.Publish
+            (fun p -> 
+                { p with
+                    Project = projectPath
+                    Framework = projectFramework
+                    Output = output @@ projectName @@ projectFramework
+                    Configuration = configuration })
+
+    netCoreProjects |> List.iter (fun p -> publishSingleProjectNetCoreApp p)
+)
+
+Target "CreateNuget" (fun _ ->
+    let nugetProjects = [ "./src/NBench/NBench.csproj"; 
+                          "./src/NBench.PerformanceCounters/NBench.PerformanceCounters.csproj";
+                          "./src/NBench.Runner/NBench.Runner.csproj" 
+                          "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj" ]
+
+    nugetProjects |> List.iter (fun proj ->
+        DotNetCli.Pack
+            (fun p -> 
+                { p with
+                    Project = proj
+                    Configuration = configuration
+                    AdditionalArgs = ["--include-symbols"]
+                    OutputPath = outputNuGet })
+        )
+)
+
+Target "PublishNuget" (fun _ ->
+    let projects = !! "./bin/nuget/*.nupkg" -- "./bin/nuget/*.symbols.nupkg"
+    let symbols = !! "./bin/nuget/*.symbols.nupkg"
+
+    let apiKey = getBuildParamOrDefault "nugetkey" ""
+    let source = getBuildParamOrDefault "nugetpublishurl" ""
+
+    let shouldPushSymbolsPackages = (hasBuildParam "symbolspublishurl") && (hasBuildParam "symbolskey")
+    let symbolSource = getBuildParamOrDefault "symbolspublishurl" ""
+    let symbolsApiKey = getBuildParamOrDefault "symbolskey" ""
+
+    if (shouldPushSymbolsPackages) then
+        let runSingleProject project =
+            DotNetCli.RunCommand
+                (fun p -> 
+                    { p with 
+                        TimeOut = TimeSpan.FromMinutes 10. })
+                (sprintf "nuget push %s --source %s --api-key %s --symbol-source %s --symbol-api-key %s" project source apiKey symbolSource symbolsApiKey)
+
+        symbols |> Seq.iter (runSingleProject)
+    else
+        let runSingleProject project =
+            DotNetCli.RunCommand
+                (fun p -> 
+                    { p with 
+                        TimeOut = TimeSpan.FromMinutes 10. })
+                (sprintf "nuget push %s --api-key %s --source %s" project apiKey source)
+
+        projects |> Seq.iter (runSingleProject)
+)
 
 //--------------------------------------------------------------------------------
 // Help 
@@ -360,7 +309,7 @@ Target "PublishNuget" <| fun _ ->
 Target "Help" <| fun _ ->
     List.iter printfn [
       "usage:"
-      "build [target]"
+      "./build.ps1 [target]"
       ""
       " Targets for building:"
       " * Build      Builds"
@@ -370,76 +319,37 @@ Target "Help" <| fun _ ->
       ""
       " Other Targets"
       " * Help       Display this help" 
-      " * HelpNuget  Display help about creating and pushing nuget packages" 
       ""]
-
-Target "HelpNuget" <| fun _ ->
-    List.iter printfn [
-      "usage: "
-      "build Nuget [nugetkey=<key> [nugetpublishurl=<url>]] "
-      "            [symbolskey=<key> symbolspublishurl=<url>] "
-      "            [nugetprerelease=<prefix>]"
-      ""
-      "Arguments for Nuget target:"
-      "   nugetprerelease=<prefix>   Creates a pre-release package."
-      "                              The version will be version-prefix<date>"
-      "                              Example: nugetprerelease=dev =>"
-      "                                       0.6.3-dev1408191917"
-      ""
-      "In order to publish a nuget package, keys must be specified."
-      "If a key is not specified the nuget packages will only be created on disk"
-      "After a build you can find them in bin/nuget"
-      ""
-      "For pushing nuget packages to nuget.org and symbols to symbolsource.org"
-      "you need to specify nugetkey=<key>"
-      "   build Nuget nugetKey=<key for nuget.org>"
-      ""
-      "For pushing the ordinary nuget packages to another place than nuget.org specify the url"
-      "  nugetkey=<key>  nugetpublishurl=<url>  "
-      ""
-      "For pushing symbols packages specify:"
-      "  symbolskey=<key>  symbolspublishurl=<url> "
-      ""
-      "Examples:"
-      "  build Nuget                      Build nuget packages to the bin/nuget folder"
-      ""
-      "  build Nuget nugetprerelease=dev  Build pre-release nuget packages"
-      ""
-      "  build Nuget nugetkey=123         Build and publish to nuget.org and symbolsource.org"
-      ""
-      "  build Nuget nugetprerelease=dev nugetkey=123 nugetpublishurl=http://abc"
-      "              symbolskey=456 symbolspublishurl=http://xyz"
-      "                                   Build and publish pre-release nuget packages to http://abc"
-      "                                   and symbols packages to http://xyz"
-      ""]
-
 
 //--------------------------------------------------------------------------------
 //  Target dependencies
 //--------------------------------------------------------------------------------
 
-Target "Mono" DoNothing
+Target "BuildRelease" DoNothing
+Target "Nuget" DoNothing
 Target "All" DoNothing
+Target "AllTests" DoNothing
 
 // build dependencies
 "Clean" ==> "AssemblyInfo" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
 
 // tests dependencies
-"CleanTests" ==> "RunTests"
-
+"Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
 
 // perf dependencies
-"CleanPerf" ==> "NBench"
+"Clean" ==> "RestorePackages" ==> "Build" ==> "NBench"
 
 // nuget dependencies
-"CleanNuget" ==> "BuildRelease" ==> "Nuget"
+"Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
+"CreateNuget" ==> "PublishNuget"
+"CreateNuget" ==> "PublishNuget" ==> "Nuget"
 
+// all
 "BuildRelease" ==> "All"
 "RunTests" ==> "All"
 "NBench" ==> "All"
 "Nuget" ==> "All"
 
-Target "AllTests" DoNothing //used for Mono builds, due to Mono 4.0 bug with FAKE / NuGet https://github.com/fsharp/fsharp/issues/427
 "BuildRelease" ==> "AllTests"
 "RunTests" ==> "AllTests"
 

@@ -1,190 +1,49 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4E0B1852-7B6D-49E7-9939-A315D086B094}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NBench</RootNamespace>
+    <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
+    <Copyright>Copyright (c) Petabridge https://petabridge.com/</Copyright>
+    <AssemblyTitle>NBench</AssemblyTitle>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Authors>Petabridge</Authors>
+    <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
     <AssemblyName>NBench</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
+    <PackageId>NBench</PackageId>
+    <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
+    <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/petabridge/NBench</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/petabridge/NBench/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
-    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
-    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
-    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
-    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
-    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
-    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
-    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
-    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
-    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
-    <CodeContractsAssertsToContractsCheckBox>True</CodeContractsAssertsToContractsCheckBox>
-    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
-    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
-    <CodeContractsMissingPublicEnsuresAsWarnings>False</CodeContractsMissingPublicEnsuresAsWarnings>
-    <CodeContractsInferRequires>True</CodeContractsInferRequires>
-    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
-    <CodeContractsInferEnsuresAutoProperties>True</CodeContractsInferEnsuresAutoProperties>
-    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
-    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
-    <CodeContractsSuggestAssumptionsForCallees>False</CodeContractsSuggestAssumptionsForCallees>
-    <CodeContractsSuggestRequires>False</CodeContractsSuggestRequires>
-    <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
-    <CodeContractsSuggestObjectInvariants>False</CodeContractsSuggestObjectInvariants>
-    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
-    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
-    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
-    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
-    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
-    <CodeContractsCustomRewriterAssembly />
-    <CodeContractsCustomRewriterClass />
-    <CodeContractsLibPaths />
-    <CodeContractsExtraRewriteOptions />
-    <CodeContractsExtraAnalysisOptions />
-    <CodeContractsSQLServerOption />
-    <CodeContractsBaseLineFile />
-    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
-    <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
-    <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
-    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
-    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
-    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
-    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
-    <DocumentationFile>bin\Debug\NBench.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\NBench.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <ItemGroup>
+
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>Properties\SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="Reporting\TeamCityBenchmarkOutput.cs" />
-    <Compile Include="Sdk\RunnerSettings.cs" />
-    <Compile Include="Tracing\NoOpBenchmarkTrace.cs" />
-    <Compile Include="Tracing\BenchmarkOutputTrace.cs" />
-    <Compile Include="Collection\Counters\CounterSelector.cs" />
-    <Compile Include="Collection\Timing\TimingCollector.cs" />
-    <Compile Include="Collection\Timing\TimingSelector.cs" />
-    <Compile Include="CounterMeasurementAttribute.cs" />
-    <Compile Include="ByteConstants.cs" />
-    <Compile Include="IBenchmarkTrace.cs" />
-    <Compile Include="MeasurementAttribute.cs" />
-    <Compile Include="Metrics\Counters\CounterMetricName.cs" />
-    <Compile Include="Metrics\GarbageCollection\GcMeasurementConfigurator.cs" />
-    <Compile Include="Metrics\GarbageCollection\GcMetricName.cs" />
-    <Compile Include="Metrics\Memory\MemoryMeasurementConfigurator.cs" />
-    <Compile Include="Metrics\Memory\MemoryMetricName.cs" />
-    <Compile Include="Metrics\MetricName.cs" />
-    <Compile Include="Metrics\Timing\TimingBenchmarkSetting.cs" />
-    <Compile Include="Metrics\Timing\TimingMeasurementConfigurator.cs" />
-    <Compile Include="Metrics\Timing\TimingMetricName.cs" />
-    <Compile Include="Properties\Friends.cs" />
-    <Compile Include="GcMeasurementAttribute.cs" />
-    <Compile Include="MemoryMeasurementAttribute.cs" />
-    <Compile Include="Reporting\AggregateMetrics.cs" />
-    <Compile Include="Metrics\BenchmarkRun.cs" />
-    <Compile Include="Reporting\BenchmarkFinalResults.cs" />
-    <Compile Include="Reporting\BenchmarkRunReport.cs" />
-    <Compile Include="Metrics\MeasureBucket.cs" />
-    <Compile Include="Metrics\MetricMeasurement.cs" />
-    <Compile Include="MustBe.cs" />
-    <Compile Include="NBenchException.cs" />
-    <Compile Include="Reporting\CompositeBenchmarkOutput.cs" />
-    <Compile Include="Reporting\IBenchmarkOutput.cs" />
-    <Compile Include="Reporting\MetricRunReport.cs" />
-    <Compile Include="Reporting\NoOpBenchmarkOutput.cs" />
-    <Compile Include="Reporting\Targets\ActionBenchmarkOutput.cs" />
-    <Compile Include="Reporting\Targets\ConsoleBenchmarkOutput.cs" />
-    <Compile Include="Reporting\Targets\MarkdownBenchmarkOutput.cs" />
-    <Compile Include="Sdk\Assertion.cs" />
-    <Compile Include="Sdk\AssertionResult.cs" />
-    <Compile Include="Sdk\DefaultBenchmarkAssertionRunner.cs" />
-    <Compile Include="Sdk\AssertionType.cs" />
-    <Compile Include="BenchmarkContext.cs" />
-    <Compile Include="Sdk\BenchmarkBuilder.cs" />
-    <Compile Include="Metrics\Counters\CounterMeasurementConfigurator.cs" />
-    <Compile Include="Sdk\Compiler\ReflectionDiscovery.Configurators.cs" />
-    <Compile Include="Sdk\IBenchmarkAssertionRunner.cs" />
-    <Compile Include="Sdk\IMeasurementConfigurator.cs" />
-    <Compile Include="Sdk\MeasurementConfigurator.cs" />
-    <Compile Include="Sdk\BenchmarkConstants.cs" />
-    <Compile Include="Reporting\BenchmarkResults.cs" />
-    <Compile Include="Sdk\BenchmarkSettings.cs" />
-    <Compile Include="Sdk\Compiler\AssemblyRuntimeLoader.cs" />
-    <Compile Include="Sdk\Benchmark.cs" />
-    <Compile Include="Counter.cs" />
-    <Compile Include="Collection\GarbageCollection\GcCollectionsPerGenerationCollector.cs" />
-    <Compile Include="Collection\GarbageCollection\GcCollectionsSelector.cs" />
-    <Compile Include="Collection\Memory\GcTotalMemoryCollector.cs" />
-    <Compile Include="Collection\Memory\TotalMemorySelector.cs" />
-    <Compile Include="Collection\MetricNames.cs" />
-    <Compile Include="Collection\MetricsCollectorSelector.cs" />
-    <Compile Include="PerformanceBenchmark.cs" />
-    <Compile Include="Collection\MetricCollector.cs" />
-    <Compile Include="Collection\Counters\CounterMetricCollector.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reporting\BenchmarkStat.cs" />
-    <Compile Include="Sdk\Compiler\IDiscovery.cs" />
-    <Compile Include="Sdk\Compiler\ReflectionDiscovery.cs" />
-    <Compile Include="Metrics\Counters\CounterBenchmarkSetting.cs" />
-    <Compile Include="Metrics\Counters\CreateCounterBenchmarkSetting.cs" />
-    <Compile Include="Sdk\DomainManager.cs" />
-    <Compile Include="Metrics\GarbageCollection\GcBenchmarkSetting.cs" />
-    <Compile Include="Sdk\IBenchmarkInvoker.cs" />
-    <Compile Include="Sdk\IBenchmarkSetting.cs" />
-    <Compile Include="Sdk\ActionBenchmarkInvoker.cs" />
-    <Compile Include="Metrics\Memory\MemoryBenchmarkSetting.cs" />
-    <Compile Include="Sdk\ReflectionBenchmarkInvoker.cs" />
-    <Compile Include="Sdk\TestPackage.cs" />
-    <Compile Include="Sdk\TestRunner.cs" />
-    <Compile Include="Sdk\WarmupData.cs" />
-    <Compile Include="Sys\SysInfo.cs" />
-    <Compile Include="TimingMeasurementAttribute.cs" />
-    <Compile Include="Tracing\TraceEvent.cs" />
-    <Compile Include="Tracing\TraceLevel.cs" />
-    <Compile Include="Util\AtomicCounter.cs" />
-    <Compile Include="Util\FileNameGenerator.cs" />
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <DefineConstants>$(DefineConstants);THREADPOOL;APPDOMAIN;SERIALIZATION</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
+    <PackageReference Include="System.Diagnostics.Contracts" Version="4.0.1" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.1.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="NBench.nuspec" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
