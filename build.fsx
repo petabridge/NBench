@@ -284,20 +284,26 @@ Target "PublishNuget" (fun _ ->
 
     if (shouldPushSymbolsPackages) then
         let runSingleProject project =
-            DotNetCli.RunCommand
-                (fun p -> 
-                    { p with 
-                        TimeOut = TimeSpan.FromMinutes 10. })
-                (sprintf "nuget push %s --source %s --api-key %s --symbol-source %s --symbol-api-key %s" project source apiKey symbolSource symbolsApiKey)
+            try
+                DotNetCli.RunCommand
+                    (fun p -> 
+                        { p with 
+                            TimeOut = TimeSpan.FromMinutes 10. })
+                    (sprintf "nuget push %s --source %s --api-key %s --symbol-source %s --symbol-api-key %s" project source apiKey symbolSource symbolsApiKey)
+            with exn ->
+                logfn "%s" exn.Message
 
         symbols |> Seq.iter (runSingleProject)
     else
         let runSingleProject project =
-            DotNetCli.RunCommand
-                (fun p -> 
-                    { p with 
-                        TimeOut = TimeSpan.FromMinutes 10. })
-                (sprintf "nuget push %s --api-key %s --source %s" project apiKey source)
+            try
+                DotNetCli.RunCommand
+                    (fun p -> 
+                        { p with 
+                            TimeOut = TimeSpan.FromMinutes 10. })
+                    (sprintf "nuget push %s --api-key %s --source %s" project apiKey source)
+            with exn ->
+                logfn "%s" exn.Message
 
         projects |> Seq.iter (runSingleProject)
 )
