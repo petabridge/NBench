@@ -4,7 +4,7 @@
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <Copyright>Copyright (c) Petabridge https://petabridge.com/</Copyright>
     <AssemblyTitle>NBench</AssemblyTitle>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.0.1</VersionPrefix>
     <Authors>Petabridge</Authors>
     <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
     <AssemblyName>NBench</AssemblyName>

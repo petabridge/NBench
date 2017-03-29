@@ -79,6 +79,8 @@ After adding this reference, run `dotnet restore` and the NBench .NET Core runne
 PS> dotnet nbench .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
 ```
 
+**NOTE:** Your shell's working directory must be inside the folder containing the .csproj file with the above `<DotNetCliToolReference>` in order to run `dotnet nbench`.
+
 ## Command Line Parameters
 ```
 NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]

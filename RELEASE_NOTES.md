@@ -1,3 +1,7 @@
+#### v1.0.1 March March 29 2017
+
+This release resolves an issue with the v1.0.0 NuGet release for NBench.Runner in which clients installing the package via `Install-Package NBench.Runner` were not getting the NBench.dll dependency for NBench.Runner.exe.  NBench.dll is now compiled into NBench.Runner.exe.
+
 #### v1.0.0 March 14 2017
 
 NBench v1.0.0 represents support for .NET Standard 1.6 for the NBench core library and a .NET Core 1.0 version of the NBench runner.
