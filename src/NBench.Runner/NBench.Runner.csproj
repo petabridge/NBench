@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NBench\NBench.csproj" />
+    <Compile Include="..\NBench\**\*.cs" Exclude="..\NBench\**\*NBench.AssemblyInfo.cs" />
   </ItemGroup>
-
+  
 </Project>
