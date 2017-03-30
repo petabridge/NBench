@@ -8,6 +8,7 @@ open System.Text
 open Fake
 open Fake.DotNetCli
 open Fake.FileUtils
+open Fake.TaskRunnerHelper
 
 // Information about the project for Nuget and Assembly info files
 let product = "NBench"
@@ -36,6 +37,11 @@ let output = __SOURCE_DIRECTORY__  @@ "bin"
 let outputTests = __SOURCE_DIRECTORY__ @@ "TestResults"
 let outputPerfTests = __SOURCE_DIRECTORY__ @@ "PerfResults"
 let outputNuGet = output @@ "nuget"
+
+// Copied from original NugetCreate target
+let nugetDir = output @@ "nuget"
+let workingDir = output @@ "build"
+let nugetExe = FullName @"./tools/nuget.exe"
 
 open AssemblyInfoFile
 Target "AssemblyInfo" (fun _ ->
@@ -136,7 +142,7 @@ Target "RunTests" (fun _ ->
 Target "NBench" <| fun _ ->
     if (isWindows) then
         // .NET 4.5.2
-        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
+        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "src/NBench.Runner/bin/Release/net452/win7-x64"
         let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
         
         let spec = getBuildParam "spec"
@@ -257,7 +263,6 @@ Target "CopyOutput" (fun _ ->
 Target "CreateNuget" (fun _ ->
     let nugetProjects = [ "./src/NBench/NBench.csproj"; 
                           "./src/NBench.PerformanceCounters/NBench.PerformanceCounters.csproj";
-                          "./src/NBench.Runner/NBench.Runner.csproj" 
                           "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj" ]
 
     nugetProjects |> List.iter (fun proj ->
@@ -269,6 +274,101 @@ Target "CreateNuget" (fun _ ->
                     AdditionalArgs = ["--include-symbols"]
                     OutputPath = outputNuGet })
         )
+
+    // NBench.Runner.exe NuGet Create
+
+    // Only using this to build NBench.Runner which doesn't need this result
+    let getDependencies project = []
+
+     // used to add -pre suffix to pre-release packages
+    let getProjectVersion project =
+        match project with
+        | _ -> release.NugetVersion
+    
+    let createNugetPackages _ =
+        let mutable dirName = 1
+        let removeDir dir = 
+            let del _ = 
+                DeleteDir dir
+                not (directoryExists dir)
+            runWithRetries del 3 |> ignore
+
+        let getDirName workingDir dirCount =
+            workingDir + dirCount.ToString()
+
+        let getReleaseFiles project releaseDir =
+            match project with
+            | "NBench.Runner" -> 
+                !! (releaseDir @@ "*.dll")
+                ++ (releaseDir @@ "*.exe")
+                ++ (releaseDir @@ "*.pdb")
+                ++ (releaseDir @@ "*.xml")
+            | _ ->
+                !! (releaseDir @@ ".dll")
+                ++ (releaseDir @@ ".exe")
+                ++ (releaseDir @@ ".pdb")
+                ++ (releaseDir @@ ".xml")
+
+        CleanDir workingDir
+
+        ensureDirectory nugetDir
+        for nuspec in !! "src/**/*NBench.Runner.nuspec" do
+            printfn "Creating nuget packages for %s" nuspec
+        
+            let project = Path.GetFileNameWithoutExtension nuspec 
+            let projectDir = Path.GetDirectoryName nuspec
+            let projectFile = (!! (projectDir @@ project + ".*sproj")) |> Seq.head
+            let releaseDir = projectDir @@ @"bin\Release\net452\win7-x64"
+            let packages = projectDir @@ "packages.config"
+            let packageDependencies = if (fileExists packages) then (getDependencies packages) else []
+            let dependencies = packageDependencies @ getDependencies project
+            let releaseVersion = getProjectVersion project
+
+            let pack outputDir symbolPackage =
+                NuGetHelper.NuGet
+                    (fun p ->
+                        { p with
+                            Description = description
+                            Authors = authors
+                            Copyright = copyright
+                            Project =  project
+                            Properties = ["Configuration", "Release"]
+                            ReleaseNotes = release.Notes |> String.concat "\n"
+                            Version = releaseVersion
+                            Tags = tags |> String.concat " "
+                            OutputPath = outputDir
+                            WorkingDir = workingDir
+                            SymbolPackage = symbolPackage
+                            Dependencies = dependencies })
+                    nuspec
+
+            // Copy dll, pdb and xml to libdir = workingDir/lib/net45/
+            let libDir = workingDir @@ @"lib\net45"
+            printfn "Creating output directory %s" libDir
+            ensureDirectory libDir
+            CleanDir libDir
+            getReleaseFiles project releaseDir
+            |> CopyFiles libDir
+
+            // Copy all src-files (.cs and .fs files) to workingDir/src
+            let nugetSrcDir = workingDir @@ @"src/"
+            CleanDir nugetSrcDir
+
+            let isCs = hasExt ".cs"
+            let isFs = hasExt ".fs"
+            let isAssemblyInfo f = (filename f).Contains("AssemblyInfo")
+            let isSrc f = (isCs f || isFs f) && not (isAssemblyInfo f) 
+            CopyDir nugetSrcDir projectDir isSrc
+        
+            //Remove workingDir/src/obj and workingDir/src/bin
+            removeDir (nugetSrcDir @@ "obj")
+            removeDir (nugetSrcDir @@ "bin")
+
+            // Create both normal nuget package and symbols nuget package. 
+            // Uses the files we copied to workingDir and outputs to nugetdir
+            pack nugetDir NugetSymbolPackage.Nuspec
+
+    createNugetPackages()
 )
 
 Target "PublishNuget" (fun _ ->
