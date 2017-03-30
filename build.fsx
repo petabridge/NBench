@@ -74,7 +74,9 @@ Target "Build" (fun _ ->
                         Project = project
                         Configuration = configuration })   
 
-        let projects = !! "./src/**/*.csproj" ++ "./tests/**/*.csproj"
+        let projects = !! "./src/**/*.csproj" 
+                       ++ "./tests/**/*.csproj"
+                       -- "./src/**/*NBench.Runner.csproj"
      
         projects |> Seq.iter (runSingleProject)
     else
@@ -136,7 +138,7 @@ Target "RunTests" (fun _ ->
 Target "NBench" <| fun _ ->
     if (isWindows) then
         // .NET 4.5.2
-        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
+        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "/src/NBench.Runner/bin/Release/"
         let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
         
         let spec = getBuildParam "spec"

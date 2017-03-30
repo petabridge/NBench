@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 
-namespace NBench.Runner
+namespace NBench.Runner.DotNetCli
 {
     /// <summary>
     /// Command line argument parser for NBench specifications
@@ -58,7 +58,7 @@ namespace NBench.Runner
         {
             Console.WriteLine(@"NBench Runner (1.0.0)
 
-Usage: NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
+Usage: dotnet nbench [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
 
 Options:
     --help  Show help
@@ -99,15 +99,15 @@ Arguments:
             return Values.Value[key];
         }
 
-		/// <summary>
-		/// Determines whether a property was written in the command line
-		/// </summary>
-		/// <param name="key">Name of the property</param>
-		/// <returns></returns>
-		public static bool HasProperty(string key)
-		{
-			return Values.Value.ContainsKey(key);
-		}
+        /// <summary>
+        /// Determines whether a property was written in the command line
+        /// </summary>
+        /// <param name="key">Name of the property</param>
+        /// <returns></returns>
+        public static bool HasProperty(string key)
+        {
+            return Values.Value.ContainsKey(key);
+        }
 
         public static int GetInt32(string key)
         {
