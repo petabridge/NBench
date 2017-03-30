@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\NBench\**\*.cs" Exclude="..\NBench\**\*NBench.AssemblyInfo.cs" />
+    <ProjectReference Include="..\NBench\NBench.csproj" Condition="'$(TargetFramework)' == 'net452'" />
   </ItemGroup>
   
 </Project>

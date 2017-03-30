@@ -136,7 +136,7 @@ Target "RunTests" (fun _ ->
 Target "NBench" <| fun _ ->
     if (isWindows) then
         // .NET 4.5.2
-        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
+        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "src/NBench.Runner/bin/Release/net452/win7-x64"
         let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
         
         let spec = getBuildParam "spec"
