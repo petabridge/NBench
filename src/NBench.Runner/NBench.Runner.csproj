@@ -5,7 +5,7 @@
     <Copyright>Copyright (c) Petabridge https://petabridge.com/</Copyright>
     <AssemblyTitle>NBench</AssemblyTitle>
     <AssemblyName>NBench.Runner</AssemblyName>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.0.1</VersionPrefix>
     <Authors>Petabridge</Authors>
     <TargetFramework>net452</TargetFramework>
     <OutputType>Exe</OutputType>   
@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NBench\NBench.csproj" />
+    <ProjectReference Include="..\NBench\NBench.csproj" Condition="'$(TargetFramework)' == 'net452'" />
   </ItemGroup>
-
+  
 </Project>
