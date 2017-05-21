@@ -177,7 +177,7 @@ Target "NBench" <| fun _ ->
                     Framework = "netcoreapp1.1"})   
 
         let netCoreNbenchRunner = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/win7-x64/"
-        let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.1/NBench.Tests.Performance.dll"
+        let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netcoreapp1.1/NBench.Tests.Performance.WithDependencies.dll"
         
         let netCoreNbenchRunnerArgs = new StringBuilder()
                                         |> append netCoreAssembly
@@ -209,7 +209,7 @@ Target "NBench" <| fun _ ->
                     Framework = "netcoreapp1.1"})   
         
         let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/debian.8-x64/dotnet-nbench"
-        let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.1/NBench.Tests.Performance.dll"
+        let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.1/NBench.Tests.Performance.WithDependencies.dll"
         
         let linuxNbenchRunnerArgs = new StringBuilder()
                                         |> append linuxPerfAssembly

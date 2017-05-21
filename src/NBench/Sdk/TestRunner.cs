@@ -7,8 +7,12 @@ using NBench.Sdk.Compiler;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if CORECLR
+using System.Runtime.Loader;
+#endif
 using System.Threading;
 using Microsoft.Win32;
 

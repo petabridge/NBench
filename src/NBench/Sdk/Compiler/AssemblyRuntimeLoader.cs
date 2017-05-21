@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 #if  CORECLR
 using System.Runtime.Loader;
+using Microsoft.Extensions.DependencyModel;
 #endif
 
 namespace NBench.Sdk.Compiler
@@ -46,7 +49,23 @@ namespace NBench.Sdk.Compiler
         public static Assembly LoadAssembly(string assemblyPath)
         {
 #if CORECLR
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            var assembly =  AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);        
+            var deps = DependencyContext.Load(assembly).CompileLibraries
+                .Where(d => d.Name.Contains(assembly.GetName().Name.ToLower()))
+                .ToList();
+            if (deps.Count > 0)
+            {
+                foreach (var dep in deps)
+                {
+                    foreach (var depDependency in dep.Dependencies)
+                    {
+                        AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetDirectoryName(assemblyPath) 
+                            + Path.DirectorySeparatorChar 
+                            + depDependency.Name + ".dll");
+                    }
+                }
+            }
+            return assembly;
 #else
             var targetAssembly = Assembly.LoadFrom(assemblyPath);
             return targetAssembly;

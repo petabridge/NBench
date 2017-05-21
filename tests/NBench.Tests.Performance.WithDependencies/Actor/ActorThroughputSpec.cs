@@ -223,7 +223,7 @@ namespace Akka.Tests.Performance.Actor
 
         [PerfBenchmark(
             Description = "Measures the throughput of an ActorBase + Pattern match class",
-            RunMode = RunMode.Iterations, NumberOfIterations = 13, TestMode = TestMode.Measurement,
+            RunMode = RunMode.Iterations, NumberOfIterations = 1, TestMode = TestMode.Measurement,
             RunTimeMilliseconds = 1000)]
         [CounterMeasurement(MailboxCounterName)]
         [GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
@@ -239,59 +239,59 @@ namespace Akka.Tests.Performance.Actor
             _resetEvent.Wait(); //wait up to a second
         }
 
-        [PerfBenchmark(
-            Description = "Measures the throughput of an UntypedActor",
-            RunMode = RunMode.Iterations, NumberOfIterations = 13, TestMode = TestMode.Measurement,
-            RunTimeMilliseconds = 1000)]
-        [CounterMeasurement(MailboxCounterName)]
-        [GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
-        public void UntypedActor_Throughput(BenchmarkContext context)
-        {
-            for (var i = 0; i < MailboxMessageCount;)
-            {
-                _untypedActorRef.Tell(dataExample);
-                _untypedActorRef.Tell(intExample);
-                _untypedActorRef.Tell(stringExample);
-                ++i;
-            }
-            _resetEvent.Wait(); //wait up to a second
-        }
+        //[PerfBenchmark(
+        //    Description = "Measures the throughput of an UntypedActor",
+        //    RunMode = RunMode.Iterations, NumberOfIterations = 1, TestMode = TestMode.Measurement,
+        //    RunTimeMilliseconds = 1000)]
+        //[CounterMeasurement(MailboxCounterName)]
+        //[GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
+        //public void UntypedActor_Throughput(BenchmarkContext context)
+        //{
+        //    for (var i = 0; i < MailboxMessageCount;)
+        //    {
+        //        _untypedActorRef.Tell(dataExample);
+        //        _untypedActorRef.Tell(intExample);
+        //        _untypedActorRef.Tell(stringExample);
+        //        ++i;
+        //    }
+        //    _resetEvent.Wait(); //wait up to a second
+        //}
 
-        [PerfBenchmark(
-            Description = "Measures the throughput of an ReceiveActor",
-            RunMode = RunMode.Iterations, NumberOfIterations = 13, TestMode = TestMode.Measurement,
-            RunTimeMilliseconds = 1000)]
-        [CounterMeasurement(MailboxCounterName)]
-        [GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
-        public void ReceiveActor_Throughput(BenchmarkContext context)
-        {
-            for (var i = 0; i < MailboxMessageCount;)
-            {
-                _receiveActorRef.Tell(dataExample);
-                _receiveActorRef.Tell(intExample);
-                _receiveActorRef.Tell(stringExample);
-                ++i;
-            }
-            _resetEvent.Wait(); //wait up to a second
-        }
+        //[PerfBenchmark(
+        //    Description = "Measures the throughput of an ReceiveActor",
+        //    RunMode = RunMode.Iterations, NumberOfIterations = 1, TestMode = TestMode.Measurement,
+        //    RunTimeMilliseconds = 1000)]
+        //[CounterMeasurement(MailboxCounterName)]
+        //[GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
+        //public void ReceiveActor_Throughput(BenchmarkContext context)
+        //{
+        //    for (var i = 0; i < MailboxMessageCount;)
+        //    {
+        //        _receiveActorRef.Tell(dataExample);
+        //        _receiveActorRef.Tell(intExample);
+        //        _receiveActorRef.Tell(stringExample);
+        //        ++i;
+        //    }
+        //    _resetEvent.Wait(); //wait up to a second
+        //}
 
-        [PerfBenchmark(
-            Description = "Measures the throughput of an MinimalActorRef",
-            RunMode = RunMode.Iterations, NumberOfIterations = 13, TestMode = TestMode.Measurement,
-            RunTimeMilliseconds = 1000)]
-        [CounterMeasurement(MailboxCounterName)]
-        [GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
-        public void MinimalActorRef_Throughput(BenchmarkContext context)
-        {
-            for (var i = 0; i < MailboxMessageCount;)
-            {
-                _minimalActorRef.Tell(dataExample);
-                _minimalActorRef.Tell(intExample);
-                _minimalActorRef.Tell(stringExample);
-                ++i;
-            }
-            _resetEvent.Wait(); //wait up to a second
-        }
+        //[PerfBenchmark(
+        //    Description = "Measures the throughput of an MinimalActorRef",
+        //    RunMode = RunMode.Iterations, NumberOfIterations = 1, TestMode = TestMode.Measurement,
+        //    RunTimeMilliseconds = 1000)]
+        //[CounterMeasurement(MailboxCounterName)]
+        //[GcMeasurement(GcMetric.TotalCollections, GcGeneration.AllGc)]
+        //public void MinimalActorRef_Throughput(BenchmarkContext context)
+        //{
+        //    for (var i = 0; i < MailboxMessageCount;)
+        //    {
+        //        _minimalActorRef.Tell(dataExample);
+        //        _minimalActorRef.Tell(intExample);
+        //        _minimalActorRef.Tell(stringExample);
+        //        ++i;
+        //    }
+        //    _resetEvent.Wait(); //wait up to a second
+        //}
 
         [PerfCleanup]
         public void Cleanup()

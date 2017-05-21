@@ -2,17 +2,12 @@
 
   <PropertyGroup>
     <AssemblyTitle>Akka.Tests.Performance</AssemblyTitle>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="App.config" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Akka" Version="1.2.0" />
-    <PackageReference Include="Akka.TestKit" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -22,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
+    <ProjectReference Include="..\Akka.TestKit\Akka.TestKit.csproj" />
+    <ProjectReference Include="..\Akka\Akka.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
