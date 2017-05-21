@@ -45,14 +45,14 @@ namespace NBench.Tests.End2End
         [Fact]
         public void LoadAssemblyCorrect()
         {
-            var package = LoadPackage();
+            var package = LoadPackageWithDependencies();
             var result = TestRunner.Run(package);
             Assert.True(result.AllTestsPassed);
             Assert.NotEqual(0, result.ExecutedTestsCount);
             Assert.Equal(0, result.IgnoredTestsCount);
         }
 
-        private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
 #if CORECLR
 		    var assemblySubfolder = "netcoreapp1.1";

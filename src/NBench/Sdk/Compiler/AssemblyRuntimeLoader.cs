@@ -70,6 +70,10 @@ namespace NBench.Sdk.Compiler
                         {
                             // TODO: swallowed temporarily
                         }
+                        catch (System.IO.FileNotFoundException e)
+                        {
+                            // TODO: swallowed temporarily
+                        }
                     }
                 }
             }
