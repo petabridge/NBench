@@ -17,8 +17,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
-    <ProjectReference Include="..\Akka.TestKit\Akka.TestKit.csproj" />
-    <ProjectReference Include="..\Akka\Akka.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Akka">
+      <HintPath>..\dependencies\Akka.dll</HintPath>
+    </Reference>
+    <Reference Include="Akka.TestKit">
+      <HintPath>..\dependencies\Akka.TestKit.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
