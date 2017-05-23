@@ -30,7 +30,7 @@ namespace NBench.Tests.End2End
         {
             if (!TestRunner.IsMono) // this spec currently hits a runtime exception with Mono: https://bugzilla.xamarin.com/show_bug.cgi?id=43291
             {
-                var benchmarks = _discovery.FindBenchmarks(GetType().GetTypeInfo().Assembly).ToList();
+                var benchmarks = _discovery.FindBenchmarks(new[] { GetType().GetTypeInfo().Assembly }).ToList();
                 Assert.True(benchmarks.Count >= 1);
                 Benchmark.PrepareForRun(); // force some GC here
                 for (var i = 0; i < benchmarks.Count; i++)

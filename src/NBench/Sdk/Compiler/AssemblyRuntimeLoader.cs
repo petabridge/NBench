@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -47,42 +48,32 @@ namespace NBench.Sdk.Compiler
         /// </summary>
         /// <param name="assemblyPath">The path to an assembly</param>
         /// <returns>The assembly at the specified location</returns>
-        public static Assembly LoadAssembly(string assemblyPath)
+        public static Assembly[] LoadAssembly(string assemblyPath)
         {
 #if CORECLR
-            var assembly =  AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);        
-            var deps = DependencyContext.Load(assembly).CompileLibraries
-                .Where(d => d.Name.Contains(assembly.GetName().Name.ToLower()))
-                .ToList();
-            if (deps.Count > 0)
-            {
-                foreach (var dep in deps)
-                {
-                    foreach (var depDependency in dep.Dependencies)
-                    {
-                        try
-                        {
-                            AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.GetDirectoryName(assemblyPath)
-                                                                             + Path.DirectorySeparatorChar
-                                                                             + depDependency.Name + ".dll");
-                        }
-                        catch (System.IO.FileLoadException e)
-                        {
-                            // TODO: swallowed temporarily
-                        }
-                        catch (System.IO.FileNotFoundException e)
-                        {
-                            // TODO: swallowed temporarily
-                        }
-                    }
-                }
-            }
-            return assembly;
+            var assemblies = ReflectionDiscovery.GetAssemblies(); // TODO: net45 AssemblyResolve has potential here
+            return assemblies;
 #else
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
             var targetAssembly = Assembly.LoadFrom(assemblyPath);
-            return targetAssembly;
+            var assemblies = new List<Assembly>();
+            assemblies.Add(targetAssembly);
+            foreach (var dependency in targetAssembly.GetReferencedAssemblies())
+            {
+                assemblies.Add(Assembly.Load(dependency));
+            }
+            return assemblies.ToArray();
 #endif
         }
+#if !CORECLR
+        private static Assembly ResolveAssembly(object sender, ResolveEventArgs e, string assemblyPath)
+        {
+            //The name would contain versioning and other information. Let's say you want to load by name.
+            string dllName = e.Name.Split(new[] { ',' })[0] + ".dll";
+            return Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
+        }
+#endif
     }
 }
 

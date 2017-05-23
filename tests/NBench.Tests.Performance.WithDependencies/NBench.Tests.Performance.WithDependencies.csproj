@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyTitle>Akka.Tests.Performance</AssemblyTitle>
-    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>net452; netcoreapp1.1</TargetFrameworks>
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
 
@@ -19,12 +19,21 @@
     <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <Reference Include="Akka">
-      <HintPath>..\dependencies\Akka.dll</HintPath>
+      <HintPath>..\dependencies\Akka\netstandard1.6\Akka.dll</HintPath>
     </Reference>
     <Reference Include="Akka.TestKit">
-      <HintPath>..\dependencies\Akka.TestKit.dll</HintPath>
+      <HintPath>..\dependencies\Akka.TestKit\netstandard1.6\Akka.TestKit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Reference Include="Akka">
+      <HintPath>..\dependencies\Akka\net45\Akka.dll</HintPath>
+    </Reference>
+    <Reference Include="Akka.TestKit">
+      <HintPath>..\dependencies\Akka.TestKit\net45\Akka.TestKit.dll</HintPath>
     </Reference>
   </ItemGroup>
 
