@@ -51,8 +51,11 @@ namespace NBench.Sdk.Compiler
         public static Assembly[] LoadAssembly(string assemblyPath)
         {
 #if CORECLR
-            var assemblies = ReflectionDiscovery.GetAssemblies(); // TODO: net45 AssemblyResolve has potential here
-            return assemblies;
+            //var assemblies = ReflectionDiscovery.GetAssemblies(); // TODO: net45 AssemblyResolve delegate has potential here
+            //return assemblies;
+            AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
+            var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            return new[] {assembly};
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
@@ -66,12 +69,19 @@ namespace NBench.Sdk.Compiler
             return assemblies.ToArray();
 #endif
         }
+
 #if !CORECLR
         private static Assembly ResolveAssembly(object sender, ResolveEventArgs e, string assemblyPath)
         {
             //The name would contain versioning and other information. Let's say you want to load by name.
             string dllName = e.Name.Split(new[] { ',' })[0] + ".dll";
             return Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
+        }
+#else
+        private static Assembly DefaultOnResolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName, string assemblyPath)
+        {
+            string dllName = assemblyName.Name.Split(new[] { ',' })[0] + ".dll";
+            return assemblyLoadContext.LoadFromAssemblyPath(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
         }
 #endif
     }

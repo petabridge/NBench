@@ -60,13 +60,6 @@ namespace NBench.Tests.End2End
             Assert.Equal(0, result.IgnoredTestsCount);
         }
 
-        [Fact]
-        public void AssemblyRuntimeLoaderCanFindCorrectDependencies()
-        {
-            var package = LoadPackageWithDependencies();
-            var assemblies = AssemblyRuntimeLoader.LoadAssembly(package.Files.FirstOrDefault());
-        }
-
         private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
 #if CORECLR
