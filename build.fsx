@@ -86,11 +86,12 @@ Target "Build" (fun _ ->
 
 Target "RunTests" (fun _ ->
     let runSingleProject project =
-        DotNetCli.Test
+        DotNetCli.RunCommand
             (fun p -> 
-                { p with
-                    Project = project
-                    Configuration = configuration})      
+                { p with 
+                    WorkingDir = (Directory.GetParent project).FullName
+                    TimeOut = TimeSpan.FromMinutes 10. })
+                (sprintf "xunit -parallel none -teamcity -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))   
 
     let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
                     -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
