@@ -58,12 +58,14 @@ namespace NBench.Sdk.Compiler
             var dependencies = DependencyContext.Load(targetAssembly)
                 .CompileLibraries
                 .Where(dep => dep.Name.ToLower()
-                    .Contains(targetAssembly.FullName.Split(new [] { ',' })[0].ToLower()))
+                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
                 .ToList();
             var assemblies = new List<Assembly> { targetAssembly };
             assemblies.AddRange(dependencies
                 .SelectMany(d => d.Dependencies
                     .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
+            assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
+                .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
             return assemblies.ToArray();
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;

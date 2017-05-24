@@ -63,7 +63,7 @@ namespace NBench.Tests.End2End
         private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
 #if CORECLR
-		    var assemblySubfolder = "netcoreapp1.1";
+		    var assemblySubfolder = "netstandard1.6";
 #else
             var assemblySubfolder = "net452";
 #endif
