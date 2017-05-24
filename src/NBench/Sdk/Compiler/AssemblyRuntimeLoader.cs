@@ -54,8 +54,17 @@ namespace NBench.Sdk.Compiler
             //var assemblies = ReflectionDiscovery.GetAssemblies(); // TODO: net45 AssemblyResolve delegate has potential here
             //return assemblies;
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
-            var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-            return new[] {assembly};
+            var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            var dependencies = DependencyContext.Load(targetAssembly)
+                .CompileLibraries
+                .Where(dep => dep.Name.ToLower()
+                    .Contains(targetAssembly.FullName.Split(new [] { ',' })[0].ToLower()))
+                .ToList();
+            var assemblies = new List<Assembly> { targetAssembly };
+            assemblies.AddRange(dependencies
+                .SelectMany(d => d.Dependencies
+                    .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
+            return assemblies.ToArray();
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
