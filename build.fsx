@@ -93,11 +93,19 @@ Target "RunTests" (fun _ ->
                     TimeOut = TimeSpan.FromMinutes 10. })
                 (sprintf "xunit -parallel none -teamcity -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))   
 
-    let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
+    let projects = 
+        match (isWindows) with 
+        | true -> (!! "./tests/**/*NBench.Tests*.csproj" 
                     -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
                     -- "./tests/**/*NBench.Tests.Performance.csproj"
                     -- "./tests/**/*NBench.Tests.Performance.WithDependencies.csproj"
                     -- "./tests/**/*NBench.Tests.Assembly.csproj")
+        | _ -> (!! "./tests/**/*NBench.Tests*.csproj" 
+                -- "./tests/**/*NBench.Tests.Reporting.csproj"
+                -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
+                -- "./tests/**/*NBench.Tests.Performance.csproj"
+                -- "./tests/**/*NBench.Tests.Performance.WithDependencies.csproj"
+                -- "./tests/**/*NBench.Tests.Assembly.csproj")
 
     projects |> Seq.iter (log)
     projects |> Seq.iter (runSingleProject)
