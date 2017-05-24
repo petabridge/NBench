@@ -72,7 +72,7 @@ Target "RestorePackages" (fun _ ->
 )
 
 Target "Build" (fun _ ->          
-    if (isWindows) then
+    //if (isWindows) then
         let runSingleProject project =
             DotNetCli.Build
                 (fun p -> 
@@ -83,27 +83,27 @@ Target "Build" (fun _ ->
         let projects = !! "./src/**/*.csproj" ++ "./tests/**/*.csproj"
      
         projects |> Seq.iter (runSingleProject)
-    else
-        DotNetCli.Build
-            (fun p ->
-                { p with 
-                    Project = "./src/NBench/NBench.csproj"
-                    Framework = "netstandard1.6"
-                    Configuration = configuration })
+    //else
+    //    DotNetCli.Build
+    //        (fun p ->
+    //            { p with 
+    //                Project = "./src/NBench/NBench.csproj"
+    //                Framework = "netstandard1.6"
+    //                Configuration = configuration })
         
-        let runSingleProjectNetCore project =
-            DotNetCli.Build
-                (fun p ->
-                    { p with
-                        Project = project
-                        Framework = "netcoreapp1.1"
-                        Configuration = configuration })
+    //    let runSingleProjectNetCore project =
+    //        DotNetCli.Build
+    //            (fun p ->
+    //                { p with
+    //                    Project = project
+    //                    Framework = "netcoreapp1.1"
+    //                    Configuration = configuration })
 
-        let netCoreProjects = (!! "./src/**/*NBench.Runner.DotNetCli.csproj"
-                               ++ "./tests/**/*NBench.Tests*.csproj" 
-                               -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
+    //    let netCoreProjects = (!! "./src/**/*NBench.Runner.DotNetCli.csproj"
+    //                           ++ "./tests/**/*NBench.Tests*.csproj" 
+    //                           -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
 
-        netCoreProjects |> Seq.iter (runSingleProjectNetCore)
+    //    netCoreProjects |> Seq.iter (runSingleProjectNetCore)
 )
 
 Target "RunTests" (fun _ ->
@@ -115,23 +115,6 @@ Target "RunTests" (fun _ ->
                         Project = project
                         Configuration = configuration})      
 
-        let projects = (!! "./tests/**/*NBench.Tests*.csproj"
-                        -- "./tests/**/*NBench.Tests.Assembly.csproj"
-                        -- "./tests/**/*NBench.Tests.Performance.csproj"
-                        -- "./tests/**/*NBench.Tests.Performance.WithDependencies.csproj")
-
-        projects |> Seq.iter (log)
-        projects |> Seq.iter (runSingleProject)
-
-    else
-        let runSingleProjectNetCore project =
-            DotNetCli.Test
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Framework = "netcoreapp1.1"
-                        Configuration = configuration})
-
         let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
                         -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
                         -- "./tests/**/*NBench.Tests.Performance.csproj"
@@ -139,7 +122,25 @@ Target "RunTests" (fun _ ->
                         -- "./tests/**/*NBench.Tests.Assembly.csproj")
 
         projects |> Seq.iter (log)
-        projects |> Seq.iter (runSingleProjectNetCore)
+        projects |> Seq.iter (runSingleProject)
+
+    //else
+    //    let runSingleProjectNetCore project =
+    //        DotNetCli.Test
+    //            (fun p -> 
+    //                { p with
+    //                    Project = project
+    //                    Framework = "netcoreapp1.1"
+    //                    Configuration = configuration})
+
+    //    let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
+    //                    -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
+    //                    -- "./tests/**/*NBench.Tests.Performance.csproj"
+    //                    -- "./tests/**/*NBench.Tests.Performance.WithDependencies.csproj"
+    //                    -- "./tests/**/*NBench.Tests.Assembly.csproj")
+
+    //    projects |> Seq.iter (log)
+    //    projects |> Seq.iter (runSingleProjectNetCore)
 )
 
 Target "NBench" <| fun _ ->
