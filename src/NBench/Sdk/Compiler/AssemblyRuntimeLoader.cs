@@ -51,8 +51,6 @@ namespace NBench.Sdk.Compiler
         public static Assembly[] LoadAssembly(string assemblyPath)
         {
 #if CORECLR
-            //var assemblies = ReflectionDiscovery.GetAssemblies(); // TODO: net45 AssemblyResolve delegate has potential here
-            //return assemblies;
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
             var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
             var dependencies = DependencyContext.Load(targetAssembly)
