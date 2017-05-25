@@ -89,7 +89,7 @@ namespace NBench.Sdk.Compiler
                 types.Where(IsConfigurationType);
         }
 #if CORECLR
-        public static Assembly[] GetAssemblies()
+        private static Assembly[] GetAssemblies()
         {
             var assemblies = new List<Assembly>();
             var dependencies = DependencyContext.Default.RuntimeLibraries;
