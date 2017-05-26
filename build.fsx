@@ -72,78 +72,50 @@ Target "RestorePackages" (fun _ ->
 )
 
 Target "Build" (fun _ ->          
-    if (isWindows) then
-        let runSingleProject project =
-            DotNetCli.Build
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Configuration = configuration })   
-
-        let projects = !! "./src/**/*.csproj" ++ "./tests/**/*.csproj"
-     
-        projects |> Seq.iter (runSingleProject)
-    else
+    let runSingleProject project =
         DotNetCli.Build
-            (fun p ->
-                { p with 
-                    Project = "./src/NBench/NBench.csproj"
-                    Framework = "netstandard1.6"
-                    Configuration = configuration })
-        
-        let runSingleProjectNetCore project =
-            DotNetCli.Build
-                (fun p ->
-                    { p with
-                        Project = project
-                        Framework = "netcoreapp1.1"
-                        Configuration = configuration })
+            (fun p -> 
+                { p with
+                    Project = project
+                    Configuration = configuration })   
 
-        let netCoreProjects = (!! "./src/**/*NBench.Runner.DotNetCli.csproj"
-                               ++ "./tests/**/*NBench.Tests*.csproj" 
-                               -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj")
-
-        netCoreProjects |> Seq.iter (runSingleProjectNetCore)
+    let projects = !! "./src/**/*.csproj" ++ "./tests/**/*.csproj"
+     
+    projects |> Seq.iter (runSingleProject)
 )
 
 Target "RunTests" (fun _ ->
-    if (isWindows) then
-        let runSingleProject project =
-            DotNetCli.Test
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Configuration = configuration})      
+    let runSingleProject project =
+        DotNetCli.RunCommand
+            (fun p -> 
+                { p with 
+                    WorkingDir = (Directory.GetParent project).FullName
+                    TimeOut = TimeSpan.FromMinutes 10. })
+                (sprintf "xunit -parallel none -teamcity -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))   
 
-        let projects = (!! "./tests/**/*NBench.Tests*.csproj"
-                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
+    let projects = 
+        match (isWindows) with 
+        | true -> (!! "./tests/**/*NBench.Tests*.csproj" 
+                    -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
+                    -- "./tests/**/*NBench.Tests.Performance.csproj"
+                    -- "./tests/**/*NBench.Tests.Performance.WithDependencies.csproj"
+                    -- "./tests/**/*NBench.Tests.Assembly.csproj")
+        | _ -> (!! "./tests/**/*NBench.Tests*.csproj" 
+                -- "./tests/**/*NBench.Tests.Reporting.csproj"
+                -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
+                -- "./tests/**/*NBench.Tests.Performance.csproj"
+                -- "./tests/**/*NBench.Tests.Performance.WithDependencies.csproj"
+                -- "./tests/**/*NBench.Tests.Assembly.csproj")
 
-        projects |> Seq.iter (log)
-        projects |> Seq.iter (runSingleProject)
-
-    else
-        let runSingleProjectNetCore project =
-            DotNetCli.Test
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Framework = "netcoreapp1.1"
-                        Configuration = configuration})
-
-        let projects = (!! "./tests/**/*NBench.Tests*.csproj" 
-                        -- "./tests/**/*NBench.PerformanceCounters.Tests.*.csproj"
-                        -- "./tests/**/*NBench.Tests.Performance.csproj"
-                        -- "./tests/**/*NBench.Tests.Assembly.csproj")
-
-        projects |> Seq.iter (log)
-        projects |> Seq.iter (runSingleProjectNetCore)
+    projects |> Seq.iter (log)
+    projects |> Seq.iter (runSingleProject)
 )
 
 Target "NBench" <| fun _ ->
     if (isWindows) then
         // .NET 4.5.2
         let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "src/NBench.Runner/bin/Release/net452/win7-x64"
-        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/net452/NBench.Tests.Performance.dll"
+        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/net452/NBench.Tests.Performance.WithDependencies.dll"
         
         let spec = getBuildParam "spec"
 
@@ -177,7 +149,7 @@ Target "NBench" <| fun _ ->
                     Framework = "netcoreapp1.1"})   
 
         let netCoreNbenchRunner = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/win7-x64/"
-        let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.1/NBench.Tests.Performance.dll"
+        let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
         
         let netCoreNbenchRunnerArgs = new StringBuilder()
                                         |> append netCoreAssembly
@@ -209,7 +181,7 @@ Target "NBench" <| fun _ ->
                     Framework = "netcoreapp1.1"})   
         
         let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/debian.8-x64/dotnet-nbench"
-        let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance/bin/Release/netcoreapp1.1/NBench.Tests.Performance.dll"
+        let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
         
         let linuxNbenchRunnerArgs = new StringBuilder()
                                         |> append linuxPerfAssembly

@@ -1,10 +1,15 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 #if  CORECLR
 using System.Runtime.Loader;
+using Microsoft.Extensions.DependencyModel;
 #endif
 
 namespace NBench.Sdk.Compiler
@@ -43,15 +48,51 @@ namespace NBench.Sdk.Compiler
         /// </summary>
         /// <param name="assemblyPath">The path to an assembly</param>
         /// <returns>The assembly at the specified location</returns>
-        public static Assembly LoadAssembly(string assemblyPath)
+        public static Assembly[] LoadAssembly(string assemblyPath)
         {
 #if CORECLR
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
+            var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            var dependencies = DependencyContext.Load(targetAssembly)
+                .CompileLibraries
+                .Where(dep => dep.Name.ToLower()
+                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
+                .ToList();
+            var assemblies = new List<Assembly> { targetAssembly };
+            assemblies.AddRange(dependencies
+                .SelectMany(d => d.Dependencies
+                    .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
+            assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
+                .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
+            return assemblies.ToArray();
 #else
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
             var targetAssembly = Assembly.LoadFrom(assemblyPath);
-            return targetAssembly;
+            var assemblies = new List<Assembly>();
+            assemblies.Add(targetAssembly);
+            foreach (var dependency in targetAssembly.GetReferencedAssemblies())
+            {
+                assemblies.Add(Assembly.Load(dependency));
+            }
+            return assemblies.ToArray();
 #endif
         }
+
+#if !CORECLR
+        private static Assembly ResolveAssembly(object sender, ResolveEventArgs e, string assemblyPath)
+        {
+            //The name would contain versioning and other information. Let's say you want to load by name.
+            string dllName = e.Name.Split(new[] { ',' })[0] + ".dll";
+            return Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
+        }
+#else
+        private static Assembly DefaultOnResolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName, string assemblyPath)
+        {
+            string dllName = assemblyName.Name.Split(new[] { ',' })[0] + ".dll";
+            return assemblyLoadContext.LoadFromAssemblyPath(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
+        }
+#endif
     }
 }
 

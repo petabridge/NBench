@@ -35,7 +35,6 @@ namespace NBench.Tests.End2End.Reporting
             ".." + Path.DirectorySeparatorChar
             + ".." + Path.DirectorySeparatorChar
             + ".." + Path.DirectorySeparatorChar
-            + ".." + Path.DirectorySeparatorChar
             + ".." + Path.DirectorySeparatorChar;
         private static readonly string _perfResultsPath =
             Path.GetFullPath(_solutionPath + "PerfResults");

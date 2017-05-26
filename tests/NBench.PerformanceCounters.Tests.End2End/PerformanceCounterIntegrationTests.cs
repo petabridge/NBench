@@ -25,7 +25,7 @@ namespace NBench.PerformanceCounters.Tests.End2End
         [Fact]
         public void ShouldPassAllBenchmarks()
         {
-            var benchmarks = _discovery.FindBenchmarks(GetType().Assembly).ToList();
+            var benchmarks = _discovery.FindBenchmarks(new[] { GetType().Assembly }).ToList();
             Assert.True(benchmarks.Count >= 1);
             Benchmark.PrepareForRun(); // force some GC here
             for (var i = 0; i < benchmarks.Count; i++)
