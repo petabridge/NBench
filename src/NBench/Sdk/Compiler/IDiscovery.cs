@@ -30,7 +30,7 @@ namespace NBench.Sdk.Compiler
         /// </summary>
         /// <param name="targetAssembly">The assembly we're going to scan for benchmarks.</param>
         /// <returns>A list of <see cref="Benchmark"/>s we can run based on the classes found inside <paramref name="targetAssembly"/>.</returns>
-        IEnumerable<Benchmark> FindBenchmarks(Assembly[] targetAssembly);
+        IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly);
 
         /// <summary>
         /// Uses reflection on the target assembly to discover <see cref="PerfBenchmarkAttribute"/>

@@ -54,7 +54,7 @@ namespace NBench.Sdk.Compiler
         public RunnerSettings RunnerSettings { get; }
         public IBenchmarkTrace Trace { get; }
 
-        public IEnumerable<Benchmark> FindBenchmarks(Assembly[] targetAssembly)
+        public IEnumerable<Benchmark> FindBenchmarks(Assembly targetAssembly)
         {
             var benchmarkMetaData = ClassesWithPerformanceBenchmarks(targetAssembly).SelectMany(CreateBenchmarksForClass).ToList();
             var benchmarks = new List<Benchmark>(benchmarkMetaData.Count());
@@ -136,13 +136,13 @@ namespace NBench.Sdk.Compiler
         ///     A list of all applicable types that contain at least one method with a
         ///     <see cref="PerfBenchmarkAttribute" />.
         /// </returns>
-        public static IReadOnlyList<TypeInfo> ClassesWithPerformanceBenchmarks(Assembly[] targetAssembly)
+        public static IReadOnlyList<TypeInfo> ClassesWithPerformanceBenchmarks(Assembly targetAssembly)
         {
             Contract.Requires(targetAssembly != null);
             
-            return targetAssembly.SelectMany(y => y.DefinedTypes.Where(
+            return targetAssembly.DefinedTypes.Where(
                 x =>
-                    x.GetMethods().Any(MethodHasValidBenchmark) && !x.IsAbstract && x.IsClass).ToList()).ToList();
+                    x.GetMethods().Any(MethodHasValidBenchmark) && !x.IsAbstract && x.IsClass).ToList();
         }
 
         public static IReadOnlyList<BenchmarkClassMetadata> CreateBenchmarksForClass(Type classWithBenchmarks)

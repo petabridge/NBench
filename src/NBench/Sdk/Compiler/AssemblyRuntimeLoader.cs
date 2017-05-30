@@ -48,7 +48,7 @@ namespace NBench.Sdk.Compiler
         /// </summary>
         /// <param name="assemblyPath">The path to an assembly</param>
         /// <returns>The assembly at the specified location</returns>
-        public static Assembly[] LoadAssembly(string assemblyPath)
+        public static Assembly LoadAssembly(string assemblyPath)
         {
 #if CORECLR
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
@@ -64,7 +64,7 @@ namespace NBench.Sdk.Compiler
                     .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
             assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
                 .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
-            return assemblies.ToArray();
+            return targetAssembly;
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
@@ -75,7 +75,7 @@ namespace NBench.Sdk.Compiler
             {
                 assemblies.Add(Assembly.Load(dependency));
             }
-            return assemblies.ToArray();
+            return targetAssembly;
 #endif
         }
 
