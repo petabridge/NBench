@@ -91,7 +91,7 @@ Target "RunTests" (fun _ ->
                 { p with 
                     WorkingDir = (Directory.GetParent project).FullName
                     TimeOut = TimeSpan.FromMinutes 10. })
-                (sprintf "xunit -parallel none -teamcity -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))   
+                (sprintf "xunit -parallel none -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))   
 
     let projects = 
         match (isWindows) with 
