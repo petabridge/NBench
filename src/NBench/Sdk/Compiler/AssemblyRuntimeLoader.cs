@@ -90,7 +90,7 @@ namespace NBench.Sdk.Compiler
         private static Assembly DefaultOnResolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName, string assemblyPath)
         {
             string dllName = assemblyName.Name.Split(new[] { ',' })[0] + ".dll";
-            Console.WriteLine($"Searching for {dllName} in folder {Path.Combine(Path.GetDirectoryName(assemblyPath))}");
+            //Console.WriteLine($"Searching for {dllName} in folder {Path.Combine(Path.GetDirectoryName(assemblyPath))}");
             return assemblyLoadContext.LoadFromAssemblyPath(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
         }
 #endif
