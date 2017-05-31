@@ -77,7 +77,8 @@ Target "Build" (fun _ ->
             (fun p -> 
                 { p with
                     Project = project
-                    Configuration = configuration })   
+                    Configuration = configuration 
+                    AdditionalArgs = ["--no-incremental"]}) // "Rebuild"  
 
     let projects = !! "./src/**/*.csproj" ++ "./tests/**/*.csproj"
      
