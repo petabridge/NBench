@@ -1,4 +1,22 @@
-#### v1.0.1 March March 29 2017
+#### v1.0.2 May 31 2017
+
+This release resolves issues: [#182](https://github.com/petabridge/NBench/issues/182) and [#192](https://github.com/petabridge/NBench/issues/192) relating to the NBench.Runner.DotNetCli (the NBench Runner that can execute benchmarks for assemblies that target .NET Core).  The root cause was that the runner was unable to execute .NET Core benchmarks that had external dependencies.
+
+Other changes include:
+
+- Integration tests to validate that the above issue is resolved
+- Upgrade to xUnit .NET Core CLI runner (v2.3.0-beta2-build3683) for all NBench unit tests
+- Update .NET Core runtime targets to `netcoreapp1.1`
+
+If you are using the .NET Core CLI runner for NBench and encountered this issue, please be sure to update your `<DotNetCliToolReference>` to v1.0.2:
+
+  ```
+  <ItemGroup>
+    <DotNetCliToolReference Include="NBench.Runner.DotNetCli" Version="1.0.2" />
+  </ItemGroup>
+  ```
+
+#### v1.0.1 March 29 2017
 
 This release resolves an issue with the v1.0.0 NuGet release for NBench.Runner in which clients installing the package via `Install-Package NBench.Runner` were not getting the NBench.dll dependency for NBench.Runner.exe.  NBench.dll is now compiled into NBench.Runner.exe.
 

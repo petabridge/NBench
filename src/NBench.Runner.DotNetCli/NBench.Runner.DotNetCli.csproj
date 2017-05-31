@@ -5,7 +5,7 @@
     <Copyright>Copyright (c) Petabridge https://petabridge.com/</Copyright>
     <AssemblyTitle>NBench</AssemblyTitle>
     <AssemblyName>dotnet-nbench</AssemblyName>
-    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <Authors>Petabridge</Authors>
     <TargetFrameworks>netcoreapp1.1</TargetFrameworks>
     <OutputType>Exe</OutputType>
