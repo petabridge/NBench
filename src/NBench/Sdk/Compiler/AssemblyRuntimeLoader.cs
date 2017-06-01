@@ -53,22 +53,16 @@ namespace NBench.Sdk.Compiler
 #if CORECLR
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
             var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-            //DependencyContext.Load(targetAssembly)
-            //    .CompileLibraries
-            //    .Where(dep => dep.Name.ToLower()
-            //        .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
-            //    .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)));
+            DependencyContext.Load(targetAssembly)
+                .CompileLibraries
+                .Where(dep => dep.Name.ToLower()
+                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
+                .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)));
             return targetAssembly;
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
             var targetAssembly = Assembly.LoadFrom(assemblyPath);
-            var assemblies = new List<Assembly>();
-            assemblies.Add(targetAssembly);
-            foreach (var dependency in targetAssembly.GetReferencedAssemblies())
-            {
-                assemblies.Add(Assembly.Load(dependency));
-            }
             return targetAssembly;
 #endif
         }
