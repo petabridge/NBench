@@ -53,17 +53,11 @@ namespace NBench.Sdk.Compiler
 #if CORECLR
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
             var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-            DependencyContext.Load(targetAssembly)
-                .CompileLibraries
-                .Where(dep => dep.Name.ToLower()
-                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
-                .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)));
-            //var assemblies = new List<Assembly> { targetAssembly };
-            //assemblies.AddRange(dependencies
-            //    .SelectMany(d => d.Dependencies
-            //        
-            //assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
-            //    .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
+            //DependencyContext.Load(targetAssembly)
+            //    .CompileLibraries
+            //    .Where(dep => dep.Name.ToLower()
+            //        .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
+            //    .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)));
             return targetAssembly;
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;
