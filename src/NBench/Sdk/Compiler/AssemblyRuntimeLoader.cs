@@ -53,15 +53,15 @@ namespace NBench.Sdk.Compiler
 #if CORECLR
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
             var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-            //var dependencies = DependencyContext.Load(targetAssembly)
-            //    .CompileLibraries
-            //    .Where(dep => dep.Name.ToLower()
-            //        .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
-            //    .ToList();
+            DependencyContext.Load(targetAssembly)
+                .CompileLibraries
+                .Where(dep => dep.Name.ToLower()
+                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
+                .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)));
             //var assemblies = new List<Assembly> { targetAssembly };
             //assemblies.AddRange(dependencies
             //    .SelectMany(d => d.Dependencies
-            //        .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
+            //        
             //assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
             //    .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
             return targetAssembly;
@@ -82,7 +82,6 @@ namespace NBench.Sdk.Compiler
 #if !CORECLR
         private static Assembly ResolveAssembly(object sender, ResolveEventArgs e, string assemblyPath)
         {
-            //The name would contain versioning and other information. Let's say you want to load by name.
             string dllName = e.Name.Split(new[] { ',' })[0] + ".dll";
             return Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
         }
