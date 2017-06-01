@@ -14,7 +14,7 @@ using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End
 {
-    public class NBenchIntregrationTestWithDependencies
+    public class NBenchIntregrationTestWithDependencies : IDisposable
     {
         private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => { }, results =>
         {
@@ -24,7 +24,7 @@ namespace NBench.Tests.End2End
             }
         });
 
-        private readonly IDiscovery _discovery = new ReflectionDiscovery(_benchmarkOutput);
+        private IDiscovery _discovery = new ReflectionDiscovery(_benchmarkOutput);
 
         private readonly ITestOutputHelper _output;
 
@@ -76,6 +76,14 @@ namespace NBench.Tests.End2End
 
             package.Validate();
             return package;
+        }
+
+        public void Dispose()
+        {
+            if (_discovery != null)
+            {
+                _discovery = null;
+            }
         }
     }
 }
