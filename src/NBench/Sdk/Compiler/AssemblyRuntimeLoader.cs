@@ -53,17 +53,17 @@ namespace NBench.Sdk.Compiler
 #if CORECLR
             AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
             var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-            var dependencies = DependencyContext.Load(targetAssembly)
-                .CompileLibraries
-                .Where(dep => dep.Name.ToLower()
-                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
-                .ToList();
-            var assemblies = new List<Assembly> { targetAssembly };
-            assemblies.AddRange(dependencies
-                .SelectMany(d => d.Dependencies
-                    .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
-            assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
-                .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
+            //var dependencies = DependencyContext.Load(targetAssembly)
+            //    .CompileLibraries
+            //    .Where(dep => dep.Name.ToLower()
+            //        .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
+            //    .ToList();
+            //var assemblies = new List<Assembly> { targetAssembly };
+            //assemblies.AddRange(dependencies
+            //    .SelectMany(d => d.Dependencies
+            //        .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)))));
+            //assemblies.AddRange(targetAssembly.GetReferencedAssemblies()
+            //    .Select(r => AssemblyLoadContext.Default.LoadFromAssemblyName(r)));
             return targetAssembly;
 #else
             AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -90,7 +90,6 @@ namespace NBench.Sdk.Compiler
         private static Assembly DefaultOnResolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName, string assemblyPath)
         {
             string dllName = assemblyName.Name.Split(new[] { ',' })[0] + ".dll";
-            //Console.WriteLine($"Searching for {dllName} in folder {Path.Combine(Path.GetDirectoryName(assemblyPath))}");
             return assemblyLoadContext.LoadFromAssemblyPath(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
         }
 #endif

@@ -86,6 +86,18 @@ Target "Build" (fun _ ->
 )
 
 Target "RunTests" (fun _ ->
+    let sampleBenchmarProjects = !! "./tests/**/NBench.Tests.Performance.csproj"
+                                 ++ "./tests/**/NBench.Tests.Performance.WithDependencies.csproj"
+                                 ++ "./tests/**/NBench.Tests.Assembly.csproj"
+    
+    sampleBenchmarProjects |> Seq.iter (fun proj ->
+        DotNetCli.Build
+            (fun p ->
+                { p with
+                    Project = proj
+                    Configuration = configuration
+                    AdditionalArgs = ["--no-incremental"]}))
+
     let runSingleProject project =
         DotNetCli.RunCommand
             (fun p -> 
