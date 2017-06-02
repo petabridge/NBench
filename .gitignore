@@ -204,3 +204,4 @@ build/
 .nuget/
 .dotnet/
 .idea/.idea.NBench.NetCore/.idea/*
+launchSettings.json

@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyTitle>Akka.Tests.Performance</AssemblyTitle>
+    <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="App.config" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <Reference Include="Akka">
+      <HintPath>..\dependencies\Akka\netstandard1.6\Akka.dll</HintPath>
+    </Reference>
+    <Reference Include="Akka.TestKit">
+      <HintPath>..\dependencies\Akka.TestKit\netstandard1.6\Akka.TestKit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Reference Include="Akka">
+      <HintPath>..\dependencies\Akka\net45\Akka.dll</HintPath>
+    </Reference>
+    <Reference Include="Akka.TestKit">
+      <HintPath>..\dependencies\Akka.TestKit\net45\Akka.TestKit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+
+</Project>

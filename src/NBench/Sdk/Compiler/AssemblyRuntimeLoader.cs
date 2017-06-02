@@ -1,10 +1,15 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 #if  CORECLR
 using System.Runtime.Loader;
+using Microsoft.Extensions.DependencyModel;
 #endif
 
 namespace NBench.Sdk.Compiler
@@ -46,12 +51,35 @@ namespace NBench.Sdk.Compiler
         public static Assembly LoadAssembly(string assemblyPath)
         {
 #if CORECLR
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            AssemblyLoadContext.Default.Resolving += (assemblyLoadContext, assemblyName) => DefaultOnResolving(assemblyLoadContext, assemblyName, assemblyPath);
+            var targetAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            DependencyContext.Load(targetAssembly)
+                .CompileLibraries
+                .Where(dep => dep.Name.ToLower()
+                    .Contains(targetAssembly.FullName.Split(new[] { ',' })[0].ToLower()))
+                .Select(dependency => AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(dependency.Name)));
+            return targetAssembly;
 #else
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += ((sender, e) => ResolveAssembly(sender, e, assemblyPath));
             var targetAssembly = Assembly.LoadFrom(assemblyPath);
             return targetAssembly;
 #endif
         }
+
+#if !CORECLR
+        private static Assembly ResolveAssembly(object sender, ResolveEventArgs e, string assemblyPath)
+        {
+            string dllName = e.Name.Split(new[] { ',' })[0] + ".dll";
+            return Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
+        }
+#else
+        private static Assembly DefaultOnResolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName, string assemblyPath)
+        {
+            string dllName = assemblyName.Name.Split(new[] { ',' })[0] + ".dll";
+            return assemblyLoadContext.LoadFromAssemblyPath(Path.Combine(Path.GetDirectoryName(assemblyPath), dllName));
+        }
+#endif
     }
 }
 
