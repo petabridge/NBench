@@ -320,14 +320,12 @@ let createNugetPackages _ =
     let getReleaseFiles project releaseDir =
         match project with
         | "NBench.Runner" -> 
-            !! (releaseDir @@ project + ".dll")
-            ++ (releaseDir @@ "NBench.dll")
-            ++ (releaseDir @@ project + ".exe")
-            ++ (releaseDir @@ project + ".pdb")
-            ++ (releaseDir @@ "NBench.pdb")
-            ++ (releaseDir @@ project + ".xml")
-        | "NBench.Runner.DotNetCli" ->
-            !! (releaseDir @@ "*")
+            !! (releaseDir @@ "net452" @@ project + ".dll")
+            ++ (releaseDir @@ "net452" @@ "NBench.dll")
+            ++ (releaseDir @@ "net452" @@ project + ".exe")
+            ++ (releaseDir @@ "net452" @@ project + ".pdb")
+            ++ (releaseDir @@ "net452" @@ "NBench.pdb")
+            ++ (releaseDir @@ "net452" @@ project + ".xml")
         | _ ->
             !! (releaseDir @@ project + ".dll")
             ++ (releaseDir @@ project + ".exe")
@@ -336,12 +334,6 @@ let createNugetPackages _ =
 
     CleanDir workingDir
 
-    let releaseDirLookup nuspecFile =
-        match Path.GetFileName nuspecFile with
-        | "NBench.Runner.nuspec" -> @"bin\Release\net452\win7-x64"
-        | "NBench.Runner.DotNetCli.nuspec" -> @"bin\Release\netcoreapp1.1\win7-x64"
-        | _ -> @"bin\Release\"
-
     ensureDirectory nugetDir
     for nuspec in !! "src/**/*.nuspec" do
         printfn "Creating nuget packages for %s" nuspec
@@ -349,7 +341,7 @@ let createNugetPackages _ =
         let project = Path.GetFileNameWithoutExtension nuspec 
         let projectDir = Path.GetDirectoryName nuspec
         let projectFile = (!! (projectDir @@ project + ".*sproj")) |> Seq.head
-        let releaseDir = projectDir @@ (releaseDirLookup nuspec)
+        let releaseDir = projectDir @@ @"bin\Release\"
         let packages = projectDir @@ "packages.config"
         let packageDependencies = if (fileExists packages) then (getNBenchDependencies packages) else []
         let dependencies = packageDependencies @ getNBenchDependencies project
@@ -374,7 +366,7 @@ let createNugetPackages _ =
                 nuspec
 
         // Copy dll, pdb and xml to libdir = workingDir/lib/net45/
-        let libDir = workingDir @@ @"lib\net45"
+        let libDir = workingDir @@ @"lib\"
         printfn "Creating output directory %s" libDir
         ensureDirectory libDir
         CleanDir libDir
