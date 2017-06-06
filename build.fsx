@@ -115,6 +115,7 @@ Target "Build" (fun _ ->
                     Project = x
                     Configuration = configuration
                     Runtime = "debian.8-x64"
+                    Framework = "netcoreapp1.1"
                     AdditionalArgs = ["--no-incremental"]}))
 )
 
@@ -178,23 +179,23 @@ Target "NBench" <| fun _ ->
             info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
     
-        //// .NET Core
-        //let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
-        //DotNetCli.Restore
-        //    (fun p ->
-        //        { p with
-        //            Project = netCoreNbenchRunnerProject
-        //            AdditionalArgs = ["-r win7-x64"] })
-        //// build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
-        //DotNetCli.Build
-        //    (fun p -> 
-        //        { p with
-        //            Project = netCoreNbenchRunnerProject
-        //            Configuration = configuration 
-        //            Runtime = "win7-x64"
-        //            Framework = "netcoreapp1.1"})   
+        // .NET Core
+        let netCoreNbenchRunnerProject = "./src/NBench.Runner/NBench.Runner.csproj"
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    AdditionalArgs = ["-r win7-x64"] })
+        // build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
+        DotNetCli.Build
+            (fun p -> 
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    Configuration = configuration 
+                    Runtime = "win7-x64"
+                    Framework = "netcoreapp1.1"})   
 
-        let netCoreNbenchRunner = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/win7-x64/"
+        let netCoreNbenchRunner = findToolInSubPath "NBench.Runner.exe" "/src/NBench.Runner/bin/Release/netcoreapp1.1/win7-x64/"
         let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
         
         let netCoreNbenchRunnerArgs = new StringBuilder()
@@ -226,7 +227,7 @@ Target "NBench" <| fun _ ->
                     Runtime = "debian.8-x64"
                     Framework = "netcoreapp1.1"})   
         
-        let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/debian.8-x64/dotnet-nbench"
+        let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/debian.8-x64/NBench.Runner"
         let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
         
         let linuxNbenchRunnerArgs = new StringBuilder()

@@ -8,8 +8,8 @@
     <VersionPrefix>1.0.2</VersionPrefix>
     <Authors>Petabridge</Authors>
     <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
-    <OutputType>Exe</OutputType>   
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <OutputType>Exe</OutputType>
+    <RuntimeIdentifiers>win7-x64;osx.10.10-x64;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64</RuntimeIdentifiers>
     <PackageId>NBench.Runner</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
     <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
