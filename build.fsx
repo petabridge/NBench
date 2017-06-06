@@ -345,10 +345,6 @@ let createNugetPackages _ =
                 ++ (releaseDir @@ "net452"  @@ project + ".pdb")
                 ++ (releaseDir @@ "net452"  @@ project + ".xml"), "net452")
             |]
-
-    
-    let copyFilesToLibFolder libDir files =
-        files |> Seq.iter (fun (files, subFolder) -> CopyFiles (libDir @@ subFolder) files) 
    
     CleanDir workingDir
 
@@ -383,7 +379,10 @@ let createNugetPackages _ =
                         Dependencies = dependencies })
                 nuspec
 
-        // Copy dll, pdb and xml to libdir = workingDir/lib/net45/
+        // Copy dll, pdb and xml to libdir = workingDir/lib/net45/            
+        let copyFilesToLibFolder libDir files =
+            files |> Seq.iter (fun (files, subFolder) -> CopyFiles (libDir @@ subFolder) files) 
+
         let libDir = workingDir @@ @"lib\"
         printfn "Creating output directory %s" libDir
         ensureDirectory libDir
