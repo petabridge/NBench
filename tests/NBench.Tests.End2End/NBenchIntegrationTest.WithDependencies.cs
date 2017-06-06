@@ -13,64 +13,8 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End
-{
-    public class NBenchIntregrationTestWithDependenciesBenchmarks : IDisposable
+{    public class NBenchIntregrationTestWithDependenciesLoadAssembly
     {
-        private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => { }, results =>
-        {
-            foreach (var assertion in results.AssertionResults)
-            {
-                Assert.True(assertion.Passed, results.BenchmarkName + " " + assertion.Message);
-            }
-        });
-
-        private IDiscovery _discovery = new ReflectionDiscovery(_benchmarkOutput);
-
-        private readonly ITestOutputHelper _output;
-
-        public NBenchIntregrationTestWithDependenciesBenchmarks(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
-        [Fact]
-        public void ShouldPassAllBenchmarks()
-        {
-            if (!TestRunner.IsMono) // this spec currently hits a runtime exception with Mono: https://bugzilla.xamarin.com/show_bug.cgi?id=43291
-            {
-                var benchmarks = _discovery.FindBenchmarks(GetType().GetTypeInfo().Assembly).ToList();
-                Assert.True(benchmarks.Count >= 1);
-                Benchmark.PrepareForRun(); // force some GC here
-                for (var i = 0; i < benchmarks.Count; i++)
-                {
-                    Benchmark.PrepareForRun(); // force some GC here
-                    benchmarks[i].Run();
-                    benchmarks[i].Finish();
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            if (_discovery != null)
-            {
-                _discovery = null;
-            }
-        }
-    }
-
-    public class NBenchIntregrationTestWithDependenciesLoadAssembly : IDisposable
-    {
-        private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => { }, results =>
-        {
-            foreach (var assertion in results.AssertionResults)
-            {
-                Assert.True(assertion.Passed, results.BenchmarkName + " " + assertion.Message);
-            }
-        });
-
-        private IDiscovery _discovery = new ReflectionDiscovery(_benchmarkOutput);
-
         private readonly ITestOutputHelper _output;
 
         public NBenchIntregrationTestWithDependenciesLoadAssembly(ITestOutputHelper output)
@@ -88,7 +32,7 @@ namespace NBench.Tests.End2End
             Assert.Equal(0, result.IgnoredTestsCount);
         }
 
-        private TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
 #if CORECLR
 		    var assemblySubfolder = "netstandard1.6";
@@ -104,14 +48,6 @@ namespace NBench.Tests.End2End
 
             package.Validate();
             return package;
-        }
-
-        public void Dispose()
-        {
-            if (_discovery != null)
-            {
-                _discovery = null;
-            }
         }
     }
 }
