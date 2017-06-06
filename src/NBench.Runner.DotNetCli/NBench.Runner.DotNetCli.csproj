@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NBench\NBench.csproj" />
+    <!--<PackageReference Include="NBench" Version="1.0.2" />-->
   </ItemGroup>
 
 </Project>
