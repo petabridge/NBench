@@ -235,7 +235,7 @@ Target "NBench" <| fun _ ->
                     Runtime = "debian.8-x64"
                     Framework = "netcoreapp1.1"})   
         
-        let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/debian.8-x64/NBench.Runner"
+        let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner/bin/Release/netcoreapp1.1/debian.8-x64/NBench.Runner"
         let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
         
         let linuxNbenchRunnerArgs = new StringBuilder()
@@ -315,6 +315,21 @@ Target "CleanNuget" (fun _ ->
 // Publish to nuget.org if nugetkey is specified
 
 let createNugetPackages _ =
+    
+    // For NBench and NBench.Performance counters we use dotnet pack
+    // because it takes care of the output folder structure
+    let netstandardProjects = [ "./src/NBench/NBench.csproj"; 
+                                "./src/NBench.PerformanceCounters/NBench.PerformanceCounters.csproj"]
+
+    netstandardProjects |> List.iter (fun proj ->
+        DotNetCli.Pack
+            (fun p -> 
+                { p with
+                    Project = proj
+                    Configuration = configuration
+                    AdditionalArgs = ["--include-symbols"]
+                    OutputPath = outputNuGet }))
+    
     let mutable dirName = 1
     let removeDir dir = 
         let del _ = 
@@ -349,7 +364,8 @@ let createNugetPackages _ =
     CleanDir workingDir
 
     ensureDirectory nugetDir
-    for nuspec in !! "src/**/*.nuspec" do
+    // we only do this with NBench.Runner.nuspec
+    for nuspec in !! "src/**/NBench.Runner.nuspec" do
         printfn "Creating nuget packages for %s" nuspec
         
         let project = Path.GetFileNameWithoutExtension nuspec 
