@@ -80,19 +80,42 @@ Target "Build" (fun _ ->
                     Configuration = configuration 
                     AdditionalArgs = ["--no-incremental"]}) // "Rebuild"  
 
-    let projects = !! "./src/**/*.csproj" 
-                   ++ "./tests/**/*.csproj"
-                   -- "./src/**/NBench.Runner.DotNetCli.csproj"
+    let assemblies = !! "./src/**/*.csproj" 
+                     ++ "./tests/**/*.csproj"
+                     -- "./src/**/NBench.Runner.DotNetCli.csproj" // no longer building this proj
+                     -- "./src/**/NBench.Runner.csproj"
      
-    projects |> Seq.iter (runSingleProject)
+    assemblies |> Seq.iter (runSingleProject)
     
-    DotNetCli.Build
-        (fun p ->
-            { p with
-                Project = Seq.head (!! "./src/**/NBench.Runner.DotNetCli.csproj")
-                Configuration = configuration
-                Runtime = "win7-x64"
-                AdditionalArgs = ["--no-incremental"]})
+    let runners = !! "./src/**/NBench.Runner.csproj"
+
+    // build win7-x64 target 
+    runners |> Seq.iter (fun x ->
+        DotNetCli.Build
+            (fun p ->
+                { p with
+                    Project = x
+                    Configuration = configuration
+                    AdditionalArgs = ["--no-incremental"]}))
+    
+    // make sure we build a debian.8-x64 runtime as well
+    // must restore for debian before building for debian
+    runners |> Seq.iter (fun x ->
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = x
+                    AdditionalArgs = ["-r debian.8-x64"] }))
+
+    // build for debian
+    runners |> Seq.iter (fun x ->
+        DotNetCli.Build
+            (fun p ->
+                { p with
+                    Project = x
+                    Configuration = configuration
+                    Runtime = "debian.8-x64"
+                    AdditionalArgs = ["--no-incremental"]}))
 )
 
 Target "RunTests" (fun _ ->
@@ -155,21 +178,21 @@ Target "NBench" <| fun _ ->
             info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
     
-        // .NET Core
-        let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
-        DotNetCli.Restore
-            (fun p ->
-                { p with
-                    Project = netCoreNbenchRunnerProject
-                    AdditionalArgs = ["-r win7-x64"] })
-        // build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
-        DotNetCli.Build
-            (fun p -> 
-                { p with
-                    Project = netCoreNbenchRunnerProject
-                    Configuration = configuration 
-                    Runtime = "win7-x64"
-                    Framework = "netcoreapp1.1"})   
+        //// .NET Core
+        //let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
+        //DotNetCli.Restore
+        //    (fun p ->
+        //        { p with
+        //            Project = netCoreNbenchRunnerProject
+        //            AdditionalArgs = ["-r win7-x64"] })
+        //// build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
+        //DotNetCli.Build
+        //    (fun p -> 
+        //        { p with
+        //            Project = netCoreNbenchRunnerProject
+        //            Configuration = configuration 
+        //            Runtime = "win7-x64"
+        //            Framework = "netcoreapp1.1"})   
 
         let netCoreNbenchRunner = findToolInSubPath "dotnet-nbench.exe" "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/win7-x64/"
         let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"

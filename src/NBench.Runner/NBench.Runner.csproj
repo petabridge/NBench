@@ -7,7 +7,7 @@
     <AssemblyName>NBench.Runner</AssemblyName>
     <VersionPrefix>1.0.2</VersionPrefix>
     <Authors>Petabridge</Authors>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
     <OutputType>Exe</OutputType>   
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <PackageId>NBench.Runner</PackageId>
@@ -23,8 +23,12 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+  </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\NBench\NBench.csproj" Condition="'$(TargetFramework)' == 'net452'" />
+    <ProjectReference Include="..\NBench\NBench.csproj" />
   </ItemGroup>
   
 </Project>
