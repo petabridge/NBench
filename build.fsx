@@ -89,6 +89,13 @@ Target "Build" (fun _ ->
     
     let runners = !! "./src/**/NBench.Runner.csproj"
 
+    runners |> Seq.iter (fun x ->
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = x
+                    AdditionalArgs = ["-r win7-x64"] }))
+
     // build win7-x64 target 
     runners |> Seq.iter (fun x ->
         DotNetCli.Build
@@ -96,6 +103,7 @@ Target "Build" (fun _ ->
                 { p with
                     Project = x
                     Configuration = configuration
+                    Runtime = "win7-x64"
                     AdditionalArgs = ["--no-incremental"]}))
     
     // make sure we build a debian.8-x64 runtime as well
@@ -320,18 +328,28 @@ let createNugetPackages _ =
     let getReleaseFiles project releaseDir =
         match project with
         | "NBench.Runner" -> 
-            !! (releaseDir @@ "net452" @@ project + ".dll")
-            ++ (releaseDir @@ "net452" @@ "NBench.dll")
-            ++ (releaseDir @@ "net452" @@ project + ".exe")
-            ++ (releaseDir @@ "net452" @@ project + ".pdb")
-            ++ (releaseDir @@ "net452" @@ "NBench.pdb")
-            ++ (releaseDir @@ "net452" @@ project + ".xml")
+            [|
+                (!! (releaseDir @@ "net452" @@ "win7-x64" @@ project + ".dll")
+                    ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ "NBench.dll")
+                    ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ project + ".exe")
+                    ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ project + ".pdb")
+                    ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ "NBench.pdb")
+                    ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ project + ".xml"), "net452");
+                (!! (releaseDir @@ "netcoreapp1.1" @@ "win7-x64" @@ "*"), "netcoreapp1.1" @@ "win7-x64");
+                (!! (releaseDir @@ "netcoreapp1.1" @@ "debian.8-x64" @@ "*"), "netcoreapp1.1" @@ "debian.8-x64")                 
+            |]
         | _ ->
-            !! (releaseDir @@ project + ".dll")
-            ++ (releaseDir @@ project + ".exe")
-            ++ (releaseDir @@ project + ".pdb")
-            ++ (releaseDir @@ project + ".xml")
+            [| 
+                (!! (releaseDir @@ "net452" @@ project + ".dll")
+                ++ (releaseDir @@ "net452"  @@ project + ".exe")
+                ++ (releaseDir @@ "net452"  @@ project + ".pdb")
+                ++ (releaseDir @@ "net452"  @@ project + ".xml"), "net452")
+            |]
 
+    
+    let copyFilesToLibFolder libDir files =
+        files |> Seq.iter (fun (files, subFolder) -> CopyFiles (libDir @@ subFolder) files) 
+   
     CleanDir workingDir
 
     ensureDirectory nugetDir
@@ -371,7 +389,7 @@ let createNugetPackages _ =
         ensureDirectory libDir
         CleanDir libDir
         getReleaseFiles project releaseDir
-        |> CopyFiles libDir // TODO: this is where to glob all releases together
+        |> copyFilesToLibFolder libDir
 
         // Copy all src-files (.cs and .fs files) to workingDir/src
         let nugetSrcDir = workingDir @@ @"src/"
