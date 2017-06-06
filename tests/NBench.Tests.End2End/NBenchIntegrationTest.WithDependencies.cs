@@ -14,7 +14,7 @@ using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End
 {
-    public class NBenchIntregrationTestWithDependencies : IDisposable
+    public class NBenchIntregrationTestWithDependenciesBenchmarks : IDisposable
     {
         private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => { }, results =>
         {
@@ -28,7 +28,7 @@ namespace NBench.Tests.End2End
 
         private readonly ITestOutputHelper _output;
 
-        public NBenchIntregrationTestWithDependencies(ITestOutputHelper output)
+        public NBenchIntregrationTestWithDependenciesBenchmarks(ITestOutputHelper output)
         {
             _output = output;
         }
@@ -50,6 +50,34 @@ namespace NBench.Tests.End2End
             }
         }
 
+        public void Dispose()
+        {
+            if (_discovery != null)
+            {
+                _discovery = null;
+            }
+        }
+    }
+
+    public class NBenchIntregrationTestWithDependenciesLoadAssembly : IDisposable
+    {
+        private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => { }, results =>
+        {
+            foreach (var assertion in results.AssertionResults)
+            {
+                Assert.True(assertion.Passed, results.BenchmarkName + " " + assertion.Message);
+            }
+        });
+
+        private IDiscovery _discovery = new ReflectionDiscovery(_benchmarkOutput);
+
+        private readonly ITestOutputHelper _output;
+
+        public NBenchIntregrationTestWithDependenciesLoadAssembly(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public void LoadAssemblyCorrect()
         {
@@ -60,7 +88,7 @@ namespace NBench.Tests.End2End
             Assert.Equal(0, result.IgnoredTestsCount);
         }
 
-        private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        private TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
 #if CORECLR
 		    var assemblySubfolder = "netstandard1.6";
