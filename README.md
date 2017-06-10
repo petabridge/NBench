@@ -55,31 +55,55 @@ After defining some NBench `PerfBenchmark` methods and declaring some measuremen
 
 ### .NET 4.5.2 Runner
 
-To install the .NET 4.5.2 NBench runner via NuGet:
+The NBench Runner NuGet package now contains executables that support .NET 4.5.2, .NET Core 1.1/win7-x64, and .NET Core 1.1/debian8-x64 benchmark assembly targets.  Before v1.0.3, you would expect the NBench.Runner NuGet package to contain a single executable that works with .NET 4.5.2:
+
+```
+lib/
+    net45/
+        NBench.Runner.exe
+```
+
+With the additional .NET Core executables, you will now get two additional subfolders in your downloaded package:
+
+```
+lib/
+    net452/
+        NBench.Runner.exe
+    netcoreapp1.1/
+        win7-x64/
+            NBench.Runner.exe
+        debian8-x64/
+            NBench.Runner
+```
+
+You may choose the appropriate executable for your benchmark assembly/architecture combination
+
+To install and execute the NBench Runner against a .NET 4.5.2 benchmark assembly, you would execute the following:
 
 ```
 PS> Install-Package NBench.Runner
-PS> .\packages\NBench.Runner\NBench.Runner.exe .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
+PS> <--packageLocation-->\NBench.Runner\lib\net452\NBench.Runner.exe <--benchmarkProjectLocation-->\bin\Debug\net452\MyPerfTests.dll output-directory="C:\Perf"
 ```
+
 And this command will run your `PerfBenchmark` and write output [that looks like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf) to a markdown file in the `output-directory`.
 
 ### .NET Core Runner
 
-NBench 1.0.0 has a separate runner for projects that target .NET Core 1.0.  It is installed on a per-project basis via NuGet by adding a `<DotNetCliToolReference>` to your test project's `.csproj` file:
+If you have compiled a benchmark assembly that targets .NET Core 1.1, you may use the appropriate executable from the lib/netcoreap1.1 folder of the downloaded NBench.Runner NuGet package;
+
+On 64-bit Windows:
 
 ```
-<ItemGroup>
-    <DotNetCliToolReference Include="NBench.Runner.DotNetCli" Version="1.0.0" />
-</ItemGroup>
+PS> Install-Package NBench.Runner
+PS> <--packageLocation-->\NBench.Runner\lib\netcoreapp1.1\win7-x64\NBench.Runner.exe <--benchmarkProjectLocation-->\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf"
 ```
 
-After adding this reference, run `dotnet restore` and the NBench .NET Core runner will be installed for your project.  To run the tests, open a command prompt and navigate to the project's parent folder.  You can now run the following command, passing the same arguments as `NBench.Runner.exe`:
+On 64-bit Debian 8:
 
 ```
-PS> dotnet nbench .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf"
+PS> Install-Package NBench.Runner
+PS> <--packageLocation-->\NBench.Runner\lib\netcoreapp1.1\debian8-x64\NBench.Runner.exe <--benchmarkProjectLocation-->\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf"
 ```
-
-**NOTE:** Your shell's working directory must be inside the folder containing the .csproj file with the above `<DotNetCliToolReference>` in order to run `dotnet nbench`.
 
 ## Command Line Parameters
 ```
