@@ -1,3 +1,50 @@
+#### v1.0.3 June 7 2017
+
+This release resolves issues with NuGet deployment of the dedicated NBench.Runner.DotNetCli runner that was originally designed to be used for .NET Core projects.  The issue is detailed by [#200](https://github.com/petabridge/NBench/issues/200) and resolved with PR [#201](https://github.com/petabridge/NBench/pull/201).
+
+Important breaking change:
+
+NBench.Runner.DotNetCli is being deprecated (temporarily) as the supported means of running the NBench runner with a benchmark assembly that targets .NET Core.  Instead, the original [NBench.Runner](https://www.nuget.org/packages/NBench.Runner/) will come packaged with 2 additional executables that are compatible with .NET Core.  Originally, per the instructions on the README, to run the **.NET 4.5.2** you would run the following commands:
+
+```
+PS> Install-Package NBench.Runner
+PS> .\packages\NBench.Runner\NBench.Runner.exe .\src\bin\Debug\MyPerfTests.dll output-directory="C:\Perf
+```
+
+Since the new NBench.Runner NuGet package ships the additional .NET Core runner, the folder structure of the downloaded runner is as follows:
+
+lib/
+    net452/
+        NBench.Runner.exe
+    netcoreapp1.1/
+        win7-x64/
+            NBench.Runner.exe
+        debian8-x64/
+            NBench.Runner
+
+The above way to run the .NET 4.5.2 runner, hence, changes to:
+
+```
+PS> Install-Package NBench.Runner
+PS> .\packages\NBench.Runner\lib\net452\NBench.Runner.exe .\src\bin\Debug\net452\MyPerfTests.dll output-directory="C:\Perf
+```
+
+For .NET Core support (meaning running a benchmark that has been targeted for `netcoreapp1.1` or `netstandard1.6`, you will run the appropriate NBench.Runner.exe for your architecture:
+
+```
+PS> Install-Package NBench.Runner
+PS> .\packages\NBench.Runner\lib\netcoreapp1.1\win7-x64\NBench.Runner.exe .\src\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf
+```
+
+or, on Debian 8:
+
+```
+PS> Install-Package NBench.Runner
+PS> .\packages\NBench.Runner\lib\netcoreapp1.1\debian8-x64\NBench.Runner.exe .\src\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf
+```
+
+Plans will be made to re-introduce support for NBench.Runner.DotNetCli which allows for the usage of NBench as a `DotNetCliToolReference`.
+
 #### v1.0.2 May 31 2017
 
 This release resolves issues: [#182](https://github.com/petabridge/NBench/issues/182) and [#192](https://github.com/petabridge/NBench/issues/192) relating to the NBench.Runner.DotNetCli (the NBench Runner that can execute benchmarks for assemblies that target .NET Core).  The root cause was that the runner was unable to execute .NET Core benchmarks that had external dependencies.
