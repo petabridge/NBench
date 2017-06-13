@@ -106,6 +106,16 @@ Target "Build" (fun _ ->
                     Runtime = "win7-x64"
                     AdditionalArgs = ["--no-incremental"]}))
     
+    runners |> Seq.iter (fun x ->
+        DotNetCli.Publish
+            (fun p ->
+                { p with
+                    Project = x
+                    Configuration = configuration
+                    Runtime = "win7-x64"
+                    Framework = "netcoreapp1.1"
+                    Output = Path.GetDirectoryName(x) @@ "bin" @@ "Release" @@ "netcoreapp1.1" @@ "win7-x64" @@ "publish"}))
+    
     // make sure we build a debian.8-x64 runtime as well
     // must restore for debian before building for debian
     runners |> Seq.iter (fun x ->
@@ -125,6 +135,16 @@ Target "Build" (fun _ ->
                     Runtime = "debian.8-x64"
                     Framework = "netcoreapp1.1"
                     AdditionalArgs = ["--no-incremental"]}))
+    
+    runners |> Seq.iter (fun x ->
+        DotNetCli.Publish
+            (fun p ->
+                { p with
+                    Project = x
+                    Configuration = configuration
+                    Runtime = "debian.8-x64"
+                    Framework = "netcoreapp1.1"
+                    Output = Path.GetDirectoryName(x) @@ "bin" @@ "Release" @@ "netcoreapp1.1" @@ "debian.8-x64" @@ "publish"}))
 )
 
 Target "RunTests" (fun _ ->
@@ -326,7 +346,7 @@ let createNugetPackages _ =
             (fun p -> 
                 { p with
                     Project = proj
-                    Configuration = configuration
+                    Configuration = configuration                    
                     AdditionalArgs = ["--include-symbols"]
                     OutputPath = outputNuGet }))
     
@@ -350,8 +370,8 @@ let createNugetPackages _ =
                     ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ project + ".pdb")
                     ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ "NBench.pdb")
                     ++ (releaseDir @@ "net452" @@ "win7-x64"  @@ project + ".xml"), "net452");
-                (!! (releaseDir @@ "netcoreapp1.1" @@ "win7-x64" @@ "*"), "netcoreapp1.1" @@ "win7-x64");
-                (!! (releaseDir @@ "netcoreapp1.1" @@ "debian.8-x64" @@ "*"), "netcoreapp1.1" @@ "debian.8-x64")                 
+                (!! (releaseDir @@ "netcoreapp1.1" @@ "win7-x64" @@ "publish" @@ "*"), "netcoreapp1.1" @@ "win7-x64");
+                (!! (releaseDir @@ "netcoreapp1.1" @@ "debian.8-x64" @@ "publish" @@ "*"), "netcoreapp1.1" @@ "debian.8-x64")                 
             |]
         | _ ->
             [| 
