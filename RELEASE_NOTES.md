@@ -1,3 +1,7 @@
+#### v1.0.4 June 14 2017
+
+This release resolves an issue with NuGet deployment of our .NET Core versions of the NBench.Runner executable.  As a standalone .NET Core executable, the .NET Core runtime must be packaged in the same folder as the .exe.  This release ensures that the .NET Core runtime is downloaded along with our .NET Core NBench Runner executables. 
+
 #### v1.0.3 June 7 2017
 
 This release resolves issues with NuGet deployment of the dedicated NBench.Runner.DotNetCli runner that was originally designed to be used for .NET Core projects.  The issue is detailed by [#200](https://github.com/petabridge/NBench/issues/200) and resolved with PR [#201](https://github.com/petabridge/NBench/pull/201).
