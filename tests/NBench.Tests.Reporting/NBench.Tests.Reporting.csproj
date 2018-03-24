@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\NBench\NBench.csproj" />
+    <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
   </ItemGroup>
 
   <ItemGroup>
