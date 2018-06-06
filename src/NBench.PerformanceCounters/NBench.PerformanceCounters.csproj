@@ -1,24 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="..\common.props" />
   <PropertyGroup>
-    <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
-    <Copyright>Copyright (c) Petabridge https://petabridge.com/</Copyright>
-    <AssemblyTitle>NBench</AssemblyTitle>
-    <VersionPrefix>1.0.4</VersionPrefix>
-    <Authors>Petabridge</Authors>
+    <Description>Windows only. Adds performance counter support to NBench measurements.</Description>
+    <AssemblyTitle>NBench.PerformanceCounters</AssemblyTitle>
     <TargetFramework>net452</TargetFramework>
     <AssemblyName>NBench.PerformanceCounters</AssemblyName>
     <PackageId>NBench.PerformanceCounters</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
-    <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/petabridge/NBench</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/petabridge/NBench/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,9 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>0.5.3</VersionPrefix>
-    <PackageReleaseNotes>Upgraded `Phobos.Monitoring.PCF` to use the latest [`Petabridge.Monitoring.PCF` driver](https://github.com/petabridge/Petabridge.Monitoring.PCF)
-Modified `Phobos.Monitoring.PCF` such that it gracefully fails over to a `NoOpMetricRecorder` if you try to launch it inside a non-PCF environment, where none of the necessary environment variables are populated.</PackageReleaseNotes>
+    <VersionPrefix>1.0.4</VersionPrefix>
+    <PackageReleaseNotes>This release resolves an issue with NuGet deployment of our .NET Core versions of the NBench.Runner executable.  As a standalone .NET Core executable, the .NET Core runtime must be packaged in the same folder as the .exe.  This release ensures that the .NET Core runtime is downloaded along with our .NET Core NBench Runner executables.</PackageReleaseNotes>
     <PackageIconUrl>https://phobos.petabridge.com/images/phobos_profile_icon.png</PackageIconUrl>
     <PackageProjectUrl>
       https://github.com/petabridge/NBench
@@ -12,8 +11,11 @@ Modified `Phobos.Monitoring.PCF` such that it gracefully fails over to a `NoOpMe
     <PackageLicenseUrl>
       https://github.com/petabridge/NBench/blob/dev/LICENSE
     </PackageLicenseUrl>
-    <Tags>akka.net phobos monitoring statsd</Tags>
+    <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
     <AkkaVersion>1.3.5</AkkaVersion>

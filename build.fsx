@@ -1,6 +1,5 @@
 #I @"tools/FAKE/tools"
 #r "FakeLib.dll"
-#r "Newtonsoft.Json.dll"
 
 open System
 open System.IO
@@ -9,10 +8,14 @@ open System.Text
 open Fake
 open Fake.DotNetCli
 open Fake.DocFxHelper
-open Newtonsoft.Json
-open Newtonsoft.Json.Linq
 
 // Information about the project for Nuget and Assembly info files
+let product = "Petabridge.Tracing.Zipkin"
+let authors = [ "Your name here" ]
+let copyright = "Copyright © 2017"
+let company = "Your name here"
+let description = "Your description here"
+let tags = ["";]
 let configuration = "Release"
 
 // Read release notes and version
@@ -167,7 +170,7 @@ Target "CreateNuget" (fun _ ->
                 { p with
                     Project = project
                     Configuration = configuration
-                    AdditionalArgs = ["--include-symbols --no-build"] //no build ensures that our signed assemblies get picked up
+                    AdditionalArgs = ["--include-symbols --no-build"]
                     VersionSuffix = overrideVersionSuffix project
                     OutputPath = outputNuGet })
 
@@ -252,8 +255,7 @@ Target "Nuget" DoNothing
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
-"CreateNuGet" ==> "Nuget"
-"SignAssemblies" ==> "CreateNuget" ==> "PublishNuget" ==> "Nuget"
+"CreateNuget" ==> "PublishNuget" ==> "Nuget"
 
 // docs
 "BuildRelease" ==> "Docfx"
