@@ -97,8 +97,8 @@ module internal ResultHandling =
 Target "RunTests" (fun _ ->
     let projects = 
         match (isWindows) with 
-        | true -> !! "./src/**/*.Tests.csproj"
-        | _ -> !! "./src/**/*.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
+        | true -> !! "./tests/**/*.Tests.csproj"
+        | _ -> !! "./tests/**/*.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
 
     let runSingleProject project =
         let arguments =
@@ -118,38 +118,89 @@ Target "RunTests" (fun _ ->
 )
 
 Target "NBench" <| fun _ ->
-    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (toolsDir @@ "NBench.Runner*")
-    printfn "Using NBench.Runner: %s" nbenchTestPath
+    if (isWindows) then
+        // .NET 4.5.2
+        let nbenchRunner = findToolInSubPath "NBench.Runner.exe" "src/NBench.Runner/bin/Release/net452/win7-x64"
+        let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/net452/NBench.Tests.Performance.WithDependencies.dll"
+        
+        let spec = getBuildParam "spec"
 
-    let nbenchTestAssemblies = !! "./src/**/*Tests.Performance.dll" // doesn't support .NET Core at the moment
-
-    let runNBench assembly =
-        let includes = getBuildParam "include"
-        let excludes = getBuildParam "exclude"
-        let teamcityStr = (getBuildParam "teamcity")
-        let enableTeamCity = 
-            match teamcityStr with
-            | null -> false
-            | "" -> false
-            | _ -> bool.Parse teamcityStr
-
-        let args = StringBuilder()
-                |> append assembly
-                |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                |> append (sprintf "concurrent=\"%b\"" true)
-                |> append (sprintf "trace=\"%b\"" true)
-                |> append (sprintf "teamcity=\"%b\"" enableTeamCity)
-                |> appendIfNotNullOrEmpty includes "include="
-                |> appendIfNotNullOrEmpty excludes "include="
-                |> toText
+        let args = new StringBuilder()
+                    |> append assembly
+                    |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                    |> append (sprintf "concurrent=\"%b\"" true)
+                    |> append (sprintf "trace=\"%b\"" true)
+                    |> toText
 
         let result = ExecProcess(fun info -> 
-            info.FileName <- nbenchTestPath
-            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
-            info.Arguments <- args) (System.TimeSpan.FromMinutes 45.0) (* Reasonably long-running task. *)
-        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
+            info.FileName <- nbenchRunner
+            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchRunner))
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
     
-    nbenchTestAssemblies |> Seq.iter runNBench
+        // .NET Core
+        let netCoreNbenchRunnerProject = "./src/NBench.Runner/NBench.Runner.csproj"
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    AdditionalArgs = ["-r win7-x64"] })
+        // build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
+        DotNetCli.Build
+            (fun p -> 
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    Configuration = configuration 
+                    Runtime = "win7-x64"
+                    Framework = "netcoreapp1.1"})   
+
+        let netCoreNbenchRunner = findToolInSubPath "NBench.Runner.exe" "/src/NBench.Runner/bin/Release/netcoreapp1.1/win7-x64/"
+        let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
+        
+        let netCoreNbenchRunnerArgs = new StringBuilder()
+                                        |> append netCoreAssembly
+                                        |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                                        |> append (sprintf "concurrent=\"%b\"" true)
+                                        |> append (sprintf "trace=\"%b\"" true)
+                                        |> toText
+
+        let result = ExecProcess(fun info -> 
+            info.FileName <- netCoreNbenchRunner
+            info.WorkingDirectory <- (Path.GetDirectoryName (FullName netCoreNbenchRunner))
+            info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" netCoreNbenchRunner netCoreNbenchRunnerArgs
+    else
+        // .NET Core
+        let netCoreNbenchRunnerProject = "./src/NBench.Runner.DotNetCli/NBench.Runner.DotNetCli.csproj"
+        DotNetCli.Restore
+            (fun p ->
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    AdditionalArgs = ["-r debian.8-x64"] })
+        // build a win7-x64 version of dotnet-nbench.dll so we know we're testing the same architecture
+        DotNetCli.Build
+            (fun p -> 
+                { p with
+                    Project = netCoreNbenchRunnerProject
+                    Configuration = configuration 
+                    Runtime = "debian.8-x64"
+                    Framework = "netcoreapp1.1"})   
+        
+        let linuxNbenchRunner =  __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner/bin/Release/netcoreapp1.1/debian.8-x64/NBench.Runner"
+        let linuxPerfAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
+        
+        let linuxNbenchRunnerArgs = new StringBuilder()
+                                        |> append linuxPerfAssembly
+                                        |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                                        |> append (sprintf "concurrent=\"%b\"" true)
+                                        |> append (sprintf "trace=\"%b\"" true)
+                                        |> toText
+
+        let result = ExecProcess(fun info -> 
+            info.FileName <- linuxNbenchRunner
+            info.WorkingDirectory <- __SOURCE_DIRECTORY__ @@ "/src/NBench.Runner.DotNetCli/bin/Release/netcoreapp1.1/debian.8-x64/"
+            info.Arguments <- linuxNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" linuxNbenchRunner linuxNbenchRunnerArgs
 
 
 //--------------------------------------------------------------------------------
@@ -161,8 +212,8 @@ let overrideVersionSuffix (project:string) =
     | _ -> versionSuffix // add additional matches to publish different versions for different projects in solution
 Target "CreateNuget" (fun _ ->    
     let projects = !! "src/**/*.csproj" 
-                   -- "src/**/*Tests.csproj" // Don't publish unit tests
-                   -- "src/**/*Tests*.csproj"
+                   -- "tests/**/*Tests.csproj" // Don't publish unit tests
+                   -- "tests/**/*Tests*.csproj"
 
     let runSingleProject project =
         DotNetCli.Pack
