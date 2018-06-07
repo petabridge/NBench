@@ -10,12 +10,6 @@ open Fake.DotNetCli
 open Fake.DocFxHelper
 
 // Information about the project for Nuget and Assembly info files
-let product = "Petabridge.Tracing.Zipkin"
-let authors = [ "Your name here" ]
-let copyright = "Copyright © 2017"
-let company = "Your name here"
-let description = "Your description here"
-let tags = ["";]
 let configuration = "Release"
 
 // Read release notes and version
@@ -38,11 +32,6 @@ let output = __SOURCE_DIRECTORY__  @@ "bin"
 let outputTests = __SOURCE_DIRECTORY__ @@ "TestResults"
 let outputPerfTests = __SOURCE_DIRECTORY__ @@ "PerfResults"
 let outputNuGet = output @@ "nuget"
-
-// Copied from original NugetCreate target
-let nugetDir = output @@ "nuget"
-let workingDir = output @@ "build"
-let nugetExe = FullName @"./tools/nuget.exe"
 
 Target "Clean" (fun _ ->
     CleanDir output
