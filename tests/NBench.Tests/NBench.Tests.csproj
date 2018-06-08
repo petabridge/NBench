@@ -13,6 +13,5 @@
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="$(XunitVersion)" />
-    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.0.0" />
   </ItemGroup>
 </Project>

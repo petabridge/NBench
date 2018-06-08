@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
+    <AssemblyName>NBench.TestAssembly</AssemblyName>
+    <RootNamespace>NBench.TestAssembly</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
