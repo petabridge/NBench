@@ -54,7 +54,7 @@ namespace NBench.Tests.End2End.Reporting
             var fakeBenchmarkResults = new BenchmarkResults("NBench.FakeBenchmark",
                 new BenchmarkSettings(TestMode.Test, RunMode.Iterations, 30, 1000,
                     new List<IBenchmarkSetting>(),
-                    new ConcurrentDictionary<MetricName, MetricsCollectorSelector>()),
+                    new Dictionary<MetricName, MetricsCollectorSelector>()),
                 new List<BenchmarkRunReport>()
                 {
                     new BenchmarkRunReport(TimeSpan.FromSeconds(3),
@@ -82,10 +82,13 @@ namespace NBench.Tests.End2End.Reporting
 
         private static void CleanPerfDir(string path)
         {
-            var files = Directory.GetFiles(path, "NBench.FakeBenchmark*", SearchOption.AllDirectories);
-            foreach (var file in files)
+            if (Directory.Exists(path)) // no need to clean the directory if we don't have it
             {
-                File.Delete(file);
+                var files = Directory.GetFiles(path, "NBench.FakeBenchmark*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
             }
         }
 

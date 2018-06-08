@@ -7,6 +7,10 @@
 *.userosscache
 *.sln.docstates
 
+#DocFx output
+_site/
+api/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

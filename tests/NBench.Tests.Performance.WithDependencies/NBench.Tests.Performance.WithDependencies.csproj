@@ -19,22 +19,12 @@
     <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <Reference Include="Akka">
-      <HintPath>..\dependencies\Akka\netstandard1.6\Akka.dll</HintPath>
-    </Reference>
-    <Reference Include="Akka.TestKit">
-      <HintPath>..\dependencies\Akka.TestKit\netstandard1.6\Akka.TestKit.dll</HintPath>
-    </Reference>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="Akka">
-      <HintPath>..\dependencies\Akka\net45\Akka.dll</HintPath>
-    </Reference>
-    <Reference Include="Akka.TestKit">
-      <HintPath>..\dependencies\Akka.TestKit\net45\Akka.TestKit.dll</HintPath>
-    </Reference>
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="1.3.8" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
