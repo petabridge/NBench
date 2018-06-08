@@ -51,7 +51,7 @@
     ],
     "dest": "_site",
     "globalMetadata": {
-      "_appTitle": "Petabridge.Tracing.Zipkin",
+      "_appTitle": "NBench",
       "_disableContribution": "true",
       "_appLogoPath": "/images/icon.png",
     },
