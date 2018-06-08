@@ -84,10 +84,9 @@ module internal ResultHandling =
         >> Option.iter (failBuildWithMessage errorLevel)
 
 Target "RunTests" (fun _ ->
-    let projects = 
-        match (isWindows) with 
-        | true -> !! "./tests/**/*.Tests.csproj"
-        | _ -> !! "./tests/**/*.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
+    let projects = !! "tests/**/*Tests.csproj" 
+                   ++ "tests/**/*Tests*.csproj"
+                   -- "tests/**/*Tests.Performance.csproj" // skip NBench specs
 
     let runSingleProject project =
         let arguments =
