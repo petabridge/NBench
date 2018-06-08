@@ -82,10 +82,13 @@ namespace NBench.Tests.End2End.Reporting
 
         private static void CleanPerfDir(string path)
         {
-            var files = Directory.GetFiles(path, "NBench.FakeBenchmark*", SearchOption.AllDirectories);
-            foreach (var file in files)
+            if (Directory.Exists(path)) // no need to clean the directory if we don't have it
             {
-                File.Delete(file);
+                var files = Directory.GetFiles(path, "NBench.FakeBenchmark*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    File.Delete(file);
+                }
             }
         }
 
