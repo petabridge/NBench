@@ -18,7 +18,6 @@
     <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <AkkaVersion>1.3.5</AkkaVersion>
     <XunitVersion>2.3.0</XunitVersion>
     <TestSdkVersion>15.3.0</TestSdkVersion>
     <FluentAssertionsVersion>4.19.4</FluentAssertionsVersion>
