@@ -54,7 +54,7 @@ namespace NBench.Tests.End2End.Reporting
             var fakeBenchmarkResults = new BenchmarkResults("NBench.FakeBenchmark",
                 new BenchmarkSettings(TestMode.Test, RunMode.Iterations, 30, 1000,
                     new List<IBenchmarkSetting>(),
-                    new ConcurrentDictionary<MetricName, MetricsCollectorSelector>()),
+                    new Dictionary<MetricName, MetricsCollectorSelector>()),
                 new List<BenchmarkRunReport>()
                 {
                     new BenchmarkRunReport(TimeSpan.FromSeconds(3),
