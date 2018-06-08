@@ -132,10 +132,15 @@ Target "NBench" <| fun _ ->
         info.FileName <- nbenchRunner
         info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
     if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
-    
+
+Target "NBenchNetCore" <| fun _ ->
+    let nbenchProject = FindFirstMatchingFile "NBench.Runner.csproj" (__SOURCE_DIRECTORY__ @@ "src" @@ "NBench.Runner")
+
     // .NET Core
-    let netCoreAssembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
-        
+    let nbenchRunner = "dotnet"
+    let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
+    let spec = getBuildParam "spec"
+
     let netCoreNbenchRunnerArgs = new StringBuilder()
                                     |> append "run"
                                     |> append "--project"
@@ -152,8 +157,7 @@ Target "NBench" <| fun _ ->
     let result = ExecProcess(fun info -> 
         info.FileName <- nbenchRunner
         info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-    if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner netCoreNbenchRunnerArgs
-
+    if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner netCoreNbenchRunnerArgs 
 
 //--------------------------------------------------------------------------------
 // Nuget targets 
