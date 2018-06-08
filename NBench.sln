@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{C8104500-2C0F-46A2-AE84-A3D74CC55697}"
 EndProject
@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{97444074
 		build.fsx = build.fsx
 		build.ps1 = build.ps1
 		build.sh = build.sh
+		src\common.props = src\common.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBench.Tests.Performance", "tests\NBench.Tests.Performance\NBench.Tests.Performance.csproj", "{E3730D65-70AE-4055-A291-800044C48FDD}"
