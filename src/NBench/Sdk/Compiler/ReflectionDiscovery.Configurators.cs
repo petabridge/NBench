@@ -8,6 +8,8 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using NBench.Sdk.Compiler.Assemblies;
+
 #if CORECLR
 using Microsoft.Extensions.DependencyModel;
 #endif
@@ -32,7 +34,7 @@ namespace NBench.Sdk.Compiler
         ///     for <see cref="IMeasurementConfigurator{T}"/> definitions to just that target assembly.
         /// </param>
         /// <returns>A corresponding <see cref="IMeasurementConfigurator{T}"/> type</returns>
-        public Type GetConfiguratorTypeForMeasurement(Type measurementType, Assembly specificAssembly = null)
+        public Type GetConfiguratorTypeForMeasurement(Type measurementType, IAssemblyLoader specificAssembly = null)
         {
             ValidateTypeIsMeasurementAttribute(measurementType);
 
@@ -40,14 +42,19 @@ namespace NBench.Sdk.Compiler
             if (_measurementConfiguratorTypes.ContainsKey(measurementType))
                 return _measurementConfiguratorTypes[measurementType];
 
-            // search for a match
-            var match = FindBestMatchingConfiguratorForMeasurement(measurementType, 
-                specificAssembly == null ? LoadAllTypeConfigurators() : LoadAllTypeConfigurators().Where(x=> x.GetTypeInfo().Assembly.Equals(specificAssembly)));
+            using (specificAssembly = specificAssembly ??
+                                      AssemblyRuntimeLoader.WrapAssembly(measurementType.GetAssembly(), Output))
+            {
 
-            // cache the result
-            _measurementConfiguratorTypes[measurementType] = match;
+                // search for a match
+                var match = FindBestMatchingConfiguratorForMeasurement(measurementType,
+                    LoadAllTypeConfigurators(specificAssembly));
 
-            return match;
+                // cache the result
+                _measurementConfiguratorTypes[measurementType] = match;
+
+                return match;
+            }
         }
 
         /// <summary>
@@ -62,7 +69,7 @@ namespace NBench.Sdk.Compiler
         ///     If a <see cref="IMeasurementConfigurator"/> type match was found, this method will return a NEW instance of that.
         ///     If no match was found, we return a special case instance of <see cref="MeasurementConfigurator.EmptyConfigurator"/>.
         /// </returns>
-        public IMeasurementConfigurator GetConfiguratorForMeasurement(Type measurementType, Assembly specificAssembly = null)
+        public IMeasurementConfigurator GetConfiguratorForMeasurement(Type measurementType, IAssemblyLoader specificAssembly = null)
         {
             ValidateTypeIsMeasurementAttribute(measurementType);
 
@@ -73,41 +80,26 @@ namespace NBench.Sdk.Compiler
                 return MeasurementConfigurator.EmptyConfigurator.Instance;
 
             // construct the instance
-            return(IMeasurementConfigurator)Activator.CreateInstance(configuratorType);
+            return (IMeasurementConfigurator)Activator.CreateInstance(configuratorType);
+
         }
 
-        public static IEnumerable<Type> LoadAllTypeConfigurators()
+        private static readonly IReadOnlyList<Type> NoTypes = new Type[0];
+
+        public static IEnumerable<Type> LoadAllTypeConfigurators(Assembly assembly)
         {
-#if  CORECLR
-            var assemblies = GetAssemblies();
-            var types = assemblies.SelectMany( AssemblyExtensions.GetTypes);
-#else
-            var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
-            var types = assemblies.SelectMany(a => a.DefinedTypes);
-#endif
+            using (var loader = AssemblyRuntimeLoader.WrapAssembly(assembly))
+            {
+                return LoadAllTypeConfigurators(loader);
+            }
+        }
+
+        public static IEnumerable<Type> LoadAllTypeConfigurators(IAssemblyLoader loader)
+        {
+            var types = loader.ReferencedAssemblies.SelectMany(a => a.DefinedTypes).Distinct().Select(x => x.AsType());
             return
                 types.Where(IsConfigurationType);
         }
-#if CORECLR
-        private static Assembly[] GetAssemblies()
-        {
-            var assemblies = new List<Assembly>();
-            var dependencies = DependencyContext.Default.RuntimeLibraries;
-            foreach (var library in dependencies)
-            {
-                try
-                {
-                    var assembly = Assembly.Load(new AssemblyName(library.Name));
-                    assemblies.Add(assembly);
-                }
-                catch (Exception e)
-                {
-                    //do nothing cant't if can't load assembly
-                }
-            }
-            return assemblies.ToArray();
-        }
-#endif
 
         public static Type FindBestMatchingConfiguratorForMeasurement(Type measurementType,
             IEnumerable<Type> knownConfigurators)

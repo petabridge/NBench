@@ -13,7 +13,8 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End
-{    public class NBenchIntregrationTestWithDependenciesLoadAssembly
+{
+    public class NBenchIntregrationTestWithDependenciesLoadAssembly
     {
         private readonly ITestOutputHelper _output;
 
@@ -22,7 +23,7 @@ namespace NBench.Tests.End2End
             _output = output;
         }
 
-        [Fact(Skip = "Too flaky being tested end to end from within build.fsx for now")]
+        [Fact()]
         public void LoadAssemblyCorrect()
         {
             if (!TestRunner.IsMono) // this test doesn't pass yet on Mono

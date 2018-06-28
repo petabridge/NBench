@@ -1,6 +1,7 @@
 ﻿#if NETFRAMEWORK
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using NBench.Reporting;
@@ -15,6 +16,14 @@ namespace NBench.Sdk.Compiler.Assemblies
     internal sealed class NetFrameworkAssemblyLoader : IAssemblyLoader
     {
         private readonly string _binaryDirectory;
+        private readonly Lazy<Assembly[]> _referencedAssemblies;
+
+        public NetFrameworkAssemblyLoader(Assembly assembly, IBenchmarkOutput trace) {
+            Assembly = assembly;
+            _binaryDirectory = Path.GetDirectoryName(Assembly.CodeBase);
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+            _referencedAssemblies = new Lazy<Assembly[]>(LoadReferencedAssemblies);
+        }
 
         public NetFrameworkAssemblyLoader(string path, IBenchmarkOutput trace)
         {
@@ -35,11 +44,30 @@ namespace NBench.Sdk.Compiler.Assemblies
             _binaryDirectory = Path.GetDirectoryName(path);
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+            _referencedAssemblies = new Lazy<Assembly[]>(LoadReferencedAssemblies);
+        }
+
+        private Assembly[] LoadReferencedAssemblies()
+        {
+            var assemblies = new List<Assembly>();
+            foreach (var assemblyName in Assembly.GetReferencedAssemblies())
+            {
+                try
+                {
+                    assemblies.Add(Assembly.Load(assemblyName));
+                }
+                catch
+                {
+                    // exception occurred, but we don't care
+                }
+            }
+
+            return assemblies.ToArray();
         }
 
         private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            return System.Reflection.Assembly.LoadFile(Path.Combine(_binaryDirectory, args.Name));
+            return Assembly.LoadFile(Path.Combine(_binaryDirectory, args.Name));
         }
 
         public void Dispose()
@@ -48,6 +76,7 @@ namespace NBench.Sdk.Compiler.Assemblies
         }
 
         public Assembly Assembly { get; }
+        public Assembly[] ReferencedAssemblies => _referencedAssemblies.Value;
     }
 }
 

@@ -8,11 +8,16 @@ namespace NBench.Sdk.Compiler.Assemblies
     ///  INTERNAL API.
     ///  Used to load and resolve assemblies as part of NBench test discovery and execution.
     ///  </summary>
-    internal interface IAssemblyLoader : IDisposable
+    public interface IAssemblyLoader : IDisposable
     {
         /// <summary>
         /// The primary assembly we're loading.
         /// </summary>
         Assembly Assembly { get; }
+
+        /// <summary>
+        /// Assemblies that <see cref="Assembly"/> depends upon.
+        /// </summary>
+        Assembly[] ReferencedAssemblies { get; }
     }
 }

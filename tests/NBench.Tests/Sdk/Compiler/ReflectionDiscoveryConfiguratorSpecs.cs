@@ -12,6 +12,7 @@ using NBench.Metrics.Memory;
 using NBench.Reporting;
 using NBench.Sdk;
 using NBench.Sdk.Compiler;
+using NBench.Sdk.Compiler.Assemblies;
 using Xunit;
 
 namespace NBench.Tests.Sdk.Compiler
@@ -80,7 +81,7 @@ namespace NBench.Tests.Sdk.Compiler
         [InlineData(typeof(DerivedMeasurementAttribute), typeof(DerivedMeasurementConfigurator))]
         public void ReflectionDiscoveryCanFindBestFittingConfiguratorViaReflection(Type measurementType, Type expectedConfiguratorType)
         {
-            var allConfigurators = ReflectionDiscovery.LoadAllTypeConfigurators();
+            var allConfigurators = ReflectionDiscovery.LoadAllTypeConfigurators(measurementType.GetAssembly());
             var actualMatch = ReflectionDiscovery.FindBestMatchingConfiguratorForMeasurement(measurementType, allConfigurators);
             Assert.True(expectedConfiguratorType == actualMatch);
         }
@@ -134,7 +135,7 @@ namespace NBench.Tests.Sdk.Compiler
             var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
 
             // limit our search to the declaring assembly
-            var actualConfiguratorType = discovery.GetConfiguratorTypeForMeasurement(measurementType, measurementType.GetTypeInfo().Assembly);
+            var actualConfiguratorType = discovery.GetConfiguratorTypeForMeasurement(measurementType);
             Assert.Equal(expectedConfiguratorType, actualConfiguratorType);
         }
         

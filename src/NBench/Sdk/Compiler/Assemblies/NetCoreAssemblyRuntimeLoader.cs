@@ -23,6 +23,24 @@ namespace NBench.Sdk.Compiler.Assemblies
         private readonly ICompilationAssemblyResolver _resolver;
         private readonly DependencyContext _dependencyContext;
         private readonly AssemblyLoadContext _loadContext;
+        private readonly Lazy<Assembly[]> _referencedAssemblies;
+
+        public NetCoreAssemblyRuntimeLoader(Assembly assembly, IBenchmarkOutput trace)
+        {
+            Assembly = assembly;
+
+            _dependencyContext = DependencyContext.Load(Assembly);
+            _loadContext = AssemblyLoadContext.GetLoadContext(Assembly);
+            _resolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]{
+                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(Assembly.CodeBase)),
+                new ReferenceAssemblyPathResolver(),
+                new PackageCacheCompilationAssemblyResolver(),
+                new PackageCompilationAssemblyResolver()});
+
+            _loadContext.Resolving += LoadContextOnResolving;
+            _referencedAssemblies = new Lazy<Assembly[]>(LoadReferencedAssemblies);
+        }
+
         public NetCoreAssemblyRuntimeLoader(string path, IBenchmarkOutput trace)
         {
             if (!File.Exists(path))
@@ -46,6 +64,25 @@ namespace NBench.Sdk.Compiler.Assemblies
                 new PackageCompilationAssemblyResolver()});
 
             _loadContext.Resolving += LoadContextOnResolving;
+            _referencedAssemblies = new Lazy<Assembly[]>(LoadReferencedAssemblies);
+        }
+
+        private Assembly[] LoadReferencedAssemblies()
+        {
+            var assemblies = new List<Assembly>();
+            foreach (var assemblyName in Assembly.GetReferencedAssemblies())
+            {
+                try
+                {
+                    assemblies.Add(_loadContext.LoadFromAssemblyName(assemblyName));
+                }
+                catch
+                {
+                    // exception occurred, but we don't care
+                }
+            }
+
+            return assemblies.ToArray();
         }
 
         private Assembly LoadContextOnResolving(AssemblyLoadContext context, AssemblyName assemblyName)
@@ -74,6 +111,12 @@ namespace NBench.Sdk.Compiler.Assemblies
         }
 
         public Assembly Assembly { get; }
+        public Assembly[] ReferencedAssemblies => _referencedAssemblies.Value;
+
+        public IEnumerable<Assembly> DependentAssemblies()
+        {
+            return Assembly.GetReferencedAssemblies().Select(x => _loadContext.LoadFromAssemblyName(x));
+        }
 
         public void Dispose()
         {

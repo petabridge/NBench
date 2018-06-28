@@ -37,6 +37,22 @@ namespace NBench.Sdk.Compiler
             return new NetFrameworkAssemblyLoader(assemblyPath, trace);
 #endif
         }
+
+        /// <summary>
+        /// Loads an assembly into the current AppDomain
+        /// </summary>
+        /// <param name="assembly">An already-loaded assembly.</param>
+        /// <param name="trace">Optional. Benchmark tracing system.</param>
+        /// <returns>An <see cref="IAssemblyLoader"/> with a reference to the <see cref="Assembly"/> at the specified location.</returns>
+        public static IAssemblyLoader WrapAssembly(Assembly assembly, IBenchmarkOutput trace = null)
+        {
+            trace = trace ?? NoOpBenchmarkOutput.Instance;
+#if CORECLR
+            return new NetCoreAssemblyRuntimeLoader(assembly, trace);
+#else
+            return new NetFrameworkAssemblyLoader(assembly, trace);
+#endif
+        }
     }
 }
 
