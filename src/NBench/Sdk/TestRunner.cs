@@ -211,28 +211,29 @@ namespace NBench.Sdk
             {
                 foreach (var testFile in _package.Files)
                 {
-                    var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
-
-                    var benchmarks = discovery.FindBenchmarks(assembly);
-
-                    foreach (var benchmark in benchmarks)
+                    using (var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile, output))
                     {
-                        // verify if the benchmark should be included/excluded from the list of benchmarks to be run
-                        if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
-                        {
-                            output.StartBenchmark(benchmark.BenchmarkName);
-                            benchmark.Run();
-                            benchmark.Finish();
+                        var benchmarks = discovery.FindBenchmarks(assembly.Assembly);
 
-                            // if one assert fails, all fail
-                            result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
-                            output.FinishBenchmark(benchmark.BenchmarkName);
-                            result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
-                        }
-                        else
+                        foreach (var benchmark in benchmarks)
                         {
-                            output.SkipBenchmark(benchmark.BenchmarkName);
-                            result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
+                            // verify if the benchmark should be included/excluded from the list of benchmarks to be run
+                            if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
+                            {
+                                output.StartBenchmark(benchmark.BenchmarkName);
+                                benchmark.Run();
+                                benchmark.Finish();
+
+                                // if one assert fails, all fail
+                                result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
+                                output.FinishBenchmark(benchmark.BenchmarkName);
+                                result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
+                            }
+                            else
+                            {
+                                output.SkipBenchmark(benchmark.BenchmarkName);
+                                result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
+                            }
                         }
                     }
                 }

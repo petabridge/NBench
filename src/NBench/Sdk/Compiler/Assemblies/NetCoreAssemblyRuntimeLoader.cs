@@ -5,23 +5,25 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using NBench.Reporting;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
 
 namespace NBench.Sdk.Compiler.Assemblies
 {
-    /// <summary>
-    /// INTERNAL API.
-    ///
-    /// Used to run .NET Core assemblies
-    /// </summary>
-    internal sealed class NetCoreAssemblyRuntimeLoader : IDisposable
+    /// <inheritdoc />
+    ///  <summary>
+    ///  INTERNAL API.
+    /// 
+    ///  Used to run .NET Core assemblies
+    ///  </summary>
+    internal sealed class NetCoreAssemblyRuntimeLoader : IAssemblyLoader
 
     {
         private readonly ICompilationAssemblyResolver _resolver;
         private readonly DependencyContext _dependencyContext;
         private readonly AssemblyLoadContext _loadContext;
-        public NetCoreAssemblyRuntimeLoader(string path, IBenchmarkTrace trace)
+        public NetCoreAssemblyRuntimeLoader(string path, IBenchmarkOutput trace)
         {
             if (!File.Exists(path))
             {
@@ -33,6 +35,7 @@ namespace NBench.Sdk.Compiler.Assemblies
             if (Assembly == null)
             {
                 trace.Error($"[NetCoreAssemblyRuntimeLoader] Found assembly [{path}], but was unable to load it.");
+                return;
             }
             _dependencyContext = DependencyContext.Load(Assembly);
             _loadContext = AssemblyLoadContext.GetLoadContext(Assembly);
