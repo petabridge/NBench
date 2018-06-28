@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace NBench.Sdk
 {
 
-#if APPDOMAIN
+#if !CORECLR
     /// <summary>
     /// Handles the creation and unloading of AppDomains used for each test file
     /// </summary>

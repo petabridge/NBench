@@ -21,7 +21,7 @@ namespace NBench.Sdk
     /// <summary>
     /// Results collected by the test runner
     /// </summary>
-#if SERIALIZATION
+#if !CORECLR
     [Serializable]
 #endif
     public class TestRunnerResult
@@ -36,7 +36,7 @@ namespace NBench.Sdk
     /// </summary>
     /// <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
     public class TestRunner
-#if APPDOMAIN
+#if !CORECLR
         : MarshalByRefObject
 #endif
     {
@@ -57,7 +57,7 @@ namespace NBench.Sdk
         }
 
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Creates a new instance of the test runner in the given app domain.
         /// </summary>
@@ -82,7 +82,7 @@ namespace NBench.Sdk
         }
 #endif
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Executes the test package.
         /// </summary>
@@ -246,7 +246,7 @@ namespace NBench.Sdk
             return result;
         }
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Control the lifetime policy for this instance
         /// </summary>
