@@ -1,4 +1,4 @@
-﻿#if NETFRAMEWORK
+﻿#if !CORECLR
 
 using System;
 using System.Collections.Generic;
@@ -13,20 +13,24 @@ namespace NBench.Sdk.Compiler.Assemblies
     ///  INTERNAL API.
     ///  Used to run .NET Framework assemblies.
     ///  </summary>
-    internal sealed class NetFrameworkAssemblyLoader : IAssemblyLoader
+    internal sealed class NetFrameworkAssemblyRuntimeLoader : IAssemblyLoader
     {
         private readonly string _binaryDirectory;
         private readonly Lazy<Assembly[]> _referencedAssemblies;
+        private readonly IBenchmarkOutput _trace;
 
-        public NetFrameworkAssemblyLoader(Assembly assembly, IBenchmarkOutput trace) {
+        public NetFrameworkAssemblyRuntimeLoader(Assembly assembly, IBenchmarkOutput trace)
+        {
+            _trace = trace;
             Assembly = assembly;
             _binaryDirectory = Path.GetDirectoryName(Assembly.CodeBase);
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
             _referencedAssemblies = new Lazy<Assembly[]>(LoadReferencedAssemblies);
         }
 
-        public NetFrameworkAssemblyLoader(string path, IBenchmarkOutput trace)
+        public NetFrameworkAssemblyRuntimeLoader(string path, IBenchmarkOutput trace)
         {
+            _trace = trace;
             if (!File.Exists(path))
             {
                 trace.Error($"[NetFrameworkAssemblyRuntimeLoader] Unable to find requested assembly [{path}]");
@@ -50,15 +54,24 @@ namespace NBench.Sdk.Compiler.Assemblies
         private Assembly[] LoadReferencedAssemblies()
         {
             var assemblies = new List<Assembly>(){ Assembly };
+#if DEBUG
+            _trace.WriteLine($"[NetFrameworkAssemblyRuntimeLoader][LoadReferencedAssemblies] Loading references for [{Assembly}]");
+#endif
             foreach (var assemblyName in Assembly.GetReferencedAssemblies())
             {
                 try
                 {
+#if DEBUG
+                    _trace.WriteLine($"[NetFrameworkAssemblyRuntimeLoader][LoadReferencedAssemblies] Attempting to load [{assemblyName}]");
+#endif
                     assemblies.Add(Assembly.Load(assemblyName));
                 }
-                catch
+                catch(Exception ex)
                 {
                     // exception occurred, but we don't care
+#if DEBUG
+                    _trace.Error(ex, $"[NetCoreAssemblyRuntimeLoader][LoadReferencedAssemblies] Failed to load [{assemblyName}]");
+#endif
                 }
             }
 

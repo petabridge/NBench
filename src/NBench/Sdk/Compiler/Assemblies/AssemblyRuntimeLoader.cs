@@ -34,7 +34,7 @@ namespace NBench.Sdk.Compiler
 #if CORECLR
             return new NetCoreAssemblyRuntimeLoader(assemblyPath, trace);
 #else
-            return new NetFrameworkAssemblyLoader(assemblyPath, trace);
+            return new NetFrameworkAssemblyRuntimeLoader(assemblyPath, trace);
 #endif
         }
 
@@ -50,7 +50,7 @@ namespace NBench.Sdk.Compiler
 #if CORECLR
             return new NetCoreAssemblyRuntimeLoader(assembly, trace);
 #else
-            return new NetFrameworkAssemblyLoader(assembly, trace);
+            return new NetFrameworkAssemblyRuntimeLoader(assembly, trace);
 #endif
         }
     }
