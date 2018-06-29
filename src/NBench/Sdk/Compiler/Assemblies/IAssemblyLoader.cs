@@ -16,8 +16,9 @@ namespace NBench.Sdk.Compiler.Assemblies
         Assembly Assembly { get; }
 
         /// <summary>
-        /// Assemblies that <see cref="Assembly"/> depends upon.
+        /// Assemblies that <see cref="Assembly"/> depends upon
+        /// and its dependencies.
         /// </summary>
-        Assembly[] ReferencedAssemblies { get; }
+        Assembly[] AssemblyAndDependencies { get; }
     }
 }

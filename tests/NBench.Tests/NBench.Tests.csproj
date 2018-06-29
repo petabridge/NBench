@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\src\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.1</TargetFrameworks>
-    <!--<TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>-->
+    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

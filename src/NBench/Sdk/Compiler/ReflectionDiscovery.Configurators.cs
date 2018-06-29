@@ -8,6 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using NBench.Reporting;
 using NBench.Sdk.Compiler.Assemblies;
 
 #if CORECLR
@@ -86,9 +87,9 @@ namespace NBench.Sdk.Compiler
 
         private static readonly IReadOnlyList<Type> NoTypes = new Type[0];
 
-        public static IEnumerable<Type> LoadAllTypeConfigurators(Assembly assembly)
+        public static IEnumerable<Type> LoadAllTypeConfigurators(Assembly assembly, IBenchmarkOutput output = null)
         {
-            using (var loader = AssemblyRuntimeLoader.WrapAssembly(assembly))
+            using (var loader = AssemblyRuntimeLoader.WrapAssembly(assembly, output))
             {
                 return LoadAllTypeConfigurators(loader);
             }
@@ -96,7 +97,7 @@ namespace NBench.Sdk.Compiler
 
         public static IEnumerable<Type> LoadAllTypeConfigurators(IAssemblyLoader loader)
         {
-            var types = loader.ReferencedAssemblies.SelectMany(a => a.DefinedTypes).Distinct().Select(x => x.AsType());
+            var types = loader.AssemblyAndDependencies.SelectMany(a => a.DefinedTypes).Distinct().Select(x => x.AsType());
             return
                 types.Where(IsConfigurationType);
         }

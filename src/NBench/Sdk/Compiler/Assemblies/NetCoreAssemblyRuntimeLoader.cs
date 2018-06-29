@@ -20,6 +20,7 @@ namespace NBench.Sdk.Compiler.Assemblies
     internal sealed class NetCoreAssemblyRuntimeLoader : IAssemblyLoader
 
     {
+        private readonly IBenchmarkOutput _trace;
         private readonly ICompilationAssemblyResolver _resolver;
         private readonly DependencyContext _dependencyContext;
         private readonly AssemblyLoadContext _loadContext;
@@ -27,6 +28,7 @@ namespace NBench.Sdk.Compiler.Assemblies
 
         public NetCoreAssemblyRuntimeLoader(Assembly assembly, IBenchmarkOutput trace)
         {
+            _trace = trace;
             Assembly = assembly;
 
             _dependencyContext = DependencyContext.Load(Assembly);
@@ -43,6 +45,7 @@ namespace NBench.Sdk.Compiler.Assemblies
 
         public NetCoreAssemblyRuntimeLoader(string path, IBenchmarkOutput trace)
         {
+            _trace = trace;
             if (!File.Exists(path))
             {
                 trace.Error($"[NetCoreAssemblyRuntimeLoader] Unable to find requested assembly [{path}]");
@@ -69,16 +72,25 @@ namespace NBench.Sdk.Compiler.Assemblies
 
         private Assembly[] LoadReferencedAssemblies()
         {
-            var assemblies = new List<Assembly>();
+            var assemblies = new List<Assembly>(){ Assembly };
+#if DEBUG
+            _trace.WriteLine($"[NetCoreAssemblyRuntimeLoader][LoadReferencedAssemblies] Loading references for [{Assembly}]");
+#endif
             foreach (var assemblyName in Assembly.GetReferencedAssemblies())
             {
                 try
                 {
+#if DEBUG
+                    _trace.WriteLine($"[NetCoreAssemblyRuntimeLoader][LoadReferencedAssemblies] Attempting to load [{assemblyName}]");
+#endif
                     assemblies.Add(_loadContext.LoadFromAssemblyName(assemblyName));
                 }
-                catch
+                catch(Exception ex)
                 {
                     // exception occurred, but we don't care
+#if DEBUG
+                    _trace.Error(ex, $"[NetCoreAssemblyRuntimeLoader][LoadReferencedAssemblies] Failed to load [{assemblyName}]");
+#endif
                 }
             }
 
@@ -92,9 +104,16 @@ namespace NBench.Sdk.Compiler.Assemblies
                 return string.Equals(runtime.Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase);
             }
 
+#if DEBUG
+            _trace.WriteLine($"[NetCoreAssemblyRuntimeLoader] Attempting to resolve [{assemblyName}]");
+#endif
+
             var runtimeLibrary = _dependencyContext.RuntimeLibraries.FirstOrDefault(x => NamesMatch(x));
             if (runtimeLibrary != null)
             {
+#if DEBUG
+                _trace.WriteLine($"[NetCoreAssemblyRuntimeLoader] Found [{runtimeLibrary}]");
+#endif
                 var wrapper = new CompilationLibrary(runtimeLibrary.Type, runtimeLibrary.Name, 
                     runtimeLibrary.Version, runtimeLibrary.Hash, 
                     runtimeLibrary.RuntimeAssemblyGroups.SelectMany(a => a.AssetPaths), 
@@ -111,7 +130,7 @@ namespace NBench.Sdk.Compiler.Assemblies
         }
 
         public Assembly Assembly { get; }
-        public Assembly[] ReferencedAssemblies => _referencedAssemblies.Value;
+        public Assembly[] AssemblyAndDependencies => _referencedAssemblies.Value;
 
         public IEnumerable<Assembly> DependentAssemblies()
         {

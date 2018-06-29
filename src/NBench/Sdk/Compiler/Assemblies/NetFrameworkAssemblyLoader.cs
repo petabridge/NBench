@@ -49,7 +49,7 @@ namespace NBench.Sdk.Compiler.Assemblies
 
         private Assembly[] LoadReferencedAssemblies()
         {
-            var assemblies = new List<Assembly>();
+            var assemblies = new List<Assembly>(){ Assembly };
             foreach (var assemblyName in Assembly.GetReferencedAssemblies())
             {
                 try
@@ -76,7 +76,7 @@ namespace NBench.Sdk.Compiler.Assemblies
         }
 
         public Assembly Assembly { get; }
-        public Assembly[] ReferencedAssemblies => _referencedAssemblies.Value;
+        public Assembly[] AssemblyAndDependencies => _referencedAssemblies.Value;
     }
 }
 

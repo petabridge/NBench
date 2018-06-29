@@ -14,6 +14,7 @@ using NBench.Sdk;
 using NBench.Sdk.Compiler;
 using NBench.Sdk.Compiler.Assemblies;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace NBench.Tests.Sdk.Compiler
 {
@@ -24,6 +25,13 @@ namespace NBench.Tests.Sdk.Compiler
     /// </summary>
     public class ReflectionDiscoveryConfiguratorSpecs
     {
+        private readonly IBenchmarkOutput _output;
+
+        public ReflectionDiscoveryConfiguratorSpecs(ITestOutputHelper helper)
+        {
+            _output = new XunitBenchmarkOutputHelper(helper);
+        }
+
         #region Internal test classes
 
         private class SimpleMeasurementAttribute : MeasurementAttribute { }
@@ -81,7 +89,7 @@ namespace NBench.Tests.Sdk.Compiler
         [InlineData(typeof(DerivedMeasurementAttribute), typeof(DerivedMeasurementConfigurator))]
         public void ReflectionDiscoveryCanFindBestFittingConfiguratorViaReflection(Type measurementType, Type expectedConfiguratorType)
         {
-            var allConfigurators = ReflectionDiscovery.LoadAllTypeConfigurators(measurementType.GetAssembly());
+            var allConfigurators = ReflectionDiscovery.LoadAllTypeConfigurators(measurementType.GetAssembly(), _output);
             var actualMatch = ReflectionDiscovery.FindBestMatchingConfiguratorForMeasurement(measurementType, allConfigurators);
             Assert.True(expectedConfiguratorType == actualMatch);
         }
@@ -132,7 +140,7 @@ namespace NBench.Tests.Sdk.Compiler
         public void ReflectionDiscoveryShouldFindAllBuiltInConfigurators(Type measurementType,
             Type expectedConfiguratorType)
         {
-            var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
+            var discovery = new ReflectionDiscovery(_output);
 
             // limit our search to the declaring assembly
             var actualConfiguratorType = discovery.GetConfiguratorTypeForMeasurement(measurementType);
@@ -142,7 +150,7 @@ namespace NBench.Tests.Sdk.Compiler
         [Fact]
         public void ReflectionDiscoveryShouldGetEmptyConfiguratorWhenNoMatchingConfiguratorIsDefined()
         {
-            var discovery = new ReflectionDiscovery(NoOpBenchmarkOutput.Instance);
+            var discovery = new ReflectionDiscovery(_output);
             var unsupportedMeasurement = typeof (UnsupportedMeasurementAttribute);
 
             var actualConfiguratorType = discovery.GetConfiguratorTypeForMeasurement(unsupportedMeasurement);
