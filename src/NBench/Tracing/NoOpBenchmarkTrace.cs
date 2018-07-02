@@ -2,8 +2,9 @@
 
 namespace NBench.Tracing
 {
+    /// <inheritdoc />
     /// <summary>
-    /// Default no-op implementation of <see cref="IBenchmarkTrace"/>. Does nothing.
+    /// Default no-op implementation of <see cref="T:NBench.IBenchmarkTrace" />. Does nothing.
     /// </summary>
     internal sealed class NoOpBenchmarkTrace : IBenchmarkTrace
     {
