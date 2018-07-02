@@ -22,9 +22,19 @@ namespace NBench.Util
             Interlocked.Increment(ref Value);
         }
 
+        public void Increment(long value)
+        {
+            Interlocked.Add(ref Value, value);
+        }
+
         public void Decrement()
         {
             Interlocked.Decrement(ref Value);
+        }
+
+        public void Decrement(long value)
+        {
+            Interlocked.Add(ref Value, -value);
         }
 
         public long Current => Interlocked.Read(ref Value);
