@@ -1,10 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
+// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
@@ -13,7 +17,9 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End
-{    public class NBenchIntregrationTestWithDependenciesLoadAssembly
+{
+
+    public class NBenchIntregrationTestWithDependenciesLoadAssembly
     {
         private readonly ITestOutputHelper _output;
 
@@ -22,16 +28,16 @@ namespace NBench.Tests.End2End
             _output = output;
         }
 
-        [Fact(Skip = "Too flaky being tested end to end from within build.fsx for now")]
+        [Fact()]
         public void LoadAssemblyCorrect()
         {
             if (!TestRunner.IsMono) // this test doesn't pass yet on Mono
             {
                 var package = LoadPackageWithDependencies();
                 var result = TestRunner.Run(package);
-                Assert.True(result.AllTestsPassed);
-                Assert.NotEqual(0, result.ExecutedTestsCount);
-                Assert.Equal(0, result.IgnoredTestsCount);
+                result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+                result.ExecutedTestsCount.Should().NotBe(0);
+                result.IgnoredTestsCount.Should().Be(0);
             }
         }
 
@@ -54,3 +60,4 @@ namespace NBench.Tests.End2End
         }
     }
 }
+

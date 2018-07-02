@@ -21,7 +21,7 @@ namespace NBench.Sdk
     /// <summary>
     /// Results collected by the test runner
     /// </summary>
-#if SERIALIZATION
+#if !CORECLR
     [Serializable]
 #endif
     public class TestRunnerResult
@@ -36,7 +36,7 @@ namespace NBench.Sdk
     /// </summary>
     /// <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
     public class TestRunner
-#if APPDOMAIN
+#if !CORECLR
         : MarshalByRefObject
 #endif
     {
@@ -57,7 +57,7 @@ namespace NBench.Sdk
         }
 
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Creates a new instance of the test runner in the given app domain.
         /// </summary>
@@ -82,7 +82,7 @@ namespace NBench.Sdk
         }
 #endif
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Executes the test package.
         /// </summary>
@@ -211,28 +211,29 @@ namespace NBench.Sdk
             {
                 foreach (var testFile in _package.Files)
                 {
-                    var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile);
-
-                    var benchmarks = discovery.FindBenchmarks(assembly);
-
-                    foreach (var benchmark in benchmarks)
+                    using (var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile, output))
                     {
-                        // verify if the benchmark should be included/excluded from the list of benchmarks to be run
-                        if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
-                        {
-                            output.StartBenchmark(benchmark.BenchmarkName);
-                            benchmark.Run();
-                            benchmark.Finish();
+                        var benchmarks = discovery.FindBenchmarks(assembly.Assembly);
 
-                            // if one assert fails, all fail
-                            result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
-                            output.FinishBenchmark(benchmark.BenchmarkName);
-                            result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
-                        }
-                        else
+                        foreach (var benchmark in benchmarks)
                         {
-                            output.SkipBenchmark(benchmark.BenchmarkName);
-                            result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
+                            // verify if the benchmark should be included/excluded from the list of benchmarks to be run
+                            if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
+                            {
+                                output.StartBenchmark(benchmark.BenchmarkName);
+                                benchmark.Run();
+                                benchmark.Finish();
+
+                                // if one assert fails, all fail
+                                result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
+                                output.FinishBenchmark(benchmark.BenchmarkName);
+                                result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
+                            }
+                            else
+                            {
+                                output.SkipBenchmark(benchmark.BenchmarkName);
+                                result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
+                            }
                         }
                     }
                 }
@@ -246,7 +247,7 @@ namespace NBench.Sdk
             return result;
         }
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Control the lifetime policy for this instance
         /// </summary>

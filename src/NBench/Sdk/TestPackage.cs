@@ -14,17 +14,17 @@ namespace NBench.Sdk
     /// <summary>
     /// A TestPackage contains one or more test files. It also holds settings how the tests should be loaded. 
     /// </summary>
-#if SERIALIZATION
+#if !CORECLR
     [Serializable]
 #endif
     public class TestPackage
-#if APPDOMAIN
+#if !CORECLR
         : MarshalByRefObject
 #endif
     {
-		/// <summary>
-		/// List of assemblies to be loaded and tested
-		/// </summary>
+        /// <summary>
+        /// List of assemblies to be loaded and tested
+        /// </summary>
         private List<string> _testfiles = new List<string>();
 
 		/// <summary>
@@ -183,7 +183,7 @@ namespace NBench.Sdk
             return Path.GetDirectoryName(_testfiles[0]);
         }
 
-#if APPDOMAIN
+#if !CORECLR
         /// <summary>
         /// Control the lifetime policy for this instance
         /// </summary>
@@ -194,11 +194,11 @@ namespace NBench.Sdk
 		}
 #endif
 
-		/// <summary>
-		/// Adds a single file to the package
-		/// </summary>
-		/// <param name="filePath">The path to a test file.</param>
-		private void AddSingleFile(string filePath)
+        /// <summary>
+        /// Adds a single file to the package
+        /// </summary>
+        /// <param name="filePath">The path to a test file.</param>
+        private void AddSingleFile(string filePath)
 		{
 			_testfiles.Add(Path.GetFullPath(filePath));
 

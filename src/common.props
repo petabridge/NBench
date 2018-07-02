@@ -1,0 +1,34 @@
+<Project>
+  <PropertyGroup>
+    <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
+    <Authors>Petabridge</Authors>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <PackageReleaseNotes>Fixes several major issues with the `NBench.Runner` executable and being able to support .NET Core dependencies. This is the first set of fixes in a series of ongoing changes designed to help make NBench more user-friendly, extensible, and capable of all manner of interesting performance-related tasks.
+New Feature: Explicitly Settable `Counter`s**
+`Counter` instances can now be explicitly set to increment or decrement by a known value:
+```
+var counter = new Counter(new AtomicCounter(), new CounterMetricName("foo"));
+counter.Increment(10);
+counter.Decrement(2);
+Console.WriteLine(counter.Current); // will print out 8
+```
+Read [the full set of changes in NBench v1.1 here](https://github.com/petabridge/NBench/milestone/4).</PackageReleaseNotes>
+    <PackageProjectUrl>
+      https://github.com/petabridge/NBench
+    </PackageProjectUrl>
+    <PackageLicenseUrl>
+      https://github.com/petabridge/NBench/blob/dev/LICENSE
+    </PackageLicenseUrl>
+    <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
+    <NoWarn>$(NoWarn);CS1591;NU1605</NoWarn>
+    <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApprovalTestsVersion>3.0.13</ApprovalTestsVersion>
+    <XunitVersion>2.3.1</XunitVersion>
+    <TestSdkVersion>15.3.0</TestSdkVersion>
+    <FluentAssertionsVersion>4.19.4</FluentAssertionsVersion>
+  </PropertyGroup>
+</Project>

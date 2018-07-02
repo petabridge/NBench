@@ -1,3 +1,19 @@
+#### v1.1.0 July 1 2018
+Fixes several major issues with the `NBench.Runner` executable and being able to support .NET Core dependencies. This is the first set of fixes in a series of ongoing changes designed to help make NBench more user-friendly, extensible, and capable of all manner of interesting performance-related tasks.
+
+**New Feature: Explicitly Settable `Counter`s**
+`Counter` instances can now be explicitly set to increment or decrement by a known value:
+
+```
+var counter = new Counter(new AtomicCounter(), new CounterMetricName("foo"));
+counter.Increment(10);
+counter.Decrement(2);
+Console.WriteLine(counter.Current); // will print out 8
+```
+
+Read [the full set of changes in NBench v1.1 here](https://github.com/petabridge/NBench/milestone/4).
+
+
 #### v1.0.4 June 14 2017
 
 This release resolves an issue with NuGet deployment of our .NET Core versions of the NBench.Runner executable.  As a standalone .NET Core executable, the .NET Core runtime must be packaged in the same folder as the .exe.  This release ensures that the .NET Core runtime is downloaded along with our .NET Core NBench Runner executables. 
