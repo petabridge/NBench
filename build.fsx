@@ -90,6 +90,7 @@ Target "RunTests" (fun _ ->
                    ++ "tests/**/*Tests*.csproj"
                    -- "tests/**/*Tests.Performance.csproj" // skip NBench specs
         | _ -> !! "tests/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
+                   ++ "tests/**/*Tests*.csproj"
                    -- "tests/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
                    -- "tests/**/*Tests.Performance.csproj" 
 
@@ -110,7 +111,7 @@ Target "RunTests" (fun _ ->
     projects |> Seq.iter (runSingleProject)
 )
 
-Target "NBench" <| fun _ ->
+Target "NBenchNet45" <| fun _ ->
     let nbenchProject = FindFirstMatchingFile "NBench.Runner.csproj" (__SOURCE_DIRECTORY__ @@ "src" @@ "NBench.Runner")
     
     // .NET 4.5.2
@@ -258,6 +259,7 @@ Target "Help" <| fun _ ->
 Target "BuildRelease" DoNothing
 Target "All" DoNothing
 Target "Nuget" DoNothing
+Target "NBench" DoNothing
 
 // build dependencies
 "Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
@@ -270,6 +272,10 @@ Target "Nuget" DoNothing
 
 // docs
 "BuildRelease" ==> "Docfx"
+
+// NBench
+"NBenchNet45" ==> "NBench"
+"NBenchNetCore" ==> "NBench"
 
 // all
 "BuildRelease" ==> "All"
