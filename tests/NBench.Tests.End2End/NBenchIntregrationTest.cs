@@ -61,8 +61,8 @@ namespace NBench.Tests.End2End
 
             var result = TestRunner.Run(package);
             result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
-            result.ExecutedTestsCount.Should().NotBe(0);
-            result.IgnoredTestsCount.Should().Be(0);
+            result.ExecutedTestsCount.Should().Be(0);
+            result.IgnoredTestsCount.Should().NotBe(0);
         }
 
         [Fact]

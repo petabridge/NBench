@@ -23,7 +23,7 @@ namespace NBench.Sdk.Compiler
         public static readonly Type MeasurementAttributeType = typeof (MeasurementAttribute);
         public static readonly Type BenchmarkContextType = typeof (BenchmarkContext);
 
-        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance, new RunnerSettings())
+        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance, new RunnerSettings(){ TracingEnabled = false})
         {
         }
 
