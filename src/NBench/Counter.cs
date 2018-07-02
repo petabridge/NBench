@@ -30,12 +30,35 @@ namespace NBench
         }
 
         /// <summary>
+        /// Increment the counter by a user-defined amount.
+        /// </summary>
+        /// <param name="v">The counter increment value.</param>
+        public void Increment(long v)
+        {
+            _internalCounter.Increment(v);
+        }
+
+        /// <summary>
         /// Decrement the value of the counter by 1
         /// </summary>
         public void Decrement()
         {
             _internalCounter.Decrement();
         }
+
+        /// <summary>
+        /// Decrement the counter by a user-defined amount.
+        /// </summary>
+        /// <param name="v">The counter decrement value.</param>
+        public void Decrement(long v)
+        {
+            _internalCounter.Decrement(v);
+        }
+
+        /// <summary>
+        /// Current value of the counter
+        /// </summary>
+        public long Current => _internalCounter.Current;
     }
 }
 

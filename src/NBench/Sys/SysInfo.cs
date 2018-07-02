@@ -18,7 +18,7 @@ namespace NBench.Sys
             OS = os;
             ProcessorCount = processorCount;
             WorkerThreads = workerThreads;
-#if THREADPOOL
+#if !CORECLR
             IOThreads = ioThreads;
 #endif
             IsMono = isMono;
@@ -53,7 +53,7 @@ namespace NBench.Sys
         /// </summary>
         public int WorkerThreads { get; private set; }
 
-#if THREADPOOL
+#if !CORECLR
         /// <summary>
         /// Number of I/O completion port threads in <see cref="ThreadPool"/>
         /// </summary>

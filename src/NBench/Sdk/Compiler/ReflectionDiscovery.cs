@@ -23,14 +23,14 @@ namespace NBench.Sdk.Compiler
         public static readonly Type MeasurementAttributeType = typeof (MeasurementAttribute);
         public static readonly Type BenchmarkContextType = typeof (BenchmarkContext);
 
-        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance, new RunnerSettings())
+        public ReflectionDiscovery(IBenchmarkOutput output) : this(output, DefaultBenchmarkAssertionRunner.Instance, new RunnerSettings(){ TracingEnabled = false})
         {
         }
 
 
         public ReflectionDiscovery(IBenchmarkOutput output, IBenchmarkAssertionRunner benchmarkAssertions, RunnerSettings settings)
         {
-            Output = _reflectionOutput = output;
+            Output = output;
             BenchmarkAssertions = benchmarkAssertions;
             RunnerSettings = settings;
             if(RunnerSettings.TracingEnabled)
@@ -47,7 +47,7 @@ namespace NBench.Sdk.Compiler
         /// 
         /// Writes to the console by default, but can be overridden through the constructor.
         /// </summary>
-        private static IBenchmarkOutput _reflectionOutput = new ConsoleBenchmarkOutput();
+        internal static IBenchmarkOutput ReflectionOutput = new ConsoleBenchmarkOutput();
 
         public IBenchmarkOutput Output { get; }
         public IBenchmarkAssertionRunner BenchmarkAssertions { get; }
@@ -199,11 +199,11 @@ namespace NBench.Sdk.Compiler
              */
             if (hasPerformanceBenchmarkAttribute && !hasAtLeastOneMeasurementAttribute)
             {
-                _reflectionOutput.Warning($"{x.DeclaringType?.Name}+{x.Name} has a declared PerformanceBenchmarkAttribute but no declared measurements. Skipping...");
+                ReflectionOutput.Warning($"{x.DeclaringType?.Name}+{x.Name} has a declared PerformanceBenchmarkAttribute but no declared measurements. Skipping...");
             }
             else if (benchmarkIsSkipped)
             {
-                _reflectionOutput.WriteLine($"Skipping {x.DeclaringType?.Name}+{x.Name}. Reason: {skipReason}.");
+                ReflectionOutput.WriteLine($"Skipping {x.DeclaringType?.Name}+{x.Name}. Reason: {skipReason}.");
             }
 
             return hasPerformanceBenchmarkAttribute && hasAtLeastOneMeasurementAttribute && !benchmarkIsSkipped;
@@ -223,7 +223,7 @@ namespace NBench.Sdk.Compiler
                 var ex =
                     new NBenchException(
                         $"{classWithBenchmarks.Name} has a declared {setupMethods.Count} PerfSetupAttributes. A maximum of 1 is allowed per class. Failing...");
-                _reflectionOutput.Error(ex.Message);
+                ReflectionOutput.Error(ex.Message);
                 throw ex;
             }
 
@@ -247,7 +247,7 @@ namespace NBench.Sdk.Compiler
                 var ex =
                     new NBenchException(
                         $"{classWithBenchmarks.Name} has a declared {cleanupMethods.Count} PerfCleanupAttributes. A maximum of 1 is allowed per class. Failing...");
-                _reflectionOutput.Error(ex.Message);
+                ReflectionOutput.Error(ex.Message);
                 throw ex;
             }
 

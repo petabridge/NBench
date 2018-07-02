@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
+    <Authors>Petabridge</Authors>
+    <VersionPrefix>1.0.4</VersionPrefix>
+    <PackageReleaseNotes>This release resolves an issue with NuGet deployment of our .NET Core versions of the NBench.Runner executable.  As a standalone .NET Core executable, the .NET Core runtime must be packaged in the same folder as the .exe.  This release ensures that the .NET Core runtime is downloaded along with our .NET Core NBench Runner executables.</PackageReleaseNotes>
+    <PackageIconUrl>https://phobos.petabridge.com/images/phobos_profile_icon.png</PackageIconUrl>
+    <PackageProjectUrl>
+      https://github.com/petabridge/NBench
+    </PackageProjectUrl>
+    <PackageLicenseUrl>
+      https://github.com/petabridge/NBench/blob/dev/LICENSE
+    </PackageLicenseUrl>
+    <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
+    <NoWarn>$(NoWarn);CS1591;NU1605</NoWarn>
+    <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApprovalTestsVersion>3.0.13</ApprovalTestsVersion>
+    <XunitVersion>2.3.1</XunitVersion>
+    <TestSdkVersion>15.3.0</TestSdkVersion>
+    <FluentAssertionsVersion>4.19.4</FluentAssertionsVersion>
+  </PropertyGroup>
+</Project>
