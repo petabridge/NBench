@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FluentAssertions;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
@@ -14,14 +15,15 @@ using Xunit;
 namespace NBench.Tests.End2End
 {
     public class NBenchIntregrationTest
+
     {
-        private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => {}, results =>
-        {
-            foreach (var assertion in results.AssertionResults)
-            {
-                Assert.True(assertion.Passed, results.BenchmarkName + " " + assertion.Message);
-            }
-        });
+        private static readonly IBenchmarkOutput _benchmarkOutput = new ActionBenchmarkOutput(report => { }, results =>
+         {
+             foreach (var assertion in results.AssertionResults)
+             {
+                 Assert.True(assertion.Passed, results.BenchmarkName + " " + assertion.Message);
+             }
+         });
 
         private readonly IDiscovery _discovery = new ReflectionDiscovery(_benchmarkOutput);
 
@@ -45,35 +47,34 @@ namespace NBench.Tests.End2End
         [Fact]
         public void LoadAssemblyCorrect()
         {
-	        var package = LoadPackage();
-	        var result = TestRunner.Run(package);
-            Assert.True(result.AllTestsPassed);
-			Assert.NotEqual(0, result.ExecutedTestsCount);
-			Assert.Equal(0, result.IgnoredTestsCount);
-		}
+            var package = LoadPackage();
+            var result = TestRunner.Run(package);
+            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+            result.ExecutedTestsCount.Should().NotBe(0);
+            result.IgnoredTestsCount.Should().Be(0);
+        }
 
-		
-	    [Fact]
-		public void RunnerIncludeInvalidName()
-		{
-			var package = LoadPackage(new string[] { "unknown" });
+        [Fact]
+        public void RunnerIncludeInvalidName()
+        {
+            var package = LoadPackage(new string[] { "unknown" });
 
-			var result = TestRunner.Run(package);
-			Assert.True(result.AllTestsPassed);
-			Assert.Equal(0, result.ExecutedTestsCount);
-			Assert.NotEqual(0, result.IgnoredTestsCount);
-		}
+            var result = TestRunner.Run(package);
+            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+            result.ExecutedTestsCount.Should().NotBe(0);
+            result.IgnoredTestsCount.Should().Be(0);
+        }
 
-		[Fact]
-		public void RunnerIncludePattern()
-		{
-			var package = LoadPackage(new [] { "*.ConfigBenchmark*" });
+        [Fact]
+        public void RunnerIncludePattern()
+        {
+            var package = LoadPackage(new[] { "*.ConfigBenchmark*" });
 
-			var result = TestRunner.Run(package);
-			Assert.True(result.AllTestsPassed);
-			Assert.Equal(1, result.ExecutedTestsCount);
-			Assert.NotEqual(0, result.IgnoredTestsCount);
-		}
+            var result = TestRunner.Run(package);
+            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+            result.ExecutedTestsCount.Should().Be(1);
+            result.IgnoredTestsCount.Should().NotBe(0);
+        }
 
         [Fact]
         public void RunnerIncludeMultiplePattern()
@@ -81,39 +82,39 @@ namespace NBench.Tests.End2End
             var package = LoadPackage(new[] { "*CounterThroughputBenchmark*", "*SimpleCounterBenchmark*" });
 
             var result = TestRunner.Run(package);
-            Assert.True(result.AllTestsPassed);
-            Assert.Equal(2, result.ExecutedTestsCount);
-            Assert.NotEqual(0, result.IgnoredTestsCount);
+            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+            result.ExecutedTestsCount.Should().Be(2);
+            result.IgnoredTestsCount.Should().NotBe(0);
         }
 
         [Fact]
-		public void RunnerExcludePattern()
-		{
-			var package = LoadPackage(null, new [] { "*CounterThroughputBenchmark*", "*SimpleCounterBenchmark*" });
+        public void RunnerExcludePattern()
+        {
+            var package = LoadPackage(null, new[] { "*CounterThroughputBenchmark*", "*SimpleCounterBenchmark*" });
 
-			var result = TestRunner.Run(package);
-			Assert.True(result.AllTestsPassed);
-			Assert.Equal(1, result.ExecutedTestsCount);
-			Assert.NotEqual(0, result.IgnoredTestsCount);
-		}
+            var result = TestRunner.Run(package);
+            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+            result.ExecutedTestsCount.Should().Be(1);
+            result.IgnoredTestsCount.Should().NotBe(0);
+        }
 
-		private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
-		{
+        private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        {
 #if CORECLR
 		    var assemblySubfolder = "netcoreapp1.1";
 #else
-		    var assemblySubfolder = "net452";
+            var assemblySubfolder = "net452";
 #endif
 
 #if DEBUG
-	        var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.TestAssembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.TestAssembly.dll", include, exclude);
+            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.TestAssembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.TestAssembly.dll", include, exclude);
 #else
             var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.TestAssembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.TestAssembly.dll", include, exclude);
 #endif
 
             package.Validate();
-			return package;
-		}
-	}
+            return package;
+        }
+    }
 }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
@@ -14,6 +15,7 @@ using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End
 {
+
     public class NBenchIntregrationTestWithDependenciesLoadAssembly
     {
         private readonly ITestOutputHelper _output;
@@ -30,9 +32,9 @@ namespace NBench.Tests.End2End
             {
                 var package = LoadPackageWithDependencies();
                 var result = TestRunner.Run(package);
-                Assert.True(result.AllTestsPassed);
-                Assert.NotEqual(0, result.ExecutedTestsCount);
-                Assert.Equal(0, result.IgnoredTestsCount);
+                result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+                result.ExecutedTestsCount.Should().NotBe(0);
+                result.IgnoredTestsCount.Should().Be(0);
             }
         }
 
