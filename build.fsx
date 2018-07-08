@@ -12,6 +12,9 @@ open Fake.DocFxHelper
 // Information about the project for Nuget and Assembly info files
 let configuration = "Release"
 
+// all of the frameworks we target for builds and packing
+let frameworks = ["net452"; "netcoreapp1.1"]
+
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
 let buildNumber = environVarOrDefault "BUILD_NUMBER" "0"
@@ -187,6 +190,44 @@ Target "CreateNuget" (fun _ ->
                     OutputPath = outputNuGet })
 
     projects |> Seq.iter (runSingleProject)
+)
+
+Target "CreateRunnerNuGet" (fun _ ->
+    // uses the template file to create a temporary .nuspec file with the correct version
+    CopyFile "./src/NBench.Runner/NBench.Runner.nuspec" "./src/NBench.Runner/NBench.Runner.nuspec.template"
+    let commonPropsVersionPrefix = XMLRead true "./src/common.props" "" "" "//Project/PropertyGroup/VersionPrefix" |> Seq.head
+    let versionReplacement = List.ofSeq [ "@version@", commonPropsVersionPrefix + (if (not (versionSuffix = "")) then ("-" + versionSuffix) else "") ]
+    let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
+    TemplateHelper.processTemplates versionReplacement [ "./src/NBench.Runner/NBench.Runner.nuspec" ]
+    TemplateHelper.processTemplates releaseNotesReplacement [ "./src/NBench.Runner/NBench.Runner.nuspec" ]
+
+    let executableProjects = !! "./src/**/NBench.Runner.csproj"
+
+    executableProjects |> Seq.iter (fun project ->
+        frameworks |> Seq.iter (fun framework ->
+            DotNetCli.Publish
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Configuration = configuration
+                        Runtime = "win7-x64"
+                        Framework = framework
+                        VersionSuffix = overrideVersionSuffix project } ) 
+                    )
+                )
+    
+    executableProjects |> Seq.iter (fun project ->  
+        DotNetCli.Pack
+            (fun p -> 
+                { p with
+                    Project = project
+                    Configuration = configuration
+                    AdditionalArgs = ["--include-symbols"]
+                    VersionSuffix = overrideVersionSuffix project
+                    OutputPath = outputNuGet } )
+    )
+
+    DeleteFile "./src/NBench.Runner/NBench.Runner.nuspec"
 )
 
 Target "PublishNuget" (fun _ ->
