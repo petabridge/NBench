@@ -178,6 +178,7 @@ Target "CreateNuget" (fun _ ->
     let projects = !! "src/**/*.csproj" 
                    -- "tests/**/*Tests.csproj" // Don't publish unit tests
                    -- "tests/**/*Tests*.csproj"
+                   -- "src/**/*.Runner.csproj" // Don't publish runners
 
     let runSingleProject project =
         DotNetCli.Pack
@@ -309,7 +310,7 @@ Target "NBench" DoNothing
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
-"CreateNuget" ==> "PublishNuget" ==> "Nuget"
+"CreateRunnerNuGet" ==> "CreateNuget" ==> "PublishNuget" ==> "Nuget"
 
 // docs
 "BuildRelease" ==> "Docfx"
