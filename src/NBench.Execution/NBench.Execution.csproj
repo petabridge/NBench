@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net452;netstandard1.6;</TargetFrameworks>
+    <RootNamespace>NBench</RootNamespace>
+    <IsPackable>false</IsPackable> <!-- Don't want to ship this as NuGet package -->
+  </PropertyGroup>
+  
+ <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <DefineConstants>$(DefineConstants);</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+
+</Project>

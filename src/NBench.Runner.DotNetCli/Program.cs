@@ -5,6 +5,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using NBench.Sdk;
 
 namespace NBench.Runner.DotNetCli
@@ -70,13 +73,12 @@ namespace NBench.Runner.DotNetCli
             }
             catch (Exception ex)
             {
-                return 3;
                 Console.WriteLine("Error: {0}", ex.Message);
+                return 3;
             }
 
             return 0;
         }
-
     }
 }
 

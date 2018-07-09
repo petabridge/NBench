@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\NBench\Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
+    <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
+    <Compile Include="..\NBench.Execution\CommandLine.cs" Link="CommandLine.cs" />
   </ItemGroup>
 
   <ItemGroup>

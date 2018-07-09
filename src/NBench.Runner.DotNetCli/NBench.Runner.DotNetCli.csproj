@@ -18,14 +18,14 @@
     <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
   </PropertyGroup>
 
-    
-  <ItemGroup>
-    <Compile Include="..\NBench.Runner\CommandLine.cs" Link="CommandLine.cs" />
-    <Compile Include="..\NBench\Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
-  </ItemGroup>
+
+   <ItemGroup>
+     <Compile Include="..\NBench.Execution\CommandLine.cs" Link="CommandLine.cs" />
+   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

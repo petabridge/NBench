@@ -33,4 +33,12 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sdk\Compiler\Assemblies\" />
+  </ItemGroup>
+
 </Project>
