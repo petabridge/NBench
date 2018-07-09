@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -17,6 +18,19 @@ namespace NBench
     /// </summary>
     internal static class MsBuildHelpers
     {
+
+#if CORECLR // only used by the DotNetCli tool
+        public static string MsBuildName { get; }
+
+        static MsBuildHelpers()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                MsBuildName = "MSBuild.exe";
+            else
+                MsBuildName = "msbuild";
+        }
+#endif
+
         /// <summary>
         /// Parses all of the supported target frameworks for a given MSBuild15 project
         /// </summary>
