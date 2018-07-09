@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using NBench.Sdk.Compiler.Assemblies;
 
 namespace NBench.Runner
 {
@@ -20,6 +21,8 @@ namespace NBench.Runner
     /// </summary>
     public class CommandLine
     {
+        public static readonly string Version = typeof(CommandLine).GetAssembly().GetName().Version.ToString();
+
         private static readonly Lazy<StringDictionary> Values = new Lazy<StringDictionary>(() =>
         {
             var dictionary = new StringDictionary();
@@ -56,7 +59,7 @@ namespace NBench.Runner
 
         public static void ShowHelp()
         {
-            Console.WriteLine(@"NBench Runner (1.0.0)
+            Console.WriteLine($"NBench Runner ({Version})" + @"
 
 Usage: NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
 

@@ -9,9 +9,17 @@
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
     <NuspecFile>NBench.Runner.nuspec</NuspecFile>
   </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\NBench\Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,6 +9,20 @@
     <PackageId>NBench.Runner.DotNetCli</PackageId>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+
+   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+    
+  <ItemGroup>
+    <Compile Include="..\NBench\Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
   </ItemGroup>
