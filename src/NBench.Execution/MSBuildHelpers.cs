@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace NBench
@@ -24,14 +25,25 @@ namespace NBench
         public static string[] GetTargetFrameworks(string projectPath)
         {
             Debug.Assert(projectPath != null);
-            var doc = XDocument.Load(projectPath);
+            var doc = new XmlDocument();
+#if CORECLR
+            using (var stream = File.Open(projectPath, FileMode.Open))
+            {
+                doc.Load(stream);
+                return GetTargetFrameworks(doc);
+            }
+#else
+            doc.Load(projectPath);
             return GetTargetFrameworks(doc);
+#endif
+
         }
 
-        public static string[] GetTargetFrameworks(XDocument doc)
+        public static string[] GetTargetFrameworks(XmlDocument doc)
         {
-            var frameworkNode = doc.Element("TargetFrameworks")?.Value ?? doc.Element("TargetFramework")?.Value;
-            Debug.Assert(frameworkNode != null);
+            var frameworkNode = doc.DocumentElement.SelectSingleNode("/Project/PropertyGroup[1]/TargetFrameworks/text()")?.Value 
+                ?? doc.DocumentElement.SelectSingleNode("/Project/PropertyGroup[1]/TargetFramework/text()")?.Value;
+            
             return frameworkNode.Split(';');
         }
     }
