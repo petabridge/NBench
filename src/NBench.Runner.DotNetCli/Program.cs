@@ -52,15 +52,15 @@ namespace NBench.Runner.DotNetCli
                 // The extra versions are unadvertised compatibility flags to match 'dotnet' command line switches
                 var requestedTargetFramework = (CommandLine.GetProperty("-framework")
                                                    ?? CommandLine.GetProperty("--framework")
-                                                   ?? CommandLine.GetProperty("-f")).SingleOrDefault();
+                                                   ?? CommandLine.GetProperty("-f"))?.SingleOrDefault();
 
                 _configuration = (CommandLine.GetProperty("-configuration")
                                 ?? CommandLine.GetProperty("--configuration")
-                                ?? CommandLine.GetProperty("-c")).SingleOrDefault()
+                                ?? CommandLine.GetProperty("-c"))?.SingleOrDefault()
                                 ?? "Release";
 
                 _fxVersion = (CommandLine.GetProperty("-fxversion")
-                            ?? CommandLine.GetProperty("--fx-version")).SingleOrDefault();
+                            ?? CommandLine.GetProperty("--fx-version"))?.SingleOrDefault();
 
                 _noBuild = (CommandLine.HasProperty("-nobuild")
                           || CommandLine.HasProperty("--no-build"));
@@ -101,12 +101,29 @@ namespace NBench.Runner.DotNetCli
                         WriteLineError($"Unknown target framework '{requestedTargetFramework}'; available frameworks: {string.Join(", ", targetFrameworks.Select(f => $"'{f}'"))}");
                         return 3;
                     }
+
+                    return RunTargetFramework(testProject, requestedTargetFramework);
                 }
+
+                var returnValue = 0;
+
+                foreach (var targetFramework in targetFrameworks)
+                {
+                    var result = RunTargetFramework(testProject, targetFramework);
+                    if (result < 0)
+                        return result;
+
+                    returnValue = Math.Max(result, returnValue);
+                }
+
+                return returnValue;
 
             }
             catch (Exception ex)
             {
                 WriteLineError($"Error: {ex.Message}");
+                WriteLineError($"Source {ex.Source}");
+                WriteLineError($"StackTrace: {ex.StackTrace}");
                 return 3;
             }
 
