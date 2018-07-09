@@ -1,14 +1,17 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+// Inspired by https://github.com/xunit/xunit/blob/master/src/dotnet-xunit/Program.cs
 
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using NBench.Sdk;
+using static NBench.MsBuildHelpers;
 
 namespace NBench.Runner.DotNetCli
 {
@@ -17,6 +20,8 @@ namespace NBench.Runner.DotNetCli
         string Configuration;
         string FxVersion;
         bool NoBuild;
+        private string ThisAssemblyPath;
+        string BuildStdProps;
 
         /// <summary>
         /// NBench Runner takes the following <see cref="args"/>
@@ -66,18 +71,47 @@ namespace NBench.Runner.DotNetCli
                 NoBuild = (CommandLine.HasProperty("-nobuild")
                           || CommandLine.HasProperty("--no-build"));
 
-                // Need to amend the paths for the report output, since we are always running
-                // in the context of the bin folder, not the project folder
-                var currentDirectory = Directory.GetCurrentDirectory();
+                var testProjects = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.*proj")
+                    .Where(x => !x.EndsWith(".xproj")) // skip the beta .NET Core format
+                    .ToList();
+
+                if (testProjects.Count == 0)
+                {
+                    WriteLineError("Could not find any project (*.*proj) file in the current directory.");
+                    return 3;
+                }
+
+                if (testProjects.Count > 1)
+                {
+                    WriteLineError($"Multiple project files were found; only a single project file is supported. Found: {string.Join(", ", testProjects.Select(x => Path.GetFileName(x)))}");
+                    return 3;
+                }
+
+                ThisAssemblyPath = Path.GetDirectoryName(typeof(Program).GetTypeInfo().Assembly.Location);
+                BuildStdProps = $"\"/p:_NBench_ImportTargetsFile={Path.Combine(ThisAssemblyPath, "import.targets")}\" " +
+                                $"/p:Configuration={Configuration}";
+
+                var testProject = testProjects[0];
+
+                var targetFrameworks = GetTargetFrameworks(testProject);
+                //if(targetFrameworks == null)
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: {0}", ex.Message);
+                WriteLineError($"Error: {ex.Message}");
                 return 3;
             }
 
+           
             return 0;
+        }
+
+        public void WriteLineError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
         }
     }
 }

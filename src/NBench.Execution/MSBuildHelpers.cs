@@ -55,10 +55,10 @@ namespace NBench
 
         public static string[] GetTargetFrameworks(XmlDocument doc)
         {
-            var frameworkNode = doc.DocumentElement.SelectSingleNode("/Project/PropertyGroup[1]/TargetFrameworks/text()")?.Value 
-                ?? doc.DocumentElement.SelectSingleNode("/Project/PropertyGroup[1]/TargetFramework/text()")?.Value;
+            var frameworkNode = doc.DocumentElement.SelectSingleNode("/Project/PropertyGroup/TargetFrameworks/text()")?.Value 
+                ?? doc.DocumentElement.SelectSingleNode("/Project/PropertyGroup/TargetFramework/text()")?.Value;
             
-            return frameworkNode.Split(';');
+            return frameworkNode?.Split(';');
         }
     }
 }

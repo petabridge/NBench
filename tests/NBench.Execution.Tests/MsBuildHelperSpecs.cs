@@ -9,6 +9,12 @@ namespace NBench.Execution.Tests
 {
     public class MsBuildHelperSpecs
     {
+        // Invalid, but want to ensure that the way we throw is consistent
+        public static readonly string NoTargetFramework = @"
+            <Project Sdk=""Microsoft.NET.Sdk"">
+              
+            </Project>";
+
         public static readonly string SingleTargetFramework = @"
             <Project Sdk=""Microsoft.NET.Sdk"">
               <Import Project=""..\..\src\common.props"" />
@@ -49,11 +55,23 @@ namespace NBench.Execution.Tests
                 <DotNetCliToolReference Include=""dotnet-xunit"" Version=""$(XunitVersion)"" />
               </ItemGroup>
 
+                <PropertyGroup Condition="" '$(TargetFramework)' == 'netcoreapp1.1' "">
+                    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+                </PropertyGroup>
+
               <ItemGroup>
                 <ProjectReference Include=""..\..\src\NBench.Execution\NBench.Execution.csproj"" />
               </ItemGroup>
 
             </Project>";
+
+        [Fact(DisplayName = "MSBuild: Should not throw when no target framework found")]
+        public void Should_not_throw_when_no_target_Framework_found()
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(NoTargetFramework);
+            MsBuildHelpers.GetTargetFrameworks(doc).Should().BeNull();
+        }
 
         [Fact(DisplayName = "MSBuild: Should be able to parse single target framework")]
         public void Should_parse_single_target_Framework()

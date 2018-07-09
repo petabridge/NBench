@@ -20,12 +20,15 @@
 
 
    <ItemGroup>
+     <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
      <Compile Include="..\NBench.Execution\CommandLine.cs" Link="CommandLine.cs" />
+     <Compile Include="..\NBench.Execution\MSBuildHelpers.cs" Link="MSBuildHelpers.cs" />
    </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
