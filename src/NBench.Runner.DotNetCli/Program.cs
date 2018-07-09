@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -17,6 +18,7 @@ namespace NBench.Runner.DotNetCli
 {
     class Program
     {
+        private static readonly Version Version452 = new Version("4.5.2");
         string Configuration;
         string FxVersion;
         bool NoBuild;
@@ -94,7 +96,20 @@ namespace NBench.Runner.DotNetCli
                 var testProject = testProjects[0];
 
                 var targetFrameworks = GetTargetFrameworks(testProject);
-                //if(targetFrameworks == null)
+                if (targetFrameworks == null)
+                {
+                    WriteLineError($"Failed to detect supported frameworks for [{testProject}]. Please ensure that this is a valid MSBuild15 project.");
+                    return 3;
+                }
+
+                if (requestedTargetFramework != null)
+                {
+                    if (!targetFrameworks.Contains(requestedTargetFramework, StringComparer.OrdinalIgnoreCase))
+                    {
+                        WriteLineError($"Unknown target framework '{requestedTargetFramework}'; available frameworks: {string.Join(", ", targetFrameworks.Select(f => $"'{f}'"))}");
+                        return 3;
+                    }
+                }
 
             }
             catch (Exception ex)
@@ -103,13 +118,172 @@ namespace NBench.Runner.DotNetCli
                 return 3;
             }
 
-           
+
             return 0;
+        }
+
+        public int RunTargetFramework(string testProject, string targetFramework)
+        {
+            var tmpFile = Path.GetTempFileName();
+            try
+            {
+                var target = string.Empty;
+
+                if (NoBuild)
+                {
+                    target = "_NBench_GetTargetValues";
+                    WriteLine($"Locating binaries for framework {targetFramework}...");
+                }
+                else
+                {
+                    target = "Build;_NBench_GetTargetValues";
+                    WriteLine($"Building for framework {targetFramework}...");
+                }
+
+                var psi = GetMsBuildProcessStartInfo(testProject);
+                psi.Arguments += $"/t:{target} \"/p:_NBenchInfoFile={tmpFile}\" \"/p:TargetFramework={targetFramework}\"";
+
+                var process = Process.Start(psi);
+                process.WaitForExit();
+                if (process.ExitCode != 0)
+                {
+                    WriteLineError("Build failed!");
+                    return process.ExitCode;
+                }
+
+                var lines = File.ReadAllLines(tmpFile);
+                var outputPath = "";
+                var assemblyName = "";
+                var targetFileName = "";
+                var targetFrameworkIdentifier = "";
+                var targetFrameworkVersion = "";
+                var runtimeFrameworkVersion = "";
+
+                foreach (var line in lines)
+                {
+                    var idx = line.IndexOf(':');
+                    if (idx <= 0) continue;
+                    var name = line.Substring(0, idx)?.Trim().ToLowerInvariant();
+                    var value = line.Substring(idx + 1)?.Trim();
+                    if (name == "outputpath")
+                        outputPath = value;
+                    else if (name == "assemblyname")
+                        assemblyName = value;
+                    else if (name == "targetfilename")
+                        targetFileName = value;
+                    else if (name == "targetframeworkidentifier")
+                        targetFrameworkIdentifier = value;
+                    else if (name == "targetframeworkversion")
+                        targetFrameworkVersion = value;
+                    else if (name == "runtimeframeworkversion")
+                        runtimeFrameworkVersion = value;
+                }
+
+                var version = string.IsNullOrWhiteSpace(targetFrameworkVersion) ? new Version("0.0.0.0") : new Version(targetFrameworkVersion.TrimStart('v'));
+
+                if (targetFrameworkIdentifier == ".NETCoreApp")
+                {
+                    if (runtimeFrameworkVersion == "2.0")
+                        runtimeFrameworkVersion = "2.0.0";
+
+                    var fxVersion = FxVersion ?? runtimeFrameworkVersion;
+                    WriteLine($"Running .NET Core {fxVersion} tests for framework {targetFramework}...");
+                    return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, $"netcoreapp{version.Major}.0");
+                }
+                if (targetFrameworkIdentifier == ".NETFramework" && version >= Version452)
+                {
+                    WriteLine($"Running desktop CLR tests for framework {targetFramework}...");
+                    return RunDesktopProject(outputPath, targetFileName);
+                }
+
+                WriteLineWarning($"Unsupported target framework '{targetFrameworkIdentifier} {version}' (only .NETCoreApp 1.x/2.x and .NETFramework 4.5.2+ are supported)");
+                return 0;
+            }
+            finally
+            {
+                File.Delete(tmpFile);
+            }
+        }
+
+        private int RunDesktopProject(string outputPath, string targetFileName)
+        {
+            var runnerFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "tools", "net452"));
+
+            // Debug hack to be able to run from the compilation folder
+            if (!Directory.Exists(runnerFolder))
+                runnerFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", "net452", "win7-x64"));
+
+            var executableName = "NBench.Runner.exe";
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = Path.Combine(runnerFolder, executableName),
+                Arguments = $@"""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())}",
+                WorkingDirectory = Path.GetFullPath(outputPath)
+            };
+
+            var runTests = Process.Start(psi);
+            runTests.WaitForExit();
+
+            return runTests.ExitCode;
+        }
+
+        private int RunDotNetCoreProject(string outputPath, string assemblyName, string targetFileName, string fxVersion, string netCoreAppVersion)
+        {
+            var consoleFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "tools", netCoreAppVersion));
+
+            // Debug hack to be able to run from the compilation folder
+            if (!Directory.Exists(consoleFolder))
+                consoleFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", netCoreAppVersion));
+
+            if (!Directory.Exists(consoleFolder))
+            {
+                WriteLineError($"Could not locate runner DLL for {netCoreAppVersion}; unsupported version of .NET Core");
+                return 3;
+            }
+
+            var runner = Path.Combine(consoleFolder, "NBench.Runner.dll");
+            var workingDirectory = Path.GetFullPath(outputPath);
+            var targetFileNameWithoutExtension = Path.GetFileNameWithoutExtension(targetFileName);
+            var depsFile = targetFileNameWithoutExtension + ".deps.json";
+            var runtimeConfigJson = targetFileNameWithoutExtension + ".runtimeconfig.json";
+
+            var args = $@"exec --fx-version {fxVersion} --depsfile ""{depsFile}"" ";
+
+            if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
+                args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
+
+            args += $@"""{runner}"" ""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())}";
+
+            var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
+
+            var runTests = Process.Start(psi);
+            runTests.WaitForExit();
+            return runTests.ExitCode;
+        }
+
+        ProcessStartInfo GetMsBuildProcessStartInfo(string testProject)
+        {
+            var args = $"\"{testProject}\" /nologo {BuildStdProps} ";
+
+            return new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = $"msbuild {args}" };
+        }
+
+        public void WriteLine(string message)
+        {
+            Console.WriteLine(message);
         }
 
         public void WriteLineError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        public void WriteLineWarning(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(message);
             Console.ResetColor();
         }
