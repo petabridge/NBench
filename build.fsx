@@ -19,7 +19,7 @@ let frameworks = ["net452"; "netcoreapp1.1"]
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
 let buildNumber = environVarOrDefault "BUILD_NUMBER" "0"
 let hasTeamCity = (not (buildNumber = "0")) // check if we have the TeamCity environment variable for build # set
-let preReleaseVersionSuffix = (if (not (buildNumber = "0")) then (buildNumber) else "") + "-beta"
+let preReleaseVersionSuffix = (if (not (buildNumber = "0")) then (buildNumber) else "") + ("-beta" + DateTime.UtcNow.Ticks.ToString())
 let versionSuffix = 
     match (getBuildParam "nugetprerelease") with
     | "dev" -> preReleaseVersionSuffix
