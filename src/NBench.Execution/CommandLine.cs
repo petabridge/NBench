@@ -132,7 +132,7 @@ Arguments:
 
         public static List<string> GetProperty(string key)
         {
-            return Values.Value[key];
+            return Values.Value.ContainsKey(key) ? Values.Value[key] : null;
         }
 
         /// <summary>

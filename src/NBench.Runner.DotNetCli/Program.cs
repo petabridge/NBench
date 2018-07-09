@@ -53,12 +53,15 @@ namespace NBench.Runner.DotNetCli
                 var requestedTargetFramework = (CommandLine.GetProperty("-framework")
                                                    ?? CommandLine.GetProperty("--framework")
                                                    ?? CommandLine.GetProperty("-f")).SingleOrDefault();
+
                 _configuration = (CommandLine.GetProperty("-configuration")
                                 ?? CommandLine.GetProperty("--configuration")
                                 ?? CommandLine.GetProperty("-c")).SingleOrDefault()
                                 ?? "Release";
+
                 _fxVersion = (CommandLine.GetProperty("-fxversion")
                             ?? CommandLine.GetProperty("--fx-version")).SingleOrDefault();
+
                 _noBuild = (CommandLine.HasProperty("-nobuild")
                           || CommandLine.HasProperty("--no-build"));
 
