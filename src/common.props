@@ -2,17 +2,10 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>1.1.0</VersionPrefix>
-    <PackageReleaseNotes>Fixes several major issues with the `NBench.Runner` executable and being able to support .NET Core dependencies. This is the first set of fixes in a series of ongoing changes designed to help make NBench more user-friendly, extensible, and capable of all manner of interesting performance-related tasks.
-New Feature: Explicitly Settable `Counter`s**
-`Counter` instances can now be explicitly set to increment or decrement by a known value:
-```
-var counter = new Counter(new AtomicCounter(), new CounterMetricName("foo"));
-counter.Increment(10);
-counter.Decrement(2);
-Console.WriteLine(counter.Current); // will print out 8
-```
-Read [the full set of changes in NBench v1.1 here](https://github.com/petabridge/NBench/milestone/4).</PackageReleaseNotes>
+    <VersionPrefix>1.1.1</VersionPrefix>
+    <PackageReleaseNotes>Minor bugfix release for NBench v1.1.0.
+Resolved [fix NBench.Runner dotnet publish output](https://github.com/petabridge/NBench/issues/237), so the stand-alone runner should now work as part fo the `NBench.Runner` package.
+Please note that all binaries are now located inside the `tools/{framework}` folder inside the `NBench.Runner` package.</PackageReleaseNotes>
     <PackageProjectUrl>
       https://github.com/petabridge/NBench
     </PackageProjectUrl>
