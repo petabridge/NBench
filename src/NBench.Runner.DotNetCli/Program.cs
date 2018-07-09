@@ -49,14 +49,6 @@ namespace NBench.Runner.DotNetCli
                     return 0;
                 }
 
-                var files = CommandLine.GetFiles(args);
-                if (files.Count == 0)
-                {
-                    Console.WriteLine("Please provide assemblies for which to run NBench tests\n");
-                    CommandLine.ShowHelp();
-                    return 1;
-                }
-
                 // The extra versions are unadvertised compatibility flags to match 'dotnet' command line switches
                 var requestedTargetFramework = (CommandLine.GetProperty("-framework")
                                                    ?? CommandLine.GetProperty("--framework")
