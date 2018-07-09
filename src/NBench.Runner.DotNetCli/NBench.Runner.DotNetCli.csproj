@@ -20,6 +20,7 @@
 
     
   <ItemGroup>
+    <Compile Include="..\NBench.Runner\CommandLine.cs" Link="CommandLine.cs" />
     <Compile Include="..\NBench\Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
   </ItemGroup>
 

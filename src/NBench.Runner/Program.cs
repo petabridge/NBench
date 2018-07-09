@@ -30,9 +30,9 @@ namespace NBench.Runner
 		    }
 
 			if (CommandLine.HasProperty("include"))
-				include = CommandLine.GetProperty("include").Split(',');
+				include = CommandLine.GetProperty("include")?.ToArray();
 			if (CommandLine.HasProperty("exclude"))
-				exclude = CommandLine.GetProperty("exclude").Split(',');
+				exclude = CommandLine.GetProperty("exclude")?.ToArray();
 		    if (CommandLine.HasProperty("concurrent"))
 		        concurrent = CommandLine.GetBool("concurrent");
 		    if (CommandLine.HasProperty("trace"))
@@ -57,10 +57,10 @@ namespace NBench.Runner
 		        new TestPackage(files, include, exclude, concurrent) {Tracing = trace};
 
 		    if (CommandLine.HasProperty("output-directory"))
-		        package.OutputDirectory = CommandLine.GetProperty("output-directory");
+		        package.OutputDirectory = CommandLine.GetSingle("output-directory");
 
 		    if (CommandLine.HasProperty("configuration"))
-		        package.ConfigurationFile = CommandLine.GetProperty("configuration");
+		        package.ConfigurationFile = CommandLine.GetSingle("configuration");
 
 		    package.TeamCity = teamcity;
 

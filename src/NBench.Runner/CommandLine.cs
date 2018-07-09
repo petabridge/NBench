@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using NBench.Sdk.Compiler.Assemblies;
 
 namespace NBench.Runner
@@ -23,17 +24,51 @@ namespace NBench.Runner
     {
         public static readonly string Version = typeof(CommandLine).GetAssembly().GetName().Version.ToString();
 
-        private static readonly Lazy<StringDictionary> Values = new Lazy<StringDictionary>(() =>
+        private static readonly Lazy<Dictionary<string, List<string>>> Values = new Lazy<Dictionary<string, List<string>>>(ParseValues);
+
+        private static Dictionary<string, List<string>> ParseValues()
         {
-            var dictionary = new StringDictionary();
-            foreach (var arg in Environment.GetCommandLineArgs())
+            var dictionary = new Dictionary<string, List<string>>();
+
+            var args = Environment.GetCommandLineArgs();
+            var idx = 0;
+            while (idx < args.Length)
             {
-                if (!arg.Contains("=")) continue;
-                var tokens = arg.Split('=');
-                dictionary.Add(tokens[0], tokens[1]);
+                var arg = args[idx++];
+                if (arg.Contains("=")) // NBench v1.1 and earlier argument formats
+                {
+                    var tokens = arg.Split('=');
+                    
+                    if (dictionary.TryGetValue(tokens[0], out var values))
+                    {
+                        dictionary[tokens[0]] = values.Concat(tokens[1].Split(',')).Distinct().ToList();
+                    }
+                    else
+                    {
+                        dictionary.Add(tokens[0], tokens[1].Split(',').ToList());
+                    }
+                }
+                else if (arg.StartsWith("-")) // later argument formats (dotnet-cli compatibility)
+                {
+                    if (!dictionary.TryGetValue(arg, out var values))
+                    {
+                        values = new List<string>();
+                        dictionary.Add(arg, values);
+                    }
+
+                    if (idx < args.Length && !args[idx].StartsWith("-"))
+                    {
+                        values.Add(args[idx++]);
+                    }
+                    else
+                        values.Add(null);
+                }
             }
+
             return dictionary;
-        });
+            
+        }
+
 
         /// <summary>
         /// Retrieve file names from the command line
@@ -97,29 +132,34 @@ Arguments:
 ");
         }
 
-        public static string GetProperty(string key)
+        public static List<string> GetProperty(string key)
         {
             return Values.Value[key];
         }
 
-		/// <summary>
-		/// Determines whether a property was written in the command line
-		/// </summary>
-		/// <param name="key">Name of the property</param>
-		/// <returns></returns>
-		public static bool HasProperty(string key)
-		{
-			return Values.Value.ContainsKey(key);
-		}
+        /// <summary>
+        /// Determines whether a property was written in the command line
+        /// </summary>
+        /// <param name="key">Name of the property</param>
+        /// <returns></returns>
+        public static bool HasProperty(string key)
+        {
+            return Values.Value.ContainsKey(key);
+        }
 
         public static int GetInt32(string key)
         {
-            return Convert.ToInt32(GetProperty(key));
+            return Convert.ToInt32(GetProperty(key).SingleOrDefault());
         }
 
         public static bool GetBool(string key)
         {
-            return Convert.ToBoolean(GetProperty(key));
+            return Convert.ToBoolean(GetProperty(key).SingleOrDefault());
+        }
+
+        public static string GetSingle(string key)
+        {
+            return GetProperty(key).SingleOrDefault();
         }
     }
 }
