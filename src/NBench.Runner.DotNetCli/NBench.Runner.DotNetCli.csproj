@@ -6,18 +6,13 @@
     <TargetFrameworks>netcoreapp1.1</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageType>DotnetCliTool</PackageType>
-    <PackageId>NBench.Runner.DotNetCli</PackageId>
+    <PackageId>dotnet-nbench</PackageId>
+    <NuspecFile>dotnet-nbench.nuspec</NuspecFile>
   </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
-    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
-  </PropertyGroup>
-
 
    <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
     <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
   </PropertyGroup>
-
 
    <ItemGroup>
      <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="AssemblyHelperExtensions.cs" />
@@ -25,14 +20,17 @@
      <Compile Include="..\NBench.Execution\MSBuildHelpers.cs" Link="MSBuildHelpers.cs" />
    </ItemGroup>
 
+
+   <ItemGroup>
+     <Content Include="import.targets">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\NBench\NBench.csproj" />
   </ItemGroup>
 
 </Project>

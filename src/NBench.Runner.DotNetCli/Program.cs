@@ -11,7 +11,6 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using NBench.Sdk;
 using static NBench.MsBuildHelpers;
 
 namespace NBench.Runner.DotNetCli
@@ -19,11 +18,11 @@ namespace NBench.Runner.DotNetCli
     class Program
     {
         private static readonly Version Version452 = new Version("4.5.2");
-        string Configuration;
-        string FxVersion;
-        bool NoBuild;
-        private string ThisAssemblyPath;
-        string BuildStdProps;
+        private string _configuration;
+        private string _fxVersion;
+        private bool _noBuild;
+        private string _thisAssemblyPath;
+        private string _buildStdProps;
 
         /// <summary>
         /// NBench Runner takes the following <see cref="args"/>
@@ -50,8 +49,6 @@ namespace NBench.Runner.DotNetCli
                     return 0;
                 }
 
-                string requestedTargetFramework;
-
                 var files = CommandLine.GetFiles(args);
                 if (files.Count == 0)
                 {
@@ -61,16 +58,16 @@ namespace NBench.Runner.DotNetCli
                 }
 
                 // The extra versions are unadvertised compatibility flags to match 'dotnet' command line switches
-                requestedTargetFramework = (CommandLine.GetProperty("-framework")
-                                            ?? CommandLine.GetProperty("--framework")
-                                            ?? CommandLine.GetProperty("-f")).SingleOrDefault();
-                Configuration = (CommandLine.GetProperty("-configuration")
+                var requestedTargetFramework = (CommandLine.GetProperty("-framework")
+                                                   ?? CommandLine.GetProperty("--framework")
+                                                   ?? CommandLine.GetProperty("-f")).SingleOrDefault();
+                _configuration = (CommandLine.GetProperty("-configuration")
                                 ?? CommandLine.GetProperty("--configuration")
                                 ?? CommandLine.GetProperty("-c")).SingleOrDefault()
                                 ?? "Release";
-                FxVersion = (CommandLine.GetProperty("-fxversion")
+                _fxVersion = (CommandLine.GetProperty("-fxversion")
                             ?? CommandLine.GetProperty("--fx-version")).SingleOrDefault();
-                NoBuild = (CommandLine.HasProperty("-nobuild")
+                _noBuild = (CommandLine.HasProperty("-nobuild")
                           || CommandLine.HasProperty("--no-build"));
 
                 var testProjects = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.*proj")
@@ -89,9 +86,9 @@ namespace NBench.Runner.DotNetCli
                     return 3;
                 }
 
-                ThisAssemblyPath = Path.GetDirectoryName(typeof(Program).GetTypeInfo().Assembly.Location);
-                BuildStdProps = $"\"/p:_NBench_ImportTargetsFile={Path.Combine(ThisAssemblyPath, "import.targets")}\" " +
-                                $"/p:Configuration={Configuration}";
+                _thisAssemblyPath = Path.GetDirectoryName(typeof(Program).GetTypeInfo().Assembly.Location);
+                _buildStdProps = $"\"/p:_NBench_ImportTargetsFile={Path.Combine(_thisAssemblyPath, "import.targets")}\" " +
+                                $"/p:Configuration={_configuration}";
 
                 var testProject = testProjects[0];
 
@@ -129,7 +126,7 @@ namespace NBench.Runner.DotNetCli
             {
                 var target = string.Empty;
 
-                if (NoBuild)
+                if (_noBuild)
                 {
                     target = "_NBench_GetTargetValues";
                     WriteLine($"Locating binaries for framework {targetFramework}...");
@@ -186,7 +183,7 @@ namespace NBench.Runner.DotNetCli
                     if (runtimeFrameworkVersion == "2.0")
                         runtimeFrameworkVersion = "2.0.0";
 
-                    var fxVersion = FxVersion ?? runtimeFrameworkVersion;
+                    var fxVersion = _fxVersion ?? runtimeFrameworkVersion;
                     WriteLine($"Running .NET Core {fxVersion} tests for framework {targetFramework}...");
                     return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, $"netcoreapp{version.Major}.0");
                 }
@@ -207,11 +204,11 @@ namespace NBench.Runner.DotNetCli
 
         private int RunDesktopProject(string outputPath, string targetFileName)
         {
-            var runnerFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "tools", "net452"));
+            var runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "tools", "net452"));
 
             // Debug hack to be able to run from the compilation folder
             if (!Directory.Exists(runnerFolder))
-                runnerFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", "net452", "win7-x64"));
+                runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", "net452", "win7-x64"));
 
             var executableName = "NBench.Runner.exe";
 
@@ -230,11 +227,11 @@ namespace NBench.Runner.DotNetCli
 
         private int RunDotNetCoreProject(string outputPath, string assemblyName, string targetFileName, string fxVersion, string netCoreAppVersion)
         {
-            var consoleFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "tools", netCoreAppVersion));
+            var consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "tools", netCoreAppVersion));
 
             // Debug hack to be able to run from the compilation folder
             if (!Directory.Exists(consoleFolder))
-                consoleFolder = Path.GetFullPath(Path.Combine(ThisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", netCoreAppVersion));
+                consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", netCoreAppVersion));
 
             if (!Directory.Exists(consoleFolder))
             {
@@ -264,7 +261,7 @@ namespace NBench.Runner.DotNetCli
 
         ProcessStartInfo GetMsBuildProcessStartInfo(string testProject)
         {
-            var args = $"\"{testProject}\" /nologo {BuildStdProps} ";
+            var args = $"\"{testProject}\" /nologo {_buildStdProps} ";
 
             return new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = $"msbuild {args}" };
         }
