@@ -180,6 +180,15 @@ Target "CreateNuget" (fun _ ->
                    -- "tests/**/*Tests*.csproj"
                    -- "src/**/*.Runner.csproj" // Don't publish runners
 
+    // Update NuSpec for DotNetCli prior to pack operation
+    CopyFile "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec" "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec.template"
+    let commonPropsVersionPrefix = XMLRead true "./src/common.props" "" "" "//Project/PropertyGroup/VersionPrefix" |> Seq.head
+    let versionReplacement = List.ofSeq [ "@version@", commonPropsVersionPrefix + (if (not (versionSuffix = "")) then ("-" + versionSuffix) else "") ]
+    let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
+
+    TemplateHelper.processTemplates versionReplacement [ "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec" ]
+    TemplateHelper.processTemplates releaseNotesReplacement [ "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec" ]
+
     let runSingleProject project =
         DotNetCli.Pack
             (fun p -> 
@@ -191,6 +200,9 @@ Target "CreateNuget" (fun _ ->
                     OutputPath = outputNuGet })
 
     projects |> Seq.iter (runSingleProject)
+
+    // clean up the temporary folder
+    DeleteFile "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec"
 )
 
 Target "CreateRunnerNuGet" (fun _ ->
@@ -201,6 +213,7 @@ Target "CreateRunnerNuGet" (fun _ ->
     let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
     TemplateHelper.processTemplates versionReplacement [ "./src/NBench.Runner/NBench.Runner.nuspec" ]
     TemplateHelper.processTemplates releaseNotesReplacement [ "./src/NBench.Runner/NBench.Runner.nuspec" ]
+
 
     let executableProjects = !! "./src/**/NBench.Runner.csproj"
 
