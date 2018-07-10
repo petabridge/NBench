@@ -12,11 +12,14 @@ open Fake.DocFxHelper
 // Information about the project for Nuget and Assembly info files
 let configuration = "Release"
 
+// all of the frameworks we target for builds and packing
+let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp2.0"; "netcoreapp2.1";]
+
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
 let buildNumber = environVarOrDefault "BUILD_NUMBER" "0"
 let hasTeamCity = (not (buildNumber = "0")) // check if we have the TeamCity environment variable for build # set
-let preReleaseVersionSuffix = (if (not (buildNumber = "0")) then (buildNumber) else "") + "-beta"
+let preReleaseVersionSuffix = (if (not (buildNumber = "0")) then (buildNumber) else "") + ("-beta" + DateTime.UtcNow.Ticks.ToString())
 let versionSuffix = 
     match (getBuildParam "nugetprerelease") with
     | "dev" -> preReleaseVersionSuffix
@@ -47,6 +50,7 @@ Target "AssemblyInfo" (fun _ ->
 )
 
 Target "RestorePackages" (fun _ ->
+    ActivateFinalTarget "KillCreatedProcesses"
     DotNetCli.Restore
         (fun p -> 
             { p with
@@ -54,7 +58,8 @@ Target "RestorePackages" (fun _ ->
                 NoCache = false })
 )
 
-Target "Build" (fun _ ->          
+Target "Build" (fun _ -> 
+    ActivateFinalTarget "KillCreatedProcesses"         
     DotNetCli.Build
         (fun p -> 
             { p with
@@ -111,58 +116,31 @@ Target "RunTests" (fun _ ->
     projects |> Seq.iter (runSingleProject)
 )
 
-Target "NBenchNet45" <| fun _ ->
-    let nbenchProject = FindFirstMatchingFile "NBench.Runner.csproj" (__SOURCE_DIRECTORY__ @@ "src" @@ "NBench.Runner")
-    
-    // .NET 4.5.2
-    let nbenchRunner = "dotnet"
-    let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/net452/NBench.Tests.Performance.WithDependencies.dll"
-        
-    let spec = getBuildParam "spec"
+Target "NBench" <| fun _ ->
+    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
+    let dotnetNBenchDll = findToolInSubPath "dotnet-nbench.dll" "./src/**/bin/Release/netcoreapp2.0"
 
-    let args = new StringBuilder()
-                |> append "run"
+    nbenchTestAssemblies |> Seq.iter(fun project -> 
+        let args = new StringBuilder()
+                |> append dotnetNBenchDll // need to unquote this parameter pair or the CLI breaks
                 |> append "--project"
-                |> append nbenchProject // need to unquote this parameter pair or the CLI breaks
-                |> append "--framework"
-                |> append "net452"
-                |> append (sprintf "--configuration %s" configuration)
-                |> append assembly
-                |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                |> append (sprintf "concurrent=\"%b\"" true)
-                |> append (sprintf "trace=\"%b\"" true)
+                |> append (filename project)
+                |> append "--output"
+                |> append outputPerfTests
+                |> append "--concurrent true" 
+                |> append "--trace true"
+                |> append "--diagnostic"
+                |> append "--no-build"
                 |> toText
 
-    let result = ExecProcess(fun info -> 
-        info.FileName <- nbenchRunner
-        info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-    if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
+        let result = ExecProcess(fun info -> 
+            info.FileName <- "dotnet"
+            info.WorkingDirectory <- (Directory.GetParent project).FullName
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
+    )
 
-Target "NBenchNetCore" <| fun _ ->
-    let nbenchProject = FindFirstMatchingFile "NBench.Runner.csproj" (__SOURCE_DIRECTORY__ @@ "src" @@ "NBench.Runner")
-
-    // .NET Core
-    let nbenchRunner = "dotnet"
-    let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
-    let spec = getBuildParam "spec"
-
-    let netCoreNbenchRunnerArgs = new StringBuilder()
-                                    |> append "run"
-                                    |> append "--project"
-                                    |> append nbenchProject // need to unquote this parameter pair or the CLI breaks
-                                    |> append "--framework"
-                                    |> append "netcoreapp1.1"
-                                    |> append (sprintf "--configuration %s" configuration)
-                                    |> append assembly
-                                    |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                                    |> append (sprintf "concurrent=\"%b\"" true)
-                                    |> append (sprintf "trace=\"%b\"" true)
-                                    |> toText
-
-    let result = ExecProcess(fun info -> 
-        info.FileName <- nbenchRunner
-        info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-    if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner netCoreNbenchRunnerArgs 
+    
 
 //--------------------------------------------------------------------------------
 // Nuget targets 
@@ -171,10 +149,40 @@ Target "NBenchNetCore" <| fun _ ->
 let overrideVersionSuffix (project:string) =
     match project with
     | _ -> versionSuffix // add additional matches to publish different versions for different projects in solution
+
+Target "CreateNuspecs" (fun _ ->
+    let nuspecs = !! "src/**/*.nuspec.template"
+
+    // For each individual .nuspec.template file, need to inject some credentials
+    let commonPropsVersionPrefix = XMLRead true "./src/common.props" "" "" "//Project/PropertyGroup/VersionPrefix" |> Seq.head
+    let versionReplacement = List.ofSeq [ "@version@", commonPropsVersionPrefix + (if (not (versionSuffix = "")) then ("-" + versionSuffix) else "") ]
+    let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
+
+    nuspecs |> Seq.iter (fun template ->
+        let fileInfo = new FileInfo(template);
+        let nuspec = (Path.Combine(fileInfo.DirectoryName, fileInfo.Name.Replace(".template", "")))
+
+        // Create the temporary .nuspec file
+        CopyFile nuspec template
+
+        TemplateHelper.processTemplates versionReplacement [ nuspec ]
+        TemplateHelper.processTemplates releaseNotesReplacement [ nuspec ]
+    )
+)
+
+Target "CleanupNuspecs" (fun _ ->
+    let nuspecs = !! "src/**/*.nuspec"
+
+    nuspecs |> Seq.iter (fun nuspec ->
+        DeleteFile nuspec
+    )
+)
+
 Target "CreateNuget" (fun _ ->    
     let projects = !! "src/**/*.csproj" 
                    -- "tests/**/*Tests.csproj" // Don't publish unit tests
                    -- "tests/**/*Tests*.csproj"
+                   -- "src/**/*.Runner.csproj" // Don't publish runners  
 
     let runSingleProject project =
         DotNetCli.Pack
@@ -187,6 +195,34 @@ Target "CreateNuget" (fun _ ->
                     OutputPath = outputNuGet })
 
     projects |> Seq.iter (runSingleProject)
+)
+
+Target "CreateRunnerNuGet" (fun _ ->
+    let executableProjects = !! "./src/**/NBench.Runner.csproj"
+
+    executableProjects |> Seq.iter (fun project ->
+        frameworks |> Seq.iter (fun framework ->
+            DotNetCli.Publish
+                (fun p -> 
+                    { p with
+                        Project = project
+                        Configuration = configuration
+                        Runtime = "win7-x64"
+                        Framework = framework
+                        VersionSuffix = overrideVersionSuffix project } ) 
+                    )
+                )
+    
+    executableProjects |> Seq.iter (fun project ->  
+        DotNetCli.Pack
+            (fun p -> 
+                { p with
+                    Project = project
+                    Configuration = configuration
+                    AdditionalArgs = ["--include-symbols"]
+                    VersionSuffix = overrideVersionSuffix project
+                    OutputPath = outputNuGet } )
+    )
 )
 
 Target "PublishNuget" (fun _ ->
@@ -232,6 +268,12 @@ Target "DocFx" (fun _ ->
                     DocFxJson = docsPath @@ "docfx.json" })
 )
 
+FinalTarget "KillCreatedProcesses" (fun _ ->
+    log "Killing processes started by FAKE:"
+    startedProcesses |> Seq.iter (fun (pid, _) -> logfn "%i" pid)
+    killAllCreatedProcesses()
+)
+
 //--------------------------------------------------------------------------------
 // Help 
 //--------------------------------------------------------------------------------
@@ -259,7 +301,6 @@ Target "Help" <| fun _ ->
 Target "BuildRelease" DoNothing
 Target "All" DoNothing
 Target "Nuget" DoNothing
-Target "NBench" DoNothing
 
 // build dependencies
 "Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
@@ -268,14 +309,13 @@ Target "NBench" DoNothing
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
-"CreateNuget" ==> "PublishNuget" ==> "Nuget"
+"CreateNuspecs" ==> "CreateRunnerNuGet" ==> "CreateNuget" ==> "CleanupNuspecs" ==> "PublishNuget" ==> "Nuget"
 
 // docs
 "BuildRelease" ==> "Docfx"
 
 // NBench
-"NBenchNet45" ==> "NBench"
-"NBenchNetCore" ==> "NBench"
+"CreateRunnerNuGet" ==> "NBench"
 
 // all
 "BuildRelease" ==> "All"
