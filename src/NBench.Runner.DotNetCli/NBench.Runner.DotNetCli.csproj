@@ -3,14 +3,18 @@
   <PropertyGroup>
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <AssemblyName>dotnet-nbench</AssemblyName>
-    <TargetFrameworks>netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <PackageType>DotnetCliTool</PackageType>
     <PackageId>dotnet-nbench</PackageId>
     <NuspecFile>dotnet-nbench.nuspec</NuspecFile>
   </PropertyGroup>
 
-   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
   </PropertyGroup>
 

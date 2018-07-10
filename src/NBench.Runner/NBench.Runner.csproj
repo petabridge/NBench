@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <AssemblyTitle>NBench.Runner</AssemblyTitle>
-    <TargetFrameworks>net452;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
     <OutputType>Exe</OutputType>  
     <PackageId>NBench.Runner</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
@@ -15,6 +15,22 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
   </ItemGroup>
 
