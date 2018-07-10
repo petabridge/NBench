@@ -197,14 +197,24 @@ namespace NBench.Runner.DotNetCli
                     if (runtimeFrameworkVersion == "2.0")
                         runtimeFrameworkVersion = "2.0.0";
 
+                    string netCoreAppVersion;
+                    if (version.Major == 2 && version.Minor == 1) // net core 2.1
+                        netCoreAppVersion = $"netcoreapp{version.Major}.1";
+                    else
+                    {
+                        netCoreAppVersion = $"netcoreapp{version.Major}.0";
+                    }
+
                     var fxVersion = _fxVersion ?? runtimeFrameworkVersion;
                     WriteLine($"Running .NET Core {fxVersion} tests for framework {targetFramework}...");
-                    return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, $"netcoreapp{version.Major}.0", Directory.GetCurrentDirectory());
+                    var outputDirectory = SetFrameworkOutputDirectory(fxVersion, testProject);
+                    return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, netCoreAppVersion, outputDirectory);
                 }
                 if (targetFrameworkIdentifier == ".NETFramework" && version >= Version452)
                 {
                     WriteLine($"Running desktop CLR tests for framework {targetFramework}...");
-                    return RunDesktopProject(outputPath, targetFileName, Directory.GetCurrentDirectory());
+                    var outputDirectory = SetFrameworkOutputDirectory(targetFramework, testProject);
+                    return RunDesktopProject(outputPath, targetFileName, outputDirectory);
                 }
 
                 WriteLineWarning($"Unsupported target framework '{targetFrameworkIdentifier} {version}' (only .NETCoreApp 1.x/2.x and .NETFramework 4.5.2+ are supported)");
@@ -267,7 +277,7 @@ namespace NBench.Runner.DotNetCli
             if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
                 args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
 
-            args += $@"""{runner}"" ""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())} output=""{outputDirectory}""";
+            args += $@"""{runner}"" ""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())} output-directory=""{outputDirectory}""";
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 
@@ -277,6 +287,29 @@ namespace NBench.Runner.DotNetCli
             var runTests = Process.Start(psi);
             runTests.WaitForExit();
             return runTests.ExitCode;
+        }
+
+        /// <summary>
+        /// Creates an output directory for NBench output if one isn't already explicitly set by the user.
+        /// </summary>
+        /// <param name="targetFramework">The framework the user is using</param>
+        /// <param name="testProject">The test project</param>
+        /// <param name="createIfNotExists">Create the root output directory if it doesn't exist.</param>
+        /// <returns></returns>
+        string SetFrameworkOutputDirectory(string targetFramework, string testProject, bool createIfNotExists = true)
+        {
+            string outputDir;
+            if (CommandLine.HasProperty("output-directory"))
+                outputDir = CommandLine.GetSingle("output-directory");
+            else
+                outputDir = Path.Combine(new FileInfo(testProject).DirectoryName, "PerfResults");
+
+            if (createIfNotExists && !Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+
+            return Path.Combine(outputDir, targetFramework);
         }
 
         ProcessStartInfo GetMsBuildProcessStartInfo(string testProject)
