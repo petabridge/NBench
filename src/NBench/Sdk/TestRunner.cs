@@ -211,6 +211,7 @@ namespace NBench.Sdk
             {
                 foreach (var testFile in _package.Files)
                 {
+                    output.WriteLine($"Executing Benchmarks in {testFile}");
                     using (var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile, output))
                     {
                         var benchmarks = discovery.FindBenchmarks(assembly.Assembly);

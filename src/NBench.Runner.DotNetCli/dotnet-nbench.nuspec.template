@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>dotnet-nbench</id>
+    <title>NBench.Runner [.NET CLI SDK]</title>
+    <version>@version@</version>
+    <authors>Petabridge</authors>
+    <owners>Petabridge</owners>
+    <description>NBench is a cross-platform automated performance profiling and testing framework for.NET applications.</description>
+    <licenseUrl>https://github.com/petabridge/NBench/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/petabridge/NBench</projectUrl>
+    <iconUrl>https://petabridge.com/images/nbench/NBench_logo_square_90.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
+    <tags>performance;benchmarking;benchmark;perf;testing;NBench</tags>
+    <developmentDependency>true</developmentDependency>
+    <PackageReleaseNotes>@release_notes@</PackageReleaseNotes>
+    <packageTypes>
+      <packageType name="DotnetCliTool" />
+    </packageTypes>
+    <dependencies>
+      <group targetFramework="netcoreapp1.0">
+        <dependency id="Microsoft.NETCore.App" version="1.0.0" />
+        <dependency id="System.Collections.Specialized" version="4.3.0" />
+        <dependency id="System.Xml.XPath" version="4.3.0" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\netcoreapp1.0\dotnet-nbench.dll"                target="lib\netcoreapp1.0\" />
+    <file src="bin\Release\netcoreapp1.0\dotnet-nbench.runtimeconfig.json" target="lib\netcoreapp1.0\" />
+    <file src="bin\Release\netcoreapp1.0\import.targets"                  target="lib\netcoreapp1.0\" />
+
+    <file src="bin\Release\netcoreapp2.0\dotnet-nbench.dll"                target="lib\netcoreapp2.0\" />
+    <file src="bin\Release\netcoreapp2.0\dotnet-nbench.runtimeconfig.json" target="lib\netcoreapp2.0\" />
+    <file src="bin\Release\netcoreapp2.0\import.targets"                  target="lib\netcoreapp2.0\" />
+
+    <file src="..\NBench.Runner\bin\Release\net452\win7-x64\publish\*.*" target="tools\net452\" />
+    <file src="..\NBench.Runner\bin\Release\netcoreapp1.0\win7-x64\publish\*.*" target="tools\netcoreapp1.0\" />
+    <file src="..\NBench.Runner\bin\Release\netcoreapp2.0\win7-x64\publish\*.*" target="tools\netcoreapp2.0\" />
+    <file src="..\NBench.Runner\bin\Release\netcoreapp2.1\win7-x64\publish\*.*" target="tools\netcoreapp2.1\" />
+  </files>
+</package>

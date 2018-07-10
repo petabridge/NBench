@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using NBench.Sdk;
 
 namespace NBench.Runner
@@ -29,16 +30,25 @@ namespace NBench.Runner
 		        return 0;
 		    }
 
-			if (CommandLine.HasProperty("include"))
-				include = CommandLine.GetProperty("include").Split(',');
-			if (CommandLine.HasProperty("exclude"))
-				exclude = CommandLine.GetProperty("exclude").Split(',');
-		    if (CommandLine.HasProperty("concurrent"))
-		        concurrent = CommandLine.GetBool("concurrent");
-		    if (CommandLine.HasProperty("trace"))
-		        trace = CommandLine.GetBool("trace");
-		    if (CommandLine.HasProperty("teamcity"))
-		        teamcity = CommandLine.GetBool("teamcity");
+            if (CommandLine.HasProperty(CommandLine.DiagnosticsKey))
+		    {
+		        Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("DIAG: Executing with parameters [{0}]", CommandLine.FormatCapturedArguments());
+                Console.WriteLine("DIAG: Unparsed arguments [{0}]", string.Join(",", Environment.GetCommandLineArgs()));
+                Console.WriteLine($"DIAG: Captured, but unrecognized arguments: {string.Join(",", CommandLine.Values.Value.Select(x => $"{x.Key}:[{string.Join(",", x.Value)}]"))}");
+                Console.ResetColor();
+		    }
+
+			if (CommandLine.HasProperty(CommandLine.IncludeKey))
+				include = CommandLine.GetProperty(CommandLine.IncludeKey)?.ToArray();
+			if (CommandLine.HasProperty(CommandLine.ExcludeKey))
+				exclude = CommandLine.GetProperty(CommandLine.ExcludeKey)?.ToArray();
+		    if (CommandLine.HasProperty(CommandLine.ConcurrentKey))
+		        concurrent = CommandLine.GetBool(CommandLine.ConcurrentKey);
+		    if (CommandLine.HasProperty(CommandLine.TracingKey))
+		        trace = CommandLine.GetBool(CommandLine.TracingKey);
+		    if (CommandLine.HasProperty(CommandLine.TeamCityKey))
+		        teamcity = true;
 		    else
 		    {
                 // try to auto-detect if not explicitly set
@@ -56,11 +66,11 @@ namespace NBench.Runner
 		    TestPackage package =
 		        new TestPackage(files, include, exclude, concurrent) {Tracing = trace};
 
-		    if (CommandLine.HasProperty("output-directory"))
-		        package.OutputDirectory = CommandLine.GetProperty("output-directory");
+		    if (CommandLine.HasProperty(CommandLine.OutputKey))
+		        package.OutputDirectory = CommandLine.GetSingle(CommandLine.OutputKey);
 
-		    if (CommandLine.HasProperty("configuration"))
-		        package.ConfigurationFile = CommandLine.GetProperty("configuration");
+		    if (CommandLine.HasProperty(CommandLine.ConfigurationKey))
+		        package.ConfigurationFile = CommandLine.GetSingle(CommandLine.ConfigurationKey);
 
 		    package.TeamCity = teamcity;
 

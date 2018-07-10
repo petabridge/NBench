@@ -33,4 +33,28 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="build\NBench.props" />
+    <None Remove="build\NBench.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="build\NBench.props">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
+    </Content>
+    <Content Include="build\NBench.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sdk\Compiler\Assemblies\" />
+  </ItemGroup>
+
 </Project>

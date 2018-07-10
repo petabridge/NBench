@@ -3,7 +3,7 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>NBench.Runner</id>
     <title>NBench.Runner</title>
-    <version>@version@</version>
+    <version>1.1.1</version>
     <authors>Petabridge</authors>
     <owners>Petabridge</owners>
     <description>NBench is a cross-platform automated performance profiling and testing framework for.NET applications.</description>
@@ -14,7 +14,9 @@
     <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
     <tags>performance;benchmarking;benchmark;perf;testing;NBench</tags>
     <developmentDependency>true</developmentDependency>
-    <PackageReleaseNotes>@release_notes@</PackageReleaseNotes>
+    <PackageReleaseNotes>Minor bugfix release for NBench v1.1.0.
+Resolved [fix NBench.Runner dotnet publish output](https://github.com/petabridge/NBench/issues/237), so the stand-alone runner should now work as part fo the `NBench.Runner` package.
+Please note that all binaries are now located inside the `tools/{framework}` folder inside the `NBench.Runner` package.</PackageReleaseNotes>
   </metadata>
   <files>
     <file src="bin\Release\net452\win7-x64\publish\*.*" target="tools\net452\" />

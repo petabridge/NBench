@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\src\common.props" />
+  <Import Project="..\..\src\NBench\build\NBench.targets"/>
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
   </PropertyGroup>

@@ -7,5 +7,3 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("NBench.Tests.End2End")]
 [assembly: InternalsVisibleTo("NBench.Microbenchmarks")]
 [assembly: InternalsVisibleTo("NBench.Tests.Reporting")]
-
-
