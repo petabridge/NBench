@@ -37,20 +37,7 @@ namespace NBench
             while (idx < args.Length)
             {
                 var arg = args[idx++];
-                if (arg.Contains("=")) // NBench v1.1 and earlier argument formats
-                {
-                    var tokens = arg.Split('=');
-
-                    if (dictionary.TryGetValue(tokens[0], out var values))
-                    {
-                        dictionary[tokens[0]] = values.Concat(tokens[1].Split(',')).Distinct().ToList();
-                    }
-                    else
-                    {
-                        dictionary.Add(tokens[0], tokens[1].Split(',').ToList());
-                    }
-                }
-                else if (arg.StartsWith("-")) // later argument formats (dotnet-cli compatibility)
+                if (arg.StartsWith("-")) // later argument formats (dotnet-cli compatibility)
                 {
                     if (!dictionary.TryGetValue(arg, out var values))
                     {
@@ -105,9 +92,9 @@ Options:
 Arguments:
     [assembly names]            List of assemblies to load and test. Space delimited. Requires .dll
                                 or .exe at the end of each assembly name.
-    [output-directory=path]     Folder where a Markdown report will be exported.
-    [configuration=path]        Folder with a config file to be used when loading the assembly names.
-    [include=name test pattern] A comma separted list of wildcard pattern to be mached and 
+    [--output path]     Folder where a Markdown report will be exported.
+    [--configuration path]        Folder with a config file to be used when loading the assembly names.
+    [--include name test pattern] A comma separted list of wildcard pattern to be mached and 
                                 included in the tests.  Default value is * (all).  The test is executed
                                 on the complete name of the benchmark Namespace.Class+MethodName.
                                 Examples: 
@@ -115,7 +102,7 @@ Arguments:
                                     include=""*MyBenchmarkClass+MyBenchmark"" (include MyBenchmark in MyBenchmarkClass)
                                     include=""*MyBenchmarkClass*,*MyOtherBenchmarkClass*"" (include all benchmarks
                                             in MyBenchmarkClass and MyOtherBenchmarkClass)
-    [exclude=name test pattern] A comma separted list of wildcard pattern to be mached and 
+    [--exclude name test pattern] A comma separted list of wildcard pattern to be mached and 
                                 excluded in the tests.  Default value is (none).  The test is executed 
                                 on the complete name of the benchmarkNamespace.Class+MethodName.
                                 Examples: 
@@ -123,12 +110,13 @@ Arguments:
                                     exclude=""*MyBenchmarkClass+MyBenchmark"" (exclude MyBenchmark in MyBenchmarkClass)
                                     exclude=""*MyBenchmarkClass*,*MyOtherBenchmarkClass*"" (exclude all benchmarks
                                             in MyBenchmarkClass and MyOtherBenchmarkClass)
-    [concurrent=true|false]     Disables thread priority and processor affinity operations for all 
+    [--concurrent true|false]     Disables thread priority and processor affinity operations for all 
                                 benchmarks.  Used only when running multi-threaded benchmarks.  
                                 Set to false (single-threaded) by default.
-    [trace=true|false]        Turns on trace capture inside the NBench runner.  Will save any 
+    [--trace true|false]        Turns on trace capture inside the NBench runner.  Will save any 
                                 captured messages to all available output targets, including Markdown 
                                 reports.  Set to false by default.
+    [--diagnostic]              Turns on diagnostic logging.
 
 ");
         }
@@ -163,13 +151,13 @@ Arguments:
             return GetProperty(key).SingleOrDefault();
         }
 
-        public const string TracingKey = "trace";
-        public const string ConcurruentKey = "concurrent";
-        public const string ExcludeKey = "exclude";
-        public const string IncludeKey = "include";
-        public const string ConfigurationKey = "configuration";
-        public const string OutputKey = "output-directory";
-        public const string DiagnosticsKey = "-diagnostic";
+        public const string TracingKey = "--trace";
+        public const string ConcurruentKey = "--concurrent";
+        public const string ExcludeKey = "--exclude";
+        public const string IncludeKey = "--include";
+        public const string ConfigurationKey = "--configuration";
+        public const string OutputKey = "--output";
+        public const string DiagnosticsKey = "--diagnostic";
 
         public static string FormatCapturedArguments(bool includeOutput = true)
         {

@@ -197,7 +197,13 @@ namespace NBench.Runner.DotNetCli
                     if (runtimeFrameworkVersion == "2.0")
                         runtimeFrameworkVersion = "2.0.0";
 
-                    string netCoreAppVersion = $"netcoreapp{version.Major}.{version.Minor}";
+                    string netCoreAppVersion;
+                    if (version.Major == 2 && version.Minor == 1) // net core 2.1
+                        netCoreAppVersion = $"netcoreapp{version.Major}.1";
+                    else
+                    {
+                        netCoreAppVersion = $"netcoreapp{version.Major}.0";
+                    }
 
                     var fxVersion = _fxVersion ?? runtimeFrameworkVersion;
                     WriteLine($"Running .NET Core {fxVersion} tests for framework {targetFramework}...");

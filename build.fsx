@@ -13,7 +13,7 @@ open Fake.DocFxHelper
 let configuration = "Release"
 
 // all of the frameworks we target for builds and packing
-let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp1.1"; "netcoreapp2.0"; "netcoreapp2.1";]
+let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp2.0"; "netcoreapp2.1";]
 
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
@@ -125,10 +125,11 @@ Target "NBench" <| fun _ ->
                 |> append dotnetNBenchDll // need to unquote this parameter pair or the CLI breaks
                 |> append "--project"
                 |> append (filename project)
-                |> append (sprintf "output-directory=%s" outputPerfTests)
-                |> append (sprintf "concurrent=%b" true)
-                |> append (sprintf "trace=%b" true)
-                |> append "-diagnostic"
+                |> append "--output"
+                |> append outputPerfTests
+                |> append "--concurrent true" 
+                |> append "--trace true"
+                |> append "--diagnostic"
                 |> append "--no-build"
                 |> toText
 
