@@ -137,7 +137,7 @@ namespace NBench.Runner.DotNetCli
             var tmpFile = Path.GetTempFileName();
             try
             {
-                var target = string.Empty;
+                string target;
 
                 if (_noBuild)
                 {
@@ -199,12 +199,12 @@ namespace NBench.Runner.DotNetCli
 
                     var fxVersion = _fxVersion ?? runtimeFrameworkVersion;
                     WriteLine($"Running .NET Core {fxVersion} tests for framework {targetFramework}...");
-                    return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, $"netcoreapp{version.Major}.0");
+                    return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, $"netcoreapp{version.Major}.0", Directory.GetCurrentDirectory());
                 }
                 if (targetFrameworkIdentifier == ".NETFramework" && version >= Version452)
                 {
                     WriteLine($"Running desktop CLR tests for framework {targetFramework}...");
-                    return RunDesktopProject(outputPath, targetFileName);
+                    return RunDesktopProject(outputPath, targetFileName, Directory.GetCurrentDirectory());
                 }
 
                 WriteLineWarning($"Unsupported target framework '{targetFrameworkIdentifier} {version}' (only .NETCoreApp 1.x/2.x and .NETFramework 4.5.2+ are supported)");
@@ -216,7 +216,7 @@ namespace NBench.Runner.DotNetCli
             }
         }
 
-        private int RunDesktopProject(string outputPath, string targetFileName)
+        private int RunDesktopProject(string outputPath, string targetFileName, string outputDirectory)
         {
             var runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "tools", "net452"));
 
@@ -229,7 +229,7 @@ namespace NBench.Runner.DotNetCli
             var psi = new ProcessStartInfo
             {
                 FileName = Path.Combine(runnerFolder, executableName),
-                Arguments = $@"""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())}",
+                Arguments = $@"""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())}  output=""{outputDirectory}""",
                 WorkingDirectory = Path.GetFullPath(outputPath)
             };
 
@@ -242,7 +242,7 @@ namespace NBench.Runner.DotNetCli
             return runTests.ExitCode;
         }
 
-        private int RunDotNetCoreProject(string outputPath, string assemblyName, string targetFileName, string fxVersion, string netCoreAppVersion)
+        private int RunDotNetCoreProject(string outputPath, string assemblyName, string targetFileName, string fxVersion, string netCoreAppVersion, string outputDirectory)
         {
             var consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "tools", netCoreAppVersion));
 
@@ -267,7 +267,7 @@ namespace NBench.Runner.DotNetCli
             if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
                 args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
 
-            args += $@"""{runner}"" ""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())}";
+            args += $@"""{runner}"" ""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())} output=""{outputDirectory}""";
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 
