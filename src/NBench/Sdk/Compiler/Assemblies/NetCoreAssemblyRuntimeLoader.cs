@@ -123,7 +123,7 @@ namespace NBench.Sdk.Compiler.Assemblies
                     runtimeLibrary.Dependencies, runtimeLibrary.Serviceable);
 
                 var loadedAssemblies = new List<string>();
-                if (_resolver.TryResolveAssemblyPaths(wrapper, loadedAssemblies))
+                if (_resolver.TryResolveAssemblyPaths(wrapper, loadedAssemblies) && loadedAssemblies.Any())
                 {
                     return _loadContext.LoadFromAssemblyPath(loadedAssemblies[0]);
                 }
