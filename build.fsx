@@ -136,6 +136,7 @@ Target "NBenchNet45" <| fun _ ->
                 |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
                 |> append (sprintf "concurrent=\"%b\"" true)
                 |> append (sprintf "trace=\"%b\"" true)
+                |> append "-diagnostic"
                 |> toText
 
     let result = ExecProcess(fun info -> 
@@ -156,12 +157,13 @@ Target "NBenchNetCore" <| fun _ ->
                                     |> append "--project"
                                     |> append nbenchProject // need to unquote this parameter pair or the CLI breaks
                                     |> append "--framework"
-                                    |> append "netcoreapp1.1"
+                                    |> append "netcoreapp1.0"
                                     |> append (sprintf "--configuration %s" configuration)
                                     |> append assembly
                                     |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
                                     |> append (sprintf "concurrent=\"%b\"" true)
                                     |> append (sprintf "trace=\"%b\"" true)
+                                    |> append "-diagnostic"
                                     |> toText
 
     let result = ExecProcess(fun info -> 

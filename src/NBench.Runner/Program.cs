@@ -33,6 +33,7 @@ namespace NBench.Runner
 		    {
 		        Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("DIAG: Executing with parameters [{0}]", CommandLine.FormatCapturedArguments());
+                Console.WriteLine("DIAG: Unparsed arguments [{0}]", string.Join(",", Environment.GetCommandLineArgs()));
                 Console.ResetColor();
 		    }
 
@@ -63,11 +64,11 @@ namespace NBench.Runner
 		    TestPackage package =
 		        new TestPackage(files, include, exclude, concurrent) {Tracing = trace};
 
-		    if (CommandLine.HasProperty("output-directory"))
-		        package.OutputDirectory = CommandLine.GetSingle("output-directory");
+		    if (CommandLine.HasProperty(CommandLine.OutputKey))
+		        package.OutputDirectory = CommandLine.GetSingle(CommandLine.OutputKey);
 
-		    if (CommandLine.HasProperty("configuration"))
-		        package.ConfigurationFile = CommandLine.GetSingle("configuration");
+		    if (CommandLine.HasProperty(CommandLine.ConfigurationKey))
+		        package.ConfigurationFile = CommandLine.GetSingle(CommandLine.ConfigurationKey);
 
 		    package.TeamCity = teamcity;
 

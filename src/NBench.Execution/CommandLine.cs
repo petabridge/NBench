@@ -126,7 +126,7 @@ Arguments:
     [concurrent=true|false]     Disables thread priority and processor affinity operations for all 
                                 benchmarks.  Used only when running multi-threaded benchmarks.  
                                 Set to false (single-threaded) by default.
-    [tracing=true|false]        Turns on trace capture inside the NBench runner.  Will save any 
+    [trace=true|false]        Turns on trace capture inside the NBench runner.  Will save any 
                                 captured messages to all available output targets, including Markdown 
                                 reports.  Set to false by default.
 
@@ -163,13 +163,13 @@ Arguments:
             return GetProperty(key).SingleOrDefault();
         }
 
-        public const string TracingKey = "tracing";
+        public const string TracingKey = "trace";
         public const string ConcurruentKey = "concurrent";
         public const string ExcludeKey = "exclude";
         public const string IncludeKey = "include";
         public const string ConfigurationKey = "configuration";
         public const string OutputKey = "output-directory";
-        public const string DiagnosticsKey = "-diagnostics";
+        public const string DiagnosticsKey = "-diagnostic";
 
         public static string FormatCapturedArguments(bool includeOutput = true)
         {
