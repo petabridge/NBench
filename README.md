@@ -53,7 +53,29 @@ public class CounterPerfSpecs
 
 After defining some NBench `PerfBenchmark` methods and declaring some measurements, you can run your benchmark by downloading the `NBench.Runner.exe` via NuGet.
 
-### .NET 4.5.2 Runner
+### Running NBench Tests with `dotnet nbench`
+The easiest way to run NBench in any runtime, .NET Core or .NET Framework is to install the `dotnet-nbench` NuGet package and add it as a `DotNetCliToolReference` to your NBench test projects.
+
+```
+<PackageReference Include="NBench" Version="1.2" />
+<DotNetCliToolReference Include="dotnet-nbench" Version="1.2" />
+```
+
+This will allow you to run NBench specifications for all frameworks your test projects target, including multi-targeted projects, by simply running the following command in the working directory of your test project:
+
+
+dotnet nbench [--output {dir-path}] [--configuration {file-path}] [--include MyTest*.Perf*,Other*Spec] [--exclude *Long*] [--concurrent {true|false}] [--trace {true|false}] [--teamcity] [--diagnostic]
+
+
+
+This will build and compile your project, as well as run the appropriate `NBench.Runner` executable to run your tests and produce an output report.
+
+> N.B. If you don't specify an `--output` setting while running in this mode, `dotnet-nbench` will automatically record all output to the `[currentDir]/PerfResults/[framework]`.
+
+### Stand-alone Runner
+Below are the instructions for the standalone `NBench.Runner` package, which is substantially more manual than the `dotnet nbench` runner described above.
+
+#### .NET 4.5.2 Runner
 
 The NBench Runner NuGet package now contains executables that support .NET 4.5.2, .NET Core 1.1/win7-x64, and .NET Core 1.1/debian8-x64 benchmark assembly targets.  Before v1.0.3, you would expect the NBench.Runner NuGet package to contain a single executable that works with .NET 4.5.2:
 
@@ -69,11 +91,15 @@ With the additional .NET Core executables, you will now get two additional subfo
 lib/
     net452/
         NBench.Runner.exe
-    netcoreapp1.1/
+    netcoreapp1.0/
         win7-x64/
-            NBench.Runner.exe
-        debian8-x64/
-            NBench.Runner
+            NBench.Runner.dll
+    netcoreapp2.0/
+        win7-x64/
+            NBench.Runner.dll
+    netcoreapp2.1/
+        win7-x64/
+            NBench.Runner.dll
 ```
 
 You may choose the appropriate executable for your benchmark assembly/architecture combination
@@ -87,38 +113,34 @@ PS> <--packageLocation-->\NBench.Runner\lib\net452\NBench.Runner.exe <--benchmar
 
 And this command will run your `PerfBenchmark` and write output [that looks like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf) to a markdown file in the `output-directory`.
 
-### .NET Core Runner
+#### .NET Core Runner
 
 If you have compiled a benchmark assembly that targets .NET Core 1.1, you may use the appropriate executable from the lib/netcoreap1.1 folder of the downloaded NBench.Runner NuGet package;
 
-On 64-bit Windows:
-
 ```
 PS> Install-Package NBench.Runner
-PS> <--packageLocation-->\NBench.Runner\lib\netcoreapp1.1\win7-x64\NBench.Runner.exe <--benchmarkProjectLocation-->\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf"
+PS> <--packageLocation-->\NBench.Runner\lib\netcoreapp1.0\win7-x64\NBench.Runner.exe <--benchmarkProjectLocation-->\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf"
 ```
 
-On 64-bit Debian 8:
-
-```
-PS> Install-Package NBench.Runner
-PS> <--packageLocation-->\NBench.Runner\lib\netcoreapp1.1\debian8-x64\NBench.Runner.exe <--benchmarkProjectLocation-->\bin\Debug\netcoreapp1.1\MyPerfTests.dll output-directory="C:\Perf"
-```
+**It's probably easier to just use `dotnet-nbench`**.
 
 ## Command Line Parameters
-```
-NBench.Runner.exe [assembly names] [output-directory={dir-path}] [configuration={file-path}] [include=MyTest*.Perf*,Other*Spec] [exclude=*Long*] [concurrent={true|false}]
-```
+
+
+NBench.Runner.exe [assembly names] [--output {dir-path}] [--configuration {file-path}] [--include MyTest*.Perf*,Other*Spec] [--exclude *Long*] [--concurrent {true|false}] [--trace {true|false}] [--teamcity] [--diagnostic]
+
 
 * **assembly names** - list of assemblies to load and test. Space delimited. Requires `.dll` or `.exe` at the end of each assembly name
-* **output-directory=path** - folder where a Markdown report will be exported. Report will [look like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf)
-* **configuration=path** - folder with a config file to be used when loading the `assembly names`
-* **include=name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and included in the tests. Default value is `*` (all)
+* **--output-directory path** - folder where a Markdown report will be exported. Report will [look like this](https://gist.github.com/Aaronontheweb/8e0bfa2cccc63f5bd8bf)
+* **--configuration path** - folder with a config file to be used when loading the `assembly names`
+* **--include name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and included in the tests. Default value is `*` (all)
 The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
-* **exclude=name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and excluded in the tests. Default value is `` (none)
+* **--exclude name test pattern** - a "`,`"(comma) separted list of wildcard pattern to be mached and excluded in the tests. Default value is `` (none)
 The test is executed on the complete name of the benchmark `Namespace.Class+MethodName`
-* **concurrent=true|false** - disables thread priority and processor affinity operations for all benchmarks. Used only when running multi-threaded benchmarks. Set to `false` (single-threaded) by default.
-* **tracing=true|false** - turns on trace capture inside the NBench runner and will save any captured messages to all available output targets, including Markdown reports. Set to `false` by default.
+* **-- concurrent true|false** - disables thread priority and processor affinity operations for all benchmarks. Used only when running multi-threaded benchmarks. Set to `false` (single-threaded) by default.
+* **--trace true|false** - turns on trace capture inside the NBench runner and will save any captured messages to all available output targets, including Markdown reports. Set to `false` by default.
+* **--diagnostic** - turns on diagnostic logging inside the `NBench.Runner` and `dotnet-nbench` executables.
+* **--teamcity** - turns on TeamCity message formatting.
 
 Supported wildcard patterns are `*` any string and `?` any char. In order to include a class with all its tests in the benchmark
 you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass.*`.
@@ -126,13 +148,13 @@ you need to specify a pattern finishing in `*`. E.g. `include=*.MyBenchmarkClass
 Example patterns:
 
 ```
-include="*MyBenchmarkClass*" (include all benchmarks in MyBenchmarkClass)
-include="*MyBenchmarkClass+MyBenchmark" (include MyBenchmark in MyBenchmarkClass)
-include="*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (include all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
+--include "*MyBenchmarkClass*" (include all benchmarks in MyBenchmarkClass)
+--include "*MyBenchmarkClass+MyBenchmark" (include MyBenchmark in MyBenchmarkClass)
+--include "*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (include all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
 
-exclude=*"MyBenchmarkClass* "(exclude all benchmarks in MyBenchmarkClass)
-exclude="*MyBenchmarkClass+MyBenchmark" (exclude MyBenchmark in MyBenchmarkClass)
-exclude="*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (exclude all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
+--exclude "*MyBenchmarkClass* "(exclude all benchmarks in MyBenchmarkClass)
+--exclude "*MyBenchmarkClass+MyBenchmark" (exclude MyBenchmark in MyBenchmarkClass)
+--exclude "*MyBenchmarkClass*,*MyOtherBenchmarkClass*" (exclude all benchmarks in MyBenchmarkClass and MyOtherBenchmarkClass)
 ```
 
 ## API
