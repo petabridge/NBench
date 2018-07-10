@@ -32,9 +32,9 @@
     <file src="bin\Release\netcoreapp1.0\dotnet-nbench.runtimeconfig.json" target="lib\netcoreapp1.0\" />
     <file src="bin\Release\netcoreapp1.0\import.targets"                  target="lib\netcoreapp1.0\" />
 
-    <file src="bin\Release\netcoreapp2.0\dotnet-nbench.dll"                target="lib\netcoreapp1.0\" />
-    <file src="bin\Release\netcoreapp2.0\dotnet-nbench.runtimeconfig.json" target="lib\netcoreapp1.0\" />
-    <file src="bin\Release\netcoreapp2.0\import.targets"                  target="lib\netcoreapp1.0\" />
+    <file src="bin\Release\netcoreapp2.0\dotnet-nbench.dll"                target="lib\netcoreapp2.0\" />
+    <file src="bin\Release\netcoreapp2.0\dotnet-nbench.runtimeconfig.json" target="lib\netcoreapp2.0\" />
+    <file src="bin\Release\netcoreapp2.0\import.targets"                  target="lib\netcoreapp2.0\" />
 
     <file src="..\NBench.Runner\bin\Release\net452\win7-x64\publish\*.*" target="tools\net452\" />
     <file src="..\NBench.Runner\bin\Release\netcoreapp1.0\win7-x64\publish\*.*" target="tools\netcoreapp1.0\" />

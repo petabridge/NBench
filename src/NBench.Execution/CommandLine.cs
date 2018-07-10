@@ -22,7 +22,7 @@ namespace NBench
     {
         public static readonly string Version = typeof(CommandLine).GetAssembly().GetName().Version.ToString();
 
-        private static readonly Lazy<Dictionary<string, List<string>>> Values = new Lazy<Dictionary<string, List<string>>>(ParseValues);
+        internal static readonly Lazy<Dictionary<string, List<string>>> Values = new Lazy<Dictionary<string, List<string>>>(ParseValues);
 
         private static Dictionary<string, List<string>> ParseValues()
         {

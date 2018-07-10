@@ -13,7 +13,7 @@ open Fake.DocFxHelper
 let configuration = "Release"
 
 // all of the frameworks we target for builds and packing
-let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp2.0"; "netcoreapp2.1";]
+let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp1.1"; "netcoreapp2.0"; "netcoreapp2.1";]
 
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution

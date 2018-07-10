@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Linq;
 using NBench.Sdk;
 
 namespace NBench.Runner
@@ -34,6 +35,7 @@ namespace NBench.Runner
 		        Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("DIAG: Executing with parameters [{0}]", CommandLine.FormatCapturedArguments());
                 Console.WriteLine("DIAG: Unparsed arguments [{0}]", string.Join(",", Environment.GetCommandLineArgs()));
+                Console.WriteLine($"DIAG: Captured, but unrecognized arguments: {string.Join(",", CommandLine.Values.Value.Select(x => $"{x.Key}:[{string.Join(",", x.Value)}]"))}");
                 Console.ResetColor();
 		    }
 
