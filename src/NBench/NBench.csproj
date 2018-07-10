@@ -7,7 +7,6 @@
     <AssemblyName>NBench</AssemblyName>
     <PackageId>NBench</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
-    <NuspecFile>NBench.nuspec</NuspecFile>
   </PropertyGroup>
 
 
@@ -35,7 +34,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="build\NBench.props" />
+    <None Remove="build\NBench.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="build\NBench.props">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
+    </Content>
+    <Content Include="build\NBench.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
