@@ -30,18 +30,14 @@ namespace NBench.Runner
 		        return 0;
 		    }
 
-#if !CORECLR
             if (CommandLine.HasProperty(CommandLine.DiagnosticsKey))
 		    {
-#endif
 		        Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("DIAG: Executing with parameters [{0}]", CommandLine.FormatCapturedArguments());
                 Console.WriteLine("DIAG: Unparsed arguments [{0}]", string.Join(",", Environment.GetCommandLineArgs()));
                 Console.WriteLine($"DIAG: Captured, but unrecognized arguments: {string.Join(",", CommandLine.Values.Value.Select(x => $"{x.Key}:[{string.Join(",", x.Value)}]"))}");
                 Console.ResetColor();
-#if !CORECLR
 		    }
-#endif
 
 			if (CommandLine.HasProperty(CommandLine.IncludeKey))
 				include = CommandLine.GetProperty(CommandLine.IncludeKey)?.ToArray();

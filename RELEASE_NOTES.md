@@ -1,9 +1,10 @@
-#### v1.1.1 July 8 2018
-Minor bugfix release for NBench v1.1.0.
+#### v1.2.0 July 10 2018
+Introduces the `dotnet-nbench` package, which allows all NBench packages to be executed via the `dotnet` CLI regardless of how many frameworks are targeted by a particular project.
 
-Resolved [fix NBench.Runner dotnet publish output](https://github.com/petabridge/NBench/issues/237), so the stand-alone runner should now work as part fo the `NBench.Runner` package.
+You can read more about the details of how the `dotnet-nbench` package works here: https://github.com/Petabridge/NBench/blob/master/README.md#running-nbench-tests-with-dotnet-nbench
 
-Please note that all binaries are now located inside the `tools/{framework}` folder inside the `NBench.Runner` package.
+**Support for .NET Core 2.0 and 2.1**
+All NBench runners now ship with native support for .NET Core 2.0 and .NET Core 2.1.
 
 #### v1.1.0 July 1 2018
 Fixes several major issues with the `NBench.Runner` executable and being able to support .NET Core dependencies. This is the first set of fixes in a series of ongoing changes designed to help make NBench more user-friendly, extensible, and capable of all manner of interesting performance-related tasks.
