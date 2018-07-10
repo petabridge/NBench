@@ -174,20 +174,40 @@ Target "NBenchNetCore" <| fun _ ->
 let overrideVersionSuffix (project:string) =
     match project with
     | _ -> versionSuffix // add additional matches to publish different versions for different projects in solution
-Target "CreateNuget" (fun _ ->    
-    let projects = !! "src/**/*.csproj" 
-                   -- "tests/**/*Tests.csproj" // Don't publish unit tests
-                   -- "tests/**/*Tests*.csproj"
-                   -- "src/**/*.Runner.csproj" // Don't publish runners
 
-    // Update NuSpec for DotNetCli prior to pack operation
-    CopyFile "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec" "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec.template"
+Target "CreateNuspecs" (fun _ ->
+    let nuspecs = !! "src/**/*.nuspec.template"
+
+    // For each individual .nuspec.template file, need to inject some credentials
     let commonPropsVersionPrefix = XMLRead true "./src/common.props" "" "" "//Project/PropertyGroup/VersionPrefix" |> Seq.head
     let versionReplacement = List.ofSeq [ "@version@", commonPropsVersionPrefix + (if (not (versionSuffix = "")) then ("-" + versionSuffix) else "") ]
     let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
 
-    TemplateHelper.processTemplates versionReplacement [ "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec" ]
-    TemplateHelper.processTemplates releaseNotesReplacement [ "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec" ]
+    nuspecs |> Seq.iter (fun template ->
+        let fileInfo = new FileInfo(template);
+        let nuspec = (Path.Combine(fileInfo.DirectoryName, fileInfo.Name.Replace(".template", "")))
+
+        // Create the temporary .nuspec file
+        CopyFile nuspec template
+
+        TemplateHelper.processTemplates versionReplacement [ nuspec ]
+        TemplateHelper.processTemplates releaseNotesReplacement [ nuspec ]
+    )
+)
+
+Target "CleanupNuspecs" (fun _ ->
+    let nuspecs = !! "src/**/*.nuspec"
+
+    nuspecs |> Seq.iter (fun nuspec ->
+        DeleteFile nuspec
+    )
+)
+
+Target "CreateNuget" (fun _ ->    
+    let projects = !! "src/**/*.csproj" 
+                   -- "tests/**/*Tests.csproj" // Don't publish unit tests
+                   -- "tests/**/*Tests*.csproj"
+                   -- "src/**/*.Runner.csproj" // Don't publish runners  
 
     let runSingleProject project =
         DotNetCli.Pack
@@ -200,21 +220,9 @@ Target "CreateNuget" (fun _ ->
                     OutputPath = outputNuGet })
 
     projects |> Seq.iter (runSingleProject)
-
-    // clean up the temporary folder
-    DeleteFile "./src/NBench.Runner.DotNetCli/dotnet-nbench.nuspec"
 )
 
 Target "CreateRunnerNuGet" (fun _ ->
-    // uses the template file to create a temporary .nuspec file with the correct version
-    CopyFile "./src/NBench.Runner/NBench.Runner.nuspec" "./src/NBench.Runner/NBench.Runner.nuspec.template"
-    let commonPropsVersionPrefix = XMLRead true "./src/common.props" "" "" "//Project/PropertyGroup/VersionPrefix" |> Seq.head
-    let versionReplacement = List.ofSeq [ "@version@", commonPropsVersionPrefix + (if (not (versionSuffix = "")) then ("-" + versionSuffix) else "") ]
-    let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
-    TemplateHelper.processTemplates versionReplacement [ "./src/NBench.Runner/NBench.Runner.nuspec" ]
-    TemplateHelper.processTemplates releaseNotesReplacement [ "./src/NBench.Runner/NBench.Runner.nuspec" ]
-
-
     let executableProjects = !! "./src/**/NBench.Runner.csproj"
 
     executableProjects |> Seq.iter (fun project ->
@@ -240,8 +248,6 @@ Target "CreateRunnerNuGet" (fun _ ->
                     VersionSuffix = overrideVersionSuffix project
                     OutputPath = outputNuGet } )
     )
-
-    DeleteFile "./src/NBench.Runner/NBench.Runner.nuspec"
 )
 
 Target "PublishNuget" (fun _ ->
@@ -323,7 +329,7 @@ Target "NBench" DoNothing
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
-"CreateRunnerNuGet" ==> "CreateNuget" ==> "PublishNuget" ==> "Nuget"
+"CreateNuspecs" ==> "CreateRunnerNuGet" ==> "CreateNuget" ==> "CleanupNuspecs" ==> "PublishNuget" ==> "Nuget"
 
 // docs
 "BuildRelease" ==> "Docfx"
