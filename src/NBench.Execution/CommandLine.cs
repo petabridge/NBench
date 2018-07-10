@@ -26,9 +26,13 @@ namespace NBench
 
         private static Dictionary<string, List<string>> ParseValues()
         {
-            var dictionary = new Dictionary<string, List<string>>();
-
             var args = Environment.GetCommandLineArgs();
+            return ParseValues(args);
+        }
+
+        public static Dictionary<string, List<string>> ParseValues(string[] args)
+        {
+            var dictionary = new Dictionary<string, List<string>>();
             var idx = 0;
             while (idx < args.Length)
             {
@@ -36,7 +40,7 @@ namespace NBench
                 if (arg.Contains("=")) // NBench v1.1 and earlier argument formats
                 {
                     var tokens = arg.Split('=');
-                    
+
                     if (dictionary.TryGetValue(tokens[0], out var values))
                     {
                         dictionary[tokens[0]] = values.Concat(tokens[1].Split(',')).Distinct().ToList();
@@ -64,7 +68,6 @@ namespace NBench
             }
 
             return dictionary;
-            
         }
 
 
