@@ -7,6 +7,7 @@
     <AssemblyName>NBench</AssemblyName>
     <PackageId>NBench</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
+    <NuspecFile>NBench.nuspec</NuspecFile>
   </PropertyGroup>
 
 

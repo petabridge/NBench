@@ -20,6 +20,7 @@ namespace NBench.Runner.DotNetCli
         private static readonly Version Version452 = new Version("4.5.2");
         private string _configuration;
         private string _fxVersion;
+        private bool _internalDiagnostics;
         private bool _noBuild;
         private string _thisAssemblyPath;
         private string _buildStdProps;
@@ -48,6 +49,9 @@ namespace NBench.Runner.DotNetCli
                     CommandLine.ShowHelp();
                     return 0;
                 }
+
+                if (CommandLine.HasProperty("-diagnostics"))
+                    _internalDiagnostics = true;
 
                 // The extra versions are unadvertised compatibility flags to match 'dotnet' command line switches
                 var requestedTargetFramework = (CommandLine.GetProperty("-framework")
@@ -126,9 +130,6 @@ namespace NBench.Runner.DotNetCli
                 WriteLineError($"StackTrace: {ex.StackTrace}");
                 return 3;
             }
-
-
-            return 0;
         }
 
         public int RunTargetFramework(string testProject, string targetFramework)
@@ -151,6 +152,7 @@ namespace NBench.Runner.DotNetCli
 
                 var psi = GetMsBuildProcessStartInfo(testProject);
                 psi.Arguments += $"/t:{target} \"/p:_NBenchInfoFile={tmpFile}\" \"/p:TargetFramework={targetFramework}\"";
+                WriteLineDiagnostics($"EXEC: \"{psi.FileName}\" {psi.Arguments}");
 
                 var process = Process.Start(psi);
                 process.WaitForExit();
@@ -231,6 +233,9 @@ namespace NBench.Runner.DotNetCli
                 WorkingDirectory = Path.GetFullPath(outputPath)
             };
 
+            WriteLineDiagnostics($"EXEC: \"{psi.FileName}\" {psi.Arguments}");
+            WriteLineDiagnostics($"  IN: {psi.WorkingDirectory}");
+
             var runTests = Process.Start(psi);
             runTests.WaitForExit();
 
@@ -266,6 +271,9 @@ namespace NBench.Runner.DotNetCli
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 
+            WriteLineDiagnostics($"EXEC: \"{psi.FileName}\" {psi.Arguments}");
+            WriteLineDiagnostics($"  IN: {psi.WorkingDirectory}");
+
             var runTests = Process.Start(psi);
             runTests.WaitForExit();
             return runTests.ExitCode;
@@ -281,6 +289,16 @@ namespace NBench.Runner.DotNetCli
         public void WriteLine(string message)
         {
             Console.WriteLine(message);
+        }
+
+        public void WriteLineDiagnostics(string message)
+        {
+            if (_internalDiagnostics)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(message);
+                Console.ResetColor();
+            }
         }
 
         public void WriteLineError(string message)
