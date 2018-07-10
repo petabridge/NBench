@@ -230,13 +230,14 @@ namespace NBench.Runner.DotNetCli
         {
             var runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "tools", "net452"));
 
-            // Debug hack to be able to run from the compilation folder
-            if (!Directory.Exists(runnerFolder))
-                runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", "net452", "win7-x64"));
-
             // Release hack to run during FAKE builds
             if (!Directory.Exists(runnerFolder))
                 runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Release", "net452", "win7-x64"));
+
+            // Debug hack to be able to run from the compilation folder
+            if (!Directory.Exists(runnerFolder))
+                runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", "net452", "win7-x64"));
+           
 
             var executableName = "NBench.Runner.exe";
 
@@ -260,13 +261,13 @@ namespace NBench.Runner.DotNetCli
         {
             var consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "tools", netCoreAppVersion));
 
-            // Debug hack to be able to run from the compilation folder
-            if (!Directory.Exists(consoleFolder))
-                consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", netCoreAppVersion));
-
             // Release hack to run during FAKE builds
             if (!Directory.Exists(consoleFolder))
                 consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Release", netCoreAppVersion));
+
+            // Debug hack to be able to run from the compilation folder
+            if (!Directory.Exists(consoleFolder))
+                consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", netCoreAppVersion));
 
             if (!Directory.Exists(consoleFolder))
             {
