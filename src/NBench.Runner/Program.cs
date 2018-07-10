@@ -39,16 +39,16 @@ namespace NBench.Runner
                 Console.ResetColor();
 		    }
 
-			if (CommandLine.HasProperty("include"))
-				include = CommandLine.GetProperty("include")?.ToArray();
-			if (CommandLine.HasProperty("exclude"))
-				exclude = CommandLine.GetProperty("exclude")?.ToArray();
-		    if (CommandLine.HasProperty("concurrent"))
-		        concurrent = CommandLine.GetBool("concurrent");
-		    if (CommandLine.HasProperty("trace"))
-		        trace = CommandLine.GetBool("trace");
-		    if (CommandLine.HasProperty("teamcity"))
-		        teamcity = CommandLine.GetBool("teamcity");
+			if (CommandLine.HasProperty(CommandLine.IncludeKey))
+				include = CommandLine.GetProperty(CommandLine.IncludeKey)?.ToArray();
+			if (CommandLine.HasProperty(CommandLine.ExcludeKey))
+				exclude = CommandLine.GetProperty(CommandLine.ExcludeKey)?.ToArray();
+		    if (CommandLine.HasProperty(CommandLine.ConcurrentKey))
+		        concurrent = CommandLine.GetBool(CommandLine.ConcurrentKey);
+		    if (CommandLine.HasProperty(CommandLine.TracingKey))
+		        trace = CommandLine.GetBool(CommandLine.TracingKey);
+		    if (CommandLine.HasProperty(CommandLine.TeamCityKey))
+		        teamcity = true;
 		    else
 		    {
                 // try to auto-detect if not explicitly set

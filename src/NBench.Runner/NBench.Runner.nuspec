@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>NBench.Runner</id>
+    <title>NBench.Runner</title>
+    <version>1.1.1</version>
+    <authors>Petabridge</authors>
+    <owners>Petabridge</owners>
+    <description>NBench is a cross-platform automated performance profiling and testing framework for.NET applications.</description>
+    <licenseUrl>https://github.com/petabridge/NBench/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/petabridge/NBench</projectUrl>
+    <iconUrl>https://petabridge.com/images/nbench/NBench_logo_square_90.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
+    <tags>performance;benchmarking;benchmark;perf;testing;NBench</tags>
+    <developmentDependency>true</developmentDependency>
+    <PackageReleaseNotes>Minor bugfix release for NBench v1.1.0.
+Resolved [fix NBench.Runner dotnet publish output](https://github.com/petabridge/NBench/issues/237), so the stand-alone runner should now work as part fo the `NBench.Runner` package.
+Please note that all binaries are now located inside the `tools/{framework}` folder inside the `NBench.Runner` package.</PackageReleaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\net452\win7-x64\publish\*.*" target="tools\net452\" />
+    <file src="bin\Release\netcoreapp1.0\win7-x64\publish\*.*" target="tools\netcoreapp1.0\" />
+    <file src="bin\Release\netcoreapp2.0\win7-x64\publish\*.*" target="tools\netcoreapp2.0\" />
+    <file src="bin\Release\netcoreapp2.1\win7-x64\publish\*.*" target="tools\netcoreapp2.1\" />
+  </files>
+</package>

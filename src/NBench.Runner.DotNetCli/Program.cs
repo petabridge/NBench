@@ -243,7 +243,7 @@ namespace NBench.Runner.DotNetCli
             var psi = new ProcessStartInfo
             {
                 FileName = Path.Combine(runnerFolder, executableName),
-                Arguments = $@"""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey}=""{outputDirectory}""",
+                Arguments = $@"""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey} ""{outputDirectory}""",
                 WorkingDirectory = Path.GetFullPath(outputPath)
             };
 
@@ -285,7 +285,7 @@ namespace NBench.Runner.DotNetCli
             if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
                 args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
 
-            args += $@"""{runner}"" ""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)}""{CommandLine.OutputKey}={outputDirectory}""";
+            args += $@"""{runner}"" ""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey} ""{outputDirectory}""";
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 
@@ -307,8 +307,8 @@ namespace NBench.Runner.DotNetCli
         string SetFrameworkOutputDirectory(string targetFramework, string testProject, bool createIfNotExists = true)
         {
             string outputDir;
-            if (CommandLine.HasProperty("output-directory"))
-                outputDir = CommandLine.GetSingle("output-directory");
+            if (CommandLine.HasProperty(CommandLine.OutputKey))
+                outputDir = CommandLine.GetSingle(CommandLine.OutputKey);
             else
                 outputDir = Path.Combine(new FileInfo(testProject).DirectoryName, "PerfResults");
 
@@ -321,7 +321,13 @@ namespace NBench.Runner.DotNetCli
 
             try
             {
-                return Path.Combine(outputDir, targetFramework);
+                var path = Path.Combine(outputDir, targetFramework);
+                if (createIfNotExists && !Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                return path;
             }
             catch
             {

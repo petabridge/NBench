@@ -117,6 +117,7 @@ Arguments:
                                 captured messages to all available output targets, including Markdown 
                                 reports.  Set to false by default.
     [--diagnostic]              Turns on diagnostic logging.
+    [--teamcity]                Turns on TeamCity output formatting
 
 ");
         }
@@ -152,12 +153,13 @@ Arguments:
         }
 
         public const string TracingKey = "--trace";
-        public const string ConcurruentKey = "--concurrent";
+        public const string ConcurrentKey = "--concurrent";
         public const string ExcludeKey = "--exclude";
         public const string IncludeKey = "--include";
         public const string ConfigurationKey = "--configuration";
         public const string OutputKey = "--output";
         public const string DiagnosticsKey = "--diagnostic";
+        public const string TeamCityKey = "--teamcity";
 
         public static string FormatCapturedArguments(bool includeOutput = true)
         {
@@ -166,9 +168,9 @@ Arguments:
             if (HasProperty(TracingKey))
                 output += $"{TracingKey}={GetSingle(TracingKey)} ";
 
-            if (HasProperty(ConcurruentKey))
+            if (HasProperty(ConcurrentKey))
             {
-                output += $"{ConcurruentKey}={GetSingle(ConcurruentKey)} ";
+                output += $"{ConcurrentKey}={GetSingle(ConcurrentKey)} ";
             }
 
             if (HasProperty(ExcludeKey))
@@ -183,7 +185,7 @@ Arguments:
 
             if (HasProperty(ConfigurationKey))
             {
-                output += $"{ConfigurationKey}={GetSingle(ConcurruentKey)} ";
+                output += $"{ConfigurationKey}={GetSingle(ConcurrentKey)} ";
             }
 
             if (HasProperty(OutputKey) && includeOutput)
