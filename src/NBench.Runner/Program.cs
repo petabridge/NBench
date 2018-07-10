@@ -29,6 +29,13 @@ namespace NBench.Runner
 		        return 0;
 		    }
 
+		    if (CommandLine.HasProperty(CommandLine.DiagnosticsKey))
+		    {
+		        Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("DIAG: Executing with parameters [{0}]", CommandLine.FormatCapturedArguments());
+                Console.ResetColor();
+		    }
+
 			if (CommandLine.HasProperty("include"))
 				include = CommandLine.GetProperty("include")?.ToArray();
 			if (CommandLine.HasProperty("exclude"))

@@ -159,6 +159,54 @@ Arguments:
         {
             return GetProperty(key).SingleOrDefault();
         }
+
+        public const string TracingKey = "tracing";
+        public const string ConcurruentKey = "concurrent";
+        public const string ExcludeKey = "exclude";
+        public const string IncludeKey = "include";
+        public const string ConfigurationKey = "configuration";
+        public const string OutputKey = "output-directory";
+        public const string DiagnosticsKey = "-diagnostics";
+
+        public static string FormatCapturedArguments(bool includeOutput = true)
+        {
+            string output = "";
+
+            if (HasProperty(TracingKey))
+                output += $"{TracingKey}={GetSingle(TracingKey)} ";
+
+            if (HasProperty(ConcurruentKey))
+            {
+                output += $"{ConcurruentKey}={GetSingle(ConcurruentKey)} ";
+            }
+
+            if (HasProperty(ExcludeKey))
+            {
+                output += $"{ExcludeKey}={string.Join(",", GetProperty(ExcludeKey))} ";
+            }
+
+            if (HasProperty(IncludeKey))
+            {
+                output += $"{IncludeKey}={string.Join(",", GetProperty(IncludeKey))} ";
+            }
+
+            if (HasProperty(ConfigurationKey))
+            {
+                output += $"{ConfigurationKey}={GetSingle(ConcurruentKey)} ";
+            }
+
+            if (HasProperty(OutputKey) && includeOutput)
+            {
+                output += $"{OutputKey}={GetSingle(OutputKey)} ";
+            }
+
+            if (HasProperty(DiagnosticsKey))
+            {
+                output += $"{DiagnosticsKey} ";
+            }
+
+            return output;
+        }
     }
 }
 

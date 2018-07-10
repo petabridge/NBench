@@ -239,7 +239,7 @@ namespace NBench.Runner.DotNetCli
             var psi = new ProcessStartInfo
             {
                 FileName = Path.Combine(runnerFolder, executableName),
-                Arguments = $@"""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())}  output=""{outputDirectory}""",
+                Arguments = $@"""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey}=""{outputDirectory}""",
                 WorkingDirectory = Path.GetFullPath(outputPath)
             };
 
@@ -277,7 +277,7 @@ namespace NBench.Runner.DotNetCli
             if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
                 args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
 
-            args += $@"""{runner}"" ""{targetFileName}"" {string.Join(" ", Environment.GetCommandLineArgs())} output-directory=""{outputDirectory}""";
+            args += $@"""{runner}"" ""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey}={outputDirectory}";
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 

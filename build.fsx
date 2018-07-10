@@ -50,6 +50,7 @@ Target "AssemblyInfo" (fun _ ->
 )
 
 Target "RestorePackages" (fun _ ->
+    ActivateFinalTarget "KillCreatedProcesses"
     DotNetCli.Restore
         (fun p -> 
             { p with
@@ -57,7 +58,8 @@ Target "RestorePackages" (fun _ ->
                 NoCache = false })
 )
 
-Target "Build" (fun _ ->          
+Target "Build" (fun _ -> 
+    ActivateFinalTarget "KillCreatedProcesses"         
     DotNetCli.Build
         (fun p -> 
             { p with
@@ -291,6 +293,12 @@ Target "DocFx" (fun _ ->
                     Timeout = TimeSpan.FromMinutes 30.0; 
                     WorkingDirectory  = docsPath; 
                     DocFxJson = docsPath @@ "docfx.json" })
+)
+
+FinalTarget "KillCreatedProcesses" (fun _ ->
+    log "Killing processes started by FAKE:"
+    startedProcesses |> Seq.iter (fun (pid, _) -> logfn "%i" pid)
+    killAllCreatedProcesses()
 )
 
 //--------------------------------------------------------------------------------
