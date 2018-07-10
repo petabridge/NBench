@@ -116,60 +116,30 @@ Target "RunTests" (fun _ ->
     projects |> Seq.iter (runSingleProject)
 )
 
-Target "NBenchNet45" <| fun _ ->
-    let nbenchProject = FindFirstMatchingFile "NBench.Runner.csproj" (__SOURCE_DIRECTORY__ @@ "src" @@ "NBench.Runner")
-    
-    // .NET 4.5.2
-    let nbenchRunner = "dotnet"
-    let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/net452/NBench.Tests.Performance.WithDependencies.dll"
-        
-    let spec = getBuildParam "spec"
+Target "NBench" <| fun _ ->
+    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
+    let dotnetNBenchDll = findToolInSubPath "dotnet-nbench.dll" "./src/**/bin/Release/netcoreapp2.0"
 
-    let args = new StringBuilder()
-                |> append "run"
+    nbenchTestAssemblies |> Seq.iter(fun project -> 
+        let args = new StringBuilder()
+                |> append dotnetNBenchDll // need to unquote this parameter pair or the CLI breaks
                 |> append "--project"
-                |> append nbenchProject // need to unquote this parameter pair or the CLI breaks
-                |> append "--framework"
-                |> append "net452"
-                |> append (sprintf "--configuration %s" configuration)
-                |> append assembly
-                |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                |> append (sprintf "concurrent=\"%b\"" true)
-                |> append (sprintf "trace=\"%b\"" true)
+                |> append (filename project)
+                |> append (sprintf "output-directory=%s" outputPerfTests)
+                |> append (sprintf "concurrent=%b" true)
+                |> append (sprintf "trace=%b" true)
                 |> append "-diagnostic"
+                |> append "--no-build"
                 |> toText
 
-    let result = ExecProcess(fun info -> 
-        info.FileName <- nbenchRunner
-        info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-    if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner args
+        let result = ExecProcess(fun info -> 
+            info.FileName <- "dotnet"
+            info.WorkingDirectory <- (Directory.GetParent project).FullName
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
+    )
 
-Target "NBenchNetCore" <| fun _ ->
-    let nbenchProject = FindFirstMatchingFile "NBench.Runner.csproj" (__SOURCE_DIRECTORY__ @@ "src" @@ "NBench.Runner")
-
-    // .NET Core
-    let nbenchRunner = "dotnet"
-    let assembly = __SOURCE_DIRECTORY__ @@ "/tests/NBench.Tests.Performance.WithDependencies/bin/Release/netstandard1.6/NBench.Tests.Performance.WithDependencies.dll"
-    let spec = getBuildParam "spec"
-
-    let netCoreNbenchRunnerArgs = new StringBuilder()
-                                    |> append "run"
-                                    |> append "--project"
-                                    |> append nbenchProject // need to unquote this parameter pair or the CLI breaks
-                                    |> append "--framework"
-                                    |> append "netcoreapp1.0"
-                                    |> append (sprintf "--configuration %s" configuration)
-                                    |> append assembly
-                                    |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                                    |> append (sprintf "concurrent=\"%b\"" true)
-                                    |> append (sprintf "trace=\"%b\"" true)
-                                    |> append "-diagnostic"
-                                    |> toText
-
-    let result = ExecProcess(fun info -> 
-        info.FileName <- nbenchRunner
-        info.Arguments <- netCoreNbenchRunnerArgs) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-    if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchRunner netCoreNbenchRunnerArgs 
+    
 
 //--------------------------------------------------------------------------------
 // Nuget targets 
@@ -330,7 +300,6 @@ Target "Help" <| fun _ ->
 Target "BuildRelease" DoNothing
 Target "All" DoNothing
 Target "Nuget" DoNothing
-Target "NBench" DoNothing
 
 // build dependencies
 "Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
@@ -345,8 +314,7 @@ Target "NBench" DoNothing
 "BuildRelease" ==> "Docfx"
 
 // NBench
-"NBenchNet45" ==> "NBench"
-"NBenchNetCore" ==> "NBench"
+"CreateRunnerNuGet" ==> "NBench"
 
 // all
 "BuildRelease" ==> "All"

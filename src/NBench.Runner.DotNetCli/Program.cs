@@ -50,7 +50,7 @@ namespace NBench.Runner.DotNetCli
                     return 0;
                 }
 
-                if (CommandLine.HasProperty("-diagnostics"))
+                if (CommandLine.HasProperty(CommandLine.DiagnosticsKey))
                     _internalDiagnostics = true;
 
                 // The extra versions are unadvertised compatibility flags to match 'dotnet' command line switches
@@ -207,7 +207,7 @@ namespace NBench.Runner.DotNetCli
 
                     var fxVersion = _fxVersion ?? runtimeFrameworkVersion;
                     WriteLine($"Running .NET Core {fxVersion} tests for framework {targetFramework}...");
-                    var outputDirectory = SetFrameworkOutputDirectory(fxVersion, testProject);
+                    var outputDirectory = SetFrameworkOutputDirectory(netCoreAppVersion, testProject);
                     return RunDotNetCoreProject(outputPath, assemblyName, targetFileName, fxVersion, netCoreAppVersion, outputDirectory);
                 }
                 if (targetFrameworkIdentifier == ".NETFramework" && version >= Version452)
@@ -233,6 +233,10 @@ namespace NBench.Runner.DotNetCli
             // Debug hack to be able to run from the compilation folder
             if (!Directory.Exists(runnerFolder))
                 runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", "net452", "win7-x64"));
+
+            // Release hack to run during FAKE builds
+            if (!Directory.Exists(runnerFolder))
+                runnerFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Release", "net452", "win7-x64"));
 
             var executableName = "NBench.Runner.exe";
 
@@ -260,6 +264,10 @@ namespace NBench.Runner.DotNetCli
             if (!Directory.Exists(consoleFolder))
                 consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Debug", netCoreAppVersion));
 
+            // Release hack to run during FAKE builds
+            if (!Directory.Exists(consoleFolder))
+                consoleFolder = Path.GetFullPath(Path.Combine(_thisAssemblyPath, "..", "..", "..", "..", "NBench.Runner", "bin", "Release", netCoreAppVersion));
+
             if (!Directory.Exists(consoleFolder))
             {
                 WriteLineError($"Could not locate runner DLL for {netCoreAppVersion}; unsupported version of .NET Core");
@@ -277,7 +285,7 @@ namespace NBench.Runner.DotNetCli
             if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
                 args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
 
-            args += $@"""{runner}"" ""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey}={outputDirectory}";
+            args += $@"""{runner}"" ""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)}""{CommandLine.OutputKey}={outputDirectory}""";
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 
@@ -304,12 +312,22 @@ namespace NBench.Runner.DotNetCli
             else
                 outputDir = Path.Combine(new FileInfo(testProject).DirectoryName, "PerfResults");
 
+            WriteLine($"OutputDir {outputDir}");
+
             if (createIfNotExists && !Directory.Exists(outputDir))
             {
                 Directory.CreateDirectory(outputDir);
             }
 
-            return Path.Combine(outputDir, targetFramework);
+            try
+            {
+                return Path.Combine(outputDir, targetFramework);
+            }
+            catch
+            {
+                WriteLineError($"Ran into error while attempting to construct path {outputDir}/{targetFramework}");
+                throw;
+            }
         }
 
         ProcessStartInfo GetMsBuildProcessStartInfo(string testProject)
