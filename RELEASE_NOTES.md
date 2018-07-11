@@ -1,3 +1,6 @@
+#### v1.2.1 July 11 2018
+Fixed an issue with the `dotnet-nbench` package where it missed a required runtime in order to execute against .NET Core 2.* projects. 
+
 #### v1.2.0 July 10 2018
 Introduces the `dotnet-nbench` package, which allows all NBench packages to be executed via the `dotnet` CLI regardless of how many frameworks are targeted by a particular project.
 

@@ -2,10 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>1.1.1</VersionPrefix>
-    <PackageReleaseNotes>Minor bugfix release for NBench v1.1.0.
-Resolved [fix NBench.Runner dotnet publish output](https://github.com/petabridge/NBench/issues/237), so the stand-alone runner should now work as part fo the `NBench.Runner` package.
-Please note that all binaries are now located inside the `tools/{framework}` folder inside the `NBench.Runner` package.</PackageReleaseNotes>
+    <VersionPrefix>1.2.1</VersionPrefix>
+    <PackageReleaseNotes>Fixed an issue with the `dotnet-nbench` package where it missed a required runtime in order to execute against .NET Core 2.* projects.</PackageReleaseNotes>
     <PackageProjectUrl>
       https://github.com/petabridge/NBench
     </PackageProjectUrl>

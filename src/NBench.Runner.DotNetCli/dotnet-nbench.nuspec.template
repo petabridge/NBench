@@ -25,6 +25,15 @@
         <dependency id="System.Xml.XPath" version="4.3.0" />
         <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" />
       </group>
+
+      <group targetFramework="netcoreapp2.0">
+        <dependency id="Microsoft.NETCore.App" version="2.0.0" />
+        <dependency id="System.Collections.Specialized" version="4.3.0" />
+        <dependency id="System.Xml.XPath" version="4.3.0" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" />
+      </group>
+
+     
     </dependencies>
   </metadata>
   <files>
