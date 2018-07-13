@@ -57,8 +57,8 @@ After defining some NBench `PerfBenchmark` methods and declaring some measuremen
 The easiest way to run NBench in any runtime, .NET Core or .NET Framework is to install the `dotnet-nbench` NuGet package and add it as a `DotNetCliToolReference` to your NBench test projects.
 
 ```
-<PackageReference Include="NBench" Version="1.2" />
-<DotNetCliToolReference Include="dotnet-nbench" Version="1.2" />
+<PackageReference Include="NBench" Version="1.2.1" />
+<DotNetCliToolReference Include="dotnet-nbench" Version="1.2.1" />
 ```
 
 This will allow you to run NBench specifications for all frameworks your test projects target, including multi-targeted projects, by simply running the following command in the working directory of your test project:
