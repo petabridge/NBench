@@ -39,7 +39,6 @@ namespace NBench.Sdk.Compiler.Assemblies
             _resolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]{
                 new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(Assembly.CodeBase)),
                 new ReferenceAssemblyPathResolver(),
-                new PackageCacheCompilationAssemblyResolver(),
                 new PackageCompilationAssemblyResolver()});
 
             _loadContext.Resolving += LoadContextOnResolving;
@@ -66,7 +65,6 @@ namespace NBench.Sdk.Compiler.Assemblies
             _resolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]{
                 new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
                 new ReferenceAssemblyPathResolver(),
-                new PackageCacheCompilationAssemblyResolver(),
                 new PackageCompilationAssemblyResolver()});
 
             _loadContext.Resolving += LoadContextOnResolving;
