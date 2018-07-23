@@ -127,8 +127,10 @@ Target "NBench" <| fun _ ->
                 |> append (filename project)
                 |> append "--output"
                 |> append outputPerfTests
-                |> append "--concurrent true" 
-                |> append "--trace true"
+                |> append "--concurrent" 
+                |> append "true"
+                |> append "--trace"
+                |> append "true"
                 |> append "--diagnostic"
                 |> append "--no-build"
                 |> toText
