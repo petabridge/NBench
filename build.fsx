@@ -14,6 +14,7 @@ let configuration = "Release"
 
 // all of the frameworks we target for builds and packing
 let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp2.0"; "netcoreapp2.1";]
+let nbenchFrameworks = (environVarOrDefault "DOTNET_FRAMEWORKS" "net452,netcoreapp1.0,netcoreapp2.0,netcoreapp2.1").Split ','
 
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
@@ -121,23 +122,27 @@ Target "NBench" <| fun _ ->
     let dotnetNBenchDll = findToolInSubPath "dotnet-nbench.dll" "./src/**/bin/Release/netcoreapp2.0"
 
     nbenchTestAssemblies |> Seq.iter(fun project -> 
-        let args = new StringBuilder()
-                |> append dotnetNBenchDll // need to unquote this parameter pair or the CLI breaks
-                |> append "--project"
-                |> append (filename project)
-                |> append "--output"
-                |> append outputPerfTests
-                |> append "--concurrent true" 
-                |> append "--trace true"
-                |> append "--diagnostic"
-                |> append "--no-build"
-                |> toText
+        nbenchFrameworks |> Seq.iter(fun framework ->
+            let args = new StringBuilder()
+                    |> append dotnetNBenchDll // need to unquote this parameter pair or the CLI breaks
+                    |> append "--project"
+                    |> append (filename project)
+                    |> append "--output"
+                    |> append outputPerfTests
+                    |> append "--concurrent true" 
+                    |> append "--trace true"
+                    |> append "--diagnostic"
+                    |> append "--no-build"
+                    |> append "--framework"
+                    |> append framework
+                    |> toText
 
-        let result = ExecProcess(fun info -> 
-            info.FileName <- "dotnet"
-            info.WorkingDirectory <- (Directory.GetParent project).FullName
-            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-        if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
+            let result = ExecProcess(fun info -> 
+                info.FileName <- "dotnet"
+                info.WorkingDirectory <- (Directory.GetParent project).FullName
+                info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+            if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
+        )
     )
 
     
