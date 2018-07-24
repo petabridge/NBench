@@ -11,7 +11,7 @@
       https://github.com/petabridge/NBench/blob/dev/LICENSE
     </PackageLicenseUrl>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
-    <NoWarn>$(NoWarn);CS1591;NU1605</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;</NoWarn>
     <PackageIconUrl>https://github.com/petabridge/NBench/raw/dev/images/NBench_logo_square_140.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
