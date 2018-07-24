@@ -166,21 +166,21 @@ Arguments:
             string output = "";
 
             if (HasProperty(TracingKey))
-                output += $"{TracingKey}={GetSingle(TracingKey)} ";
+                output += $"{TracingKey} {GetSingle(TracingKey)} ";
 
             if (HasProperty(ConcurrentKey))
             {
-                output += $"{ConcurrentKey}={GetSingle(ConcurrentKey)} ";
+                output += $"{ConcurrentKey} {GetSingle(ConcurrentKey)} ";
             }
 
             if (HasProperty(ExcludeKey))
             {
-                output += $"{ExcludeKey}={string.Join(",", GetProperty(ExcludeKey))} ";
+                output += $"{ExcludeKey} {string.Join(",", GetProperty(ExcludeKey))} ";
             }
 
             if (HasProperty(IncludeKey))
             {
-                output += $"{IncludeKey}={string.Join(",", GetProperty(IncludeKey))} ";
+                output += $"{IncludeKey} {string.Join(",", GetProperty(IncludeKey))} ";
             }
 
             if (HasProperty(ConfigurationKey))
@@ -190,7 +190,7 @@ Arguments:
 
             if (HasProperty(OutputKey) && includeOutput)
             {
-                output += $"{OutputKey}={GetSingle(OutputKey)} ";
+                output += $"{OutputKey} {GetSingle(OutputKey)} ";
             }
 
             if (HasProperty(DiagnosticsKey))
