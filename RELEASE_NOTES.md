@@ -1,3 +1,7 @@
+#### v1.2.2 July 24 2018
+* [Bug: unable to propagate --concurrent setting to .NET Core executables via dotnet nbench](https://github.com/petabridge/NBench/issues/250) - fixed.
+* [.Net Core: NU1605    Detected package downgrade: System.Reflection.TypeExtensions](https://github.com/petabridge/NBench/issues/246) - fixed.
+
 #### v1.2.1 July 11 2018
 Fixed an issue with the `dotnet-nbench` package where it missed a required runtime in order to execute against .NET Core 2.* projects. 
 
