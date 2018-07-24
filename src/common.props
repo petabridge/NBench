@@ -2,8 +2,9 @@
   <PropertyGroup>
     <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
     <Authors>Petabridge</Authors>
-    <VersionPrefix>1.2.1</VersionPrefix>
-    <PackageReleaseNotes>Fixed an issue with the `dotnet-nbench` package where it missed a required runtime in order to execute against .NET Core 2.* projects.</PackageReleaseNotes>
+    <VersionPrefix>1.2.2</VersionPrefix>
+    <PackageReleaseNotes>[Bug: unable to propagate --concurrent setting to .NET Core executables via dotnet nbench](https://github.com/petabridge/NBench/issues/250) - fixed.
+[.Net Core: NU1605    Detected package downgrade: System.Reflection.TypeExtensions](https://github.com/petabridge/NBench/issues/246) - fixed.</PackageReleaseNotes>
     <PackageProjectUrl>
       https://github.com/petabridge/NBench
     </PackageProjectUrl>
