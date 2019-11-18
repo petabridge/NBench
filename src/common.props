@@ -18,7 +18,7 @@
     <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <ApprovalTestsVersion>3.0.13</ApprovalTestsVersion>
+    <ApprovalTestsVersion>4.3.0</ApprovalTestsVersion>
     <XunitVersion>2.3.1</XunitVersion>
     <TestSdkVersion>15.3.0</TestSdkVersion>
     <FluentAssertionsVersion>4.19.4</FluentAssertionsVersion>
