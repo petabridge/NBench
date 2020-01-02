@@ -21,6 +21,6 @@
     <ApprovalTestsVersion>3.0.13</ApprovalTestsVersion>
     <XunitVersion>2.3.1</XunitVersion>
     <TestSdkVersion>15.3.0</TestSdkVersion>
-    <FluentAssertionsVersion>4.19.4</FluentAssertionsVersion>
+    <FluentAssertionsVersion>5.10.0</FluentAssertionsVersion>
   </PropertyGroup>
 </Project>
