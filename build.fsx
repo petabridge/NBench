@@ -94,10 +94,12 @@ Target "RunTests" (fun _ ->
         | true -> !! "tests/**/*Tests.csproj" 
                    ++ "tests/**/*Tests*.csproj"
                    -- "tests/**/*Tests.Performance.csproj" // skip NBench specs
+                   -- "tests/**/*Tests.Performance.**.csproj" // skip NBench specs
         | _ -> !! "tests/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
                    ++ "tests/**/*Tests*.csproj"
                    -- "tests/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
                    -- "tests/**/*Tests.Performance.csproj" 
+                   -- "tests/**/*Tests.Performance.**.csproj" // skip NBench specs
 
     let runSingleProject project =
         let arguments =
@@ -117,7 +119,7 @@ Target "RunTests" (fun _ ->
 )
 
 Target "NBench" <| fun _ ->
-    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
+    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" -- "./tests/**/*Tests.Performance.csproj" // disable for now
     let dotnetNBenchDll = findToolInSubPath "dotnet-nbench.dll" "./src/**/bin/Release/netcoreapp2.0"
 
     nbenchTestAssemblies |> Seq.iter(fun project -> 
