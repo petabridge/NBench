@@ -5,9 +5,11 @@ using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk.Compiler;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading;
+using IBenchmarkOutput = NBench.Reporting.IBenchmarkOutput;
 
 namespace NBench.Sdk
 {
@@ -20,6 +22,8 @@ namespace NBench.Sdk
 
         public int ExecutedTestsCount { get; set; }
         public int IgnoredTestsCount { get; set; }
+
+        public IReadOnlyList<BenchmarkFinalResults> FullResults { get; set; }
     }
     /// <summary>
     /// Executor of tests
@@ -34,6 +38,10 @@ namespace NBench.Sdk
 
         private readonly TestPackage _package;
 
+        private readonly List<BenchmarkFinalResults> _results = new List<BenchmarkFinalResults>();
+
+        private IBenchmarkOutput _resultsCollector;
+
         /// <summary>
         /// Initializes a new instance of the test runner.
         /// </summary>
@@ -41,6 +49,7 @@ namespace NBench.Sdk
         public TestRunner(TestPackage package)
         {
             _package = package;
+            _resultsCollector = new ActionBenchmarkOutput(benchmarkAction: f => { _results.Add(f); });
         }
 
         /// <summary>
@@ -111,7 +120,8 @@ namespace NBench.Sdk
                 runnerSettings);
             var result = new TestRunnerResult()
             {
-                AllTestsPassed = true
+                AllTestsPassed = true,
+                FullResults = _results
             };
 
             try
@@ -158,13 +168,17 @@ namespace NBench.Sdk
         /// <returns></returns>
         protected virtual IBenchmarkOutput CreateOutput()
         {
+            var outputs = new List<IBenchmarkOutput>() { _resultsCollector };
             var consoleOutput = _package.TeamCity ?
                 new TeamCityBenchmarkOutput()
                 : (IBenchmarkOutput)new ConsoleBenchmarkOutput();
-            if (string.IsNullOrEmpty(_package.OutputDirectory))
-                return consoleOutput;
-            else
-                return new CompositeBenchmarkOutput(consoleOutput, new MarkdownBenchmarkOutput(_package.OutputDirectory));
+            outputs.Add(consoleOutput);
+            if (!string.IsNullOrEmpty(_package.OutputDirectory))
+            {
+                outputs.Add(new MarkdownBenchmarkOutput(_package.OutputDirectory));
+            }
+
+            return new CompositeBenchmarkOutput(outputs.ToArray());
         }
     }
 }

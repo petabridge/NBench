@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using NBench.Reporting;
+using NBench.Reporting.Targets;
 
 
 namespace NBench.Sdk
@@ -19,13 +21,13 @@ namespace NBench.Sdk
         /// <summary>
 		/// List of patterns to be included in the tests. Wildchars supported (*, ?)
 		/// </summary>
-		private List<string> _include = new List<string>();
+		private readonly List<string> _include = new List<string>();
 		private List<Regex> _includePatterns;	// locally build cache
 
 		/// <summary>
 		/// List of patterns to be excluded from the tests. Wildchars supported (*, ?)
 		/// </summary>
-		private List<string> _exclude = new List<string>();
+		private readonly List<string> _exclude = new List<string>();
 		private List<Regex> _excludePatterns;   // locally build cache
 
 
@@ -72,6 +74,14 @@ namespace NBench.Sdk
         /// Defaults to false.
         /// </summary>
         public bool TeamCity { get; set; }
+
+		private readonly List<IBenchmarkOutput> _outputs = new List<IBenchmarkOutput>();
+
+        /// <summary>
+        /// Additional output targets that will be written to in addition to <see cref="MarkdownBenchmarkOutput"/>
+        /// and <see cref="ConsoleBenchmarkOutput"/>.
+        /// </summary>
+        public IReadOnlyList<IBenchmarkOutput> OutputTargets => _outputs;
 
 		/// <summary>
 		/// Initializes a new test package with one test assembly.
@@ -135,24 +145,35 @@ namespace NBench.Sdk
 		/// Add a pattern to be excluded. We'll ignore nulls.
 		/// </summary>
 		/// <param name="exclude"></param>
-		public void AddExclude(string exclude)
+		public TestPackage AddExclude(string exclude)
 		{
-			if (String.IsNullOrEmpty(exclude))
-				return;
-			
-			_exclude.Add(exclude);
-		}
+            if (!string.IsNullOrEmpty(exclude))
+            {
+                _exclude.Add(exclude);
+			}
+
+            return this;
+        }
 
 		/// <summary>
 		/// Add a pattern to be included. We'll ignore nulls.
 		/// </summary>
 		/// <param name="include"></param>
-		public void AddInclude(string include)
-		{
-			if (String.IsNullOrEmpty(include))
-				return;
-			_include.Add(include);
-		}
+		public TestPackage AddInclude(string include)
+        {
+            if (!string.IsNullOrEmpty(include))
+            {
+                _include.Add(include);
+			}
+
+            return this;
+        }
+
+        public TestPackage AddOutput(IBenchmarkOutput output)
+        {
+			_outputs.Add(output);
+            return this;
+        }
 
 	    public bool ShouldRunBenchmark(string benchmarkName)
 	    {

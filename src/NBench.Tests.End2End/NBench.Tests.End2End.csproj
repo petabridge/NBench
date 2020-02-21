@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>$(NetCoreTestVersion)</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\NBench.Tests\XunitBenchmarkOutputHelper.cs" Link="XunitBenchmarkOutputHelper.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NBench\NBench.csproj" />
