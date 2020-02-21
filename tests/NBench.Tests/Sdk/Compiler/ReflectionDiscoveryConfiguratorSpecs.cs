@@ -89,7 +89,7 @@ namespace NBench.Tests.Sdk.Compiler
         [InlineData(typeof(DerivedMeasurementAttribute), typeof(DerivedMeasurementConfigurator))]
         public void ReflectionDiscoveryCanFindBestFittingConfiguratorViaReflection(Type measurementType, Type expectedConfiguratorType)
         {
-            var allConfigurators = ReflectionDiscovery.LoadAllTypeConfigurators(measurementType.GetAssembly(), _output);
+            var allConfigurators = ReflectionDiscovery.LoadAllTypeConfigurators(measurementType.Assembly, _output);
             var actualMatch = ReflectionDiscovery.FindBestMatchingConfiguratorForMeasurement(measurementType, allConfigurators);
             Assert.True(expectedConfiguratorType == actualMatch);
         }

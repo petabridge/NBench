@@ -5,29 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
 
 namespace NBench.Sdk
 {
     /// <summary>
     /// A TestPackage contains one or more test files. It also holds settings how the tests should be loaded. 
     /// </summary>
-#if !CORECLR
-    [Serializable]
-#endif
     public class TestPackage
-#if !CORECLR
-        : MarshalByRefObject
-#endif
     {
         /// <summary>
-        /// List of assemblies to be loaded and tested
-        /// </summary>
-        private List<string> _testfiles = new List<string>();
-
-		/// <summary>
 		/// List of patterns to be included in the tests. Wildchars supported (*, ?)
 		/// </summary>
 		private List<string> _include = new List<string>();
@@ -64,12 +53,9 @@ namespace NBench.Sdk
         public bool Concurrent { get; set; }
 
 		/// <summary>
-		/// Gets the file names of the assemblies containing tests
+		/// Gets the assemblies containing tests
 		/// </summary>
-		public IEnumerable<string> Files
-        {
-            get { return _testfiles; }
-        }
+		public IReadOnlyList<Assembly> TestAssemblies { get; }
 
         /// <summary>
         /// If <c>true</c>, NBench enables tracing and writes its output to all configured output targets.
@@ -87,19 +73,19 @@ namespace NBench.Sdk
         /// </summary>
         public bool TeamCity { get; set; }
 
-        /// <summary>
-        /// Initializes a new test package with one test file.
-        /// </summary>
-        /// <param name="filePath">The path to a test file.</param>
-        /// <param name="include">An optional include pattern</param>
-        /// <param name="exclude">An optiona exclude pattern</param>
-        /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
-        public TestPackage(string filePath, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
+		/// <summary>
+		/// Initializes a new test package with one test assembly.
+		/// </summary>
+		/// <param name="testAssembly">An assembly to test.</param>
+		/// <param name="include">An optional include pattern</param>
+		/// <param name="exclude">An optional exclude pattern</param>
+		/// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
+		public TestPackage(Assembly testAssembly, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
 		{
-			if (string.IsNullOrEmpty(filePath))
-				throw new ArgumentNullException(nameof(filePath));
+			if (testAssembly == null)
+				throw new ArgumentNullException(nameof(testAssembly));
 
-			AddSingleFile(filePath);
+			TestAssemblies = new List<Assembly>(){ testAssembly };
 
 			if (include != null)
 			{
@@ -118,24 +104,18 @@ namespace NBench.Sdk
         /// <summary>
         /// Initializes a new package with multiple test files.
         /// </summary>
-        /// <param name="files">A list of test files.</param>
+        /// <param name="assemblies">A list of test files.</param>
         /// <param name="include">Optional list of include patterns</param>
         /// <param name="exclude">Optional list of exclude patterns</param>
         /// <param name="concurrent">Enable benchmarks that use multiple threads. See <see cref="Concurrent"/> for more details.</param>
-        public TestPackage(IEnumerable<string> files, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
+        public TestPackage(IEnumerable<Assembly> assemblies, IEnumerable<string> include = null, IEnumerable<string> exclude = null, bool concurrent = false)
         {
-            var enumerable = files as string[] ?? files.ToArray();
-            if (files == null || !enumerable.Any())
-                throw new ArgumentException("Please provide at least one test file." ,nameof(files));
+            var enumerable = assemblies.ToArray();
+            if (assemblies == null || !enumerable.Any())
+                throw new ArgumentException("Please provide at least one test assembly." ,nameof(assemblies));
 
 			// if only one file is given use same common logic
-			if (enumerable.Count() == 1)
-				AddSingleFile(enumerable.ElementAt(0));
-			else
-			{
-				foreach (var file in enumerable)
-					_testfiles.Add(Path.GetFullPath(file));
-			}
+            TestAssemblies = enumerable;
 
 		    if (include != null)
 		    {
@@ -151,71 +131,11 @@ namespace NBench.Sdk
             Concurrent = concurrent;
         }
 
-        /// <summary>
-        /// Validates the test package
-        /// </summary>
-        public void Validate()
-        {
-            // validate the files
-            foreach(var file in _testfiles)
-            {
-                if (!File.Exists(file))
-                    throw new FileNotFoundException($"Test file '{file}' could not be found!");
-            }
-
-            // validation configuration file
-            if (!string.IsNullOrEmpty(ConfigurationFile))
-            {
-                if (!Path.IsPathRooted(ConfigurationFile))
-                    ConfigurationFile = Path.Combine(GetBasePath(), ConfigurationFile);
-
-                if (!File.Exists(ConfigurationFile))
-                    throw new FileNotFoundException($"Configuration file '{ConfigurationFile}' could not be found!");
-            }
-        }
-
-        /// <summary>
-        /// Gets the base path for this test package
-        /// </summary>
-        /// <returns></returns>
-        public string GetBasePath()
-        {
-            return Path.GetDirectoryName(_testfiles[0]);
-        }
-
-#if !CORECLR
-        /// <summary>
-        /// Control the lifetime policy for this instance
-        /// </summary>
-        public override object InitializeLifetimeService()
-		{
-			// Live forever
-			return null;
-		}
-#endif
-
-        /// <summary>
-        /// Adds a single file to the package
-        /// </summary>
-        /// <param name="filePath">The path to a test file.</param>
-        private void AddSingleFile(string filePath)
-		{
-			_testfiles.Add(Path.GetFullPath(filePath));
-
-			// use config file of the given assembly if available
-			var configFile = _testfiles[0] + ".config";
-
-			if (File.Exists(configFile))
-				ConfigurationFile = configFile;
-
-			Name = Path.GetFileNameWithoutExtension(filePath);
-		}
-
 		/// <summary>
 		/// Add a pattern to be excluded. We'll ignore nulls.
 		/// </summary>
 		/// <param name="exclude"></param>
-		private void AddExclude(string exclude)
+		public void AddExclude(string exclude)
 		{
 			if (String.IsNullOrEmpty(exclude))
 				return;
@@ -227,7 +147,7 @@ namespace NBench.Sdk
 		/// Add a pattern to be included. We'll ignore nulls.
 		/// </summary>
 		/// <param name="include"></param>
-		private void AddInclude(string include)
+		public void AddInclude(string include)
 		{
 			if (String.IsNullOrEmpty(include))
 				return;

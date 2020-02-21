@@ -44,7 +44,7 @@ namespace NBench.Sdk.Compiler
                 return _measurementConfiguratorTypes[measurementType];
 
             using (specificAssembly = specificAssembly ??
-                                      AssemblyRuntimeLoader.WrapAssembly(measurementType.GetAssembly(), Output))
+                                      AssemblyRuntimeLoader.WrapAssembly(measurementType.Assembly, Output))
             {
 
                 // search for a match

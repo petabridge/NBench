@@ -8,11 +8,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Akka.Tests.Performance.Actor;
 using FluentAssertions;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
 using NBench.Sdk.Compiler;
+using NBench.Tests.Assembly;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -43,19 +45,20 @@ namespace NBench.Tests.End2End
 
         private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
-#if CORECLR
-		    var assemblySubfolder = "netstandard1.6";
-#else
-            var assemblySubfolder = "net452";
-#endif
+            var package = NBenchRunner.CreateTest<ActorThroughputSpec>();
 
-#if DEBUG
-            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Performance.WithDependencies" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.Tests.Performance.WithDependencies.dll", include, exclude);
-#else
-            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.Tests.Performance.WithDependencies" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.Tests.Performance.WithDependencies.dll", include, exclude);
-#endif
+            if (include != null)
+                foreach (var i in include)
+                {
+                    package.AddInclude(i);
+                }
 
-            package.Validate();
+            if (exclude != null)
+                foreach (var e in exclude)
+                {
+                    package.AddExclude(e);
+                }
+
             return package;
         }
     }

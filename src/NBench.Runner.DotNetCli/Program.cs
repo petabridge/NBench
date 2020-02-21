@@ -46,28 +46,28 @@ namespace NBench.Runner.DotNetCli
             {
                 if (args.Length == 1 && args[0] == "--help")
                 {
-                    CommandLine.ShowHelp();
+                    NBenchCommands.ShowHelp();
                     return 0;
                 }
 
-                if (CommandLine.HasProperty(CommandLine.DiagnosticsKey))
+                if (NBenchCommands.HasProperty(NBenchCommands.DiagnosticsKey))
                     _internalDiagnostics = true;
 
                 // The extra versions are unadvertised compatibility flags to match 'dotnet' command line switches
-                var requestedTargetFramework = (CommandLine.GetProperty("-framework")
-                                                   ?? CommandLine.GetProperty("--framework")
-                                                   ?? CommandLine.GetProperty("-f"))?.SingleOrDefault();
+                var requestedTargetFramework = (NBenchCommands.GetProperty("-framework")
+                                                   ?? NBenchCommands.GetProperty("--framework")
+                                                   ?? NBenchCommands.GetProperty("-f"))?.SingleOrDefault();
 
-                _configuration = (CommandLine.GetProperty("-configuration")
-                                ?? CommandLine.GetProperty("--configuration")
-                                ?? CommandLine.GetProperty("-c"))?.SingleOrDefault()
+                _configuration = (NBenchCommands.GetProperty("-configuration")
+                                ?? NBenchCommands.GetProperty("--configuration")
+                                ?? NBenchCommands.GetProperty("-c"))?.SingleOrDefault()
                                 ?? "Release";
 
-                _fxVersion = (CommandLine.GetProperty("-fxversion")
-                            ?? CommandLine.GetProperty("--fx-version"))?.SingleOrDefault();
+                _fxVersion = (NBenchCommands.GetProperty("-fxversion")
+                            ?? NBenchCommands.GetProperty("--fx-version"))?.SingleOrDefault();
 
-                _noBuild = (CommandLine.HasProperty("-nobuild")
-                          || CommandLine.HasProperty("--no-build"));
+                _noBuild = (NBenchCommands.HasProperty("-nobuild")
+                          || NBenchCommands.HasProperty("--no-build"));
 
                 var testProjects = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.*proj")
                     .Where(x => !x.EndsWith(".xproj")) // skip the beta .NET Core format
@@ -244,7 +244,7 @@ namespace NBench.Runner.DotNetCli
             var psi = new ProcessStartInfo
             {
                 FileName = Path.Combine(runnerFolder, executableName),
-                Arguments = $@"""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey} ""{outputDirectory}""",
+                Arguments = $@"""{targetFileName}"" {NBenchCommands.FormatCapturedArguments(false)} {NBenchCommands.OutputKey} ""{outputDirectory}""",
                 WorkingDirectory = Path.GetFullPath(outputPath)
             };
 
@@ -286,7 +286,7 @@ namespace NBench.Runner.DotNetCli
             if (File.Exists(Path.Combine(workingDirectory, runtimeConfigJson)))
                 args += $@"--runtimeconfig ""{runtimeConfigJson}"" ";
 
-            args += $@"""{runner}"" ""{targetFileName}"" {CommandLine.FormatCapturedArguments(false)} {CommandLine.OutputKey} ""{outputDirectory}""";
+            args += $@"""{runner}"" ""{targetFileName}"" {NBenchCommands.FormatCapturedArguments(false)} {NBenchCommands.OutputKey} ""{outputDirectory}""";
 
             var psi = new ProcessStartInfo { FileName = DotNetMuxer.MuxerPath, Arguments = args, WorkingDirectory = workingDirectory };
 
@@ -308,8 +308,8 @@ namespace NBench.Runner.DotNetCli
         string SetFrameworkOutputDirectory(string targetFramework, string testProject, bool createIfNotExists = true)
         {
             string outputDir;
-            if (CommandLine.HasProperty(CommandLine.OutputKey))
-                outputDir = CommandLine.GetSingle(CommandLine.OutputKey);
+            if (NBenchCommands.HasProperty(NBenchCommands.OutputKey))
+                outputDir = NBenchCommands.GetSingle(NBenchCommands.OutputKey);
             else
                 outputDir = Path.Combine(new FileInfo(testProject).DirectoryName, "PerfResults");
 

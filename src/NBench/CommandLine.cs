@@ -18,9 +18,9 @@ namespace NBench
     ///     var outputDirectory = CommandLine.GetInt32("output-directory");
     /// </code>
     /// </summary>
-    public class CommandLine
+    public static class NBenchCommands
     {
-        public static readonly string Version = typeof(CommandLine).GetAssembly().GetName().Version.ToString();
+        public static readonly string Version = typeof(NBenchCommands).Assembly.GetName().Version.ToString();
 
         internal static readonly Lazy<Dictionary<string, List<string>>> Values = new Lazy<Dictionary<string, List<string>>>(ParseValues);
 
@@ -55,29 +55,6 @@ namespace NBench
             }
 
             return dictionary;
-        }
-
-
-        /// <summary>
-        /// Retrieve file names from the command line
-        /// </summary>
-        /// <returns></returns>
-        public static List<string> GetFiles(string[] args)
-        {
-            List<string> files = new List<string>();
-
-            foreach (var arg in args)
-            {
-                // stop at options
-                if (arg.Contains("="))
-                    break;
-
-                var ext = Path.GetExtension(arg);
-                if (ext.Equals(".dll", StringComparison.OrdinalIgnoreCase) || ext.Equals(".exe", StringComparison.OrdinalIgnoreCase))
-                    files.Add(arg);
-            }
-
-            return files;
         }
 
         public static void ShowHelp()
@@ -163,7 +140,7 @@ Arguments:
 
         public static string FormatCapturedArguments(bool includeOutput = true)
         {
-            string output = "";
+            var output = "";
 
             if (HasProperty(TracingKey))
                 output += $"{TracingKey} {GetSingle(TracingKey)} ";

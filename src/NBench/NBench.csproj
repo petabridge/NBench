@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <AssemblyTitle>NBench</AssemblyTitle>
-    <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>$(NetStandardLibVersion)</TargetFrameworks>
     <AssemblyName>NBench</AssemblyName>
     <PackageId>NBench</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
@@ -34,27 +34,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="build\NBench.props" />
-    <None Remove="build\NBench.targets" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="build\NBench.props">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
-    </Content>
-    <Content Include="build\NBench.targets">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Sdk\Compiler\Assemblies\" />
+    <Reference Include="Microsoft.Extensions.DependencyModel">
+      <HintPath>D:\NuGetCache\microsoft.extensions.dependencymodel\1.0.3\lib\netstandard1.6\Microsoft.Extensions.DependencyModel.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Loader">
+      <HintPath>D:\NuGetCache\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1\System.Runtime.Loader.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

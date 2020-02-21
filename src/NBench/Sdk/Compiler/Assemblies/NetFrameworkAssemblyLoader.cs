@@ -16,13 +16,13 @@ namespace NBench.Sdk.Compiler.Assemblies
     ///  INTERNAL API.
     ///  Used to run .NET Framework assemblies.
     ///  </summary>
-    internal sealed class NetFrameworkAssemblyRuntimeLoader : IAssemblyLoader
+    internal sealed class AssemblyRuntimeLoader : IAssemblyLoader
     {
         private readonly string _binaryDirectory;
         private readonly Lazy<Assembly[]> _referencedAssemblies;
         private readonly IBenchmarkOutput _trace;
 
-        public NetFrameworkAssemblyRuntimeLoader(Assembly assembly, IBenchmarkOutput trace)
+        public AssemblyRuntimeLoader(Assembly assembly, IBenchmarkOutput trace)
         {
             _trace = trace;
             Assembly = assembly;
@@ -31,7 +31,7 @@ namespace NBench.Sdk.Compiler.Assemblies
             _referencedAssemblies = new Lazy<Assembly[]>(LoadReferencedAssemblies);
         }
 
-        public NetFrameworkAssemblyRuntimeLoader(string path, IBenchmarkOutput trace)
+        public AssemblyRuntimeLoader(string path, IBenchmarkOutput trace)
         {
             _trace = trace;
             if (!File.Exists(path))
