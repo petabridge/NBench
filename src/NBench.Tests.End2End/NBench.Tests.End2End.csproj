@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\src\common.props" />
+  <Import Project="..\common.props" />
   <PropertyGroup>
     <TargetFramework>$(NetCoreTestVersion)</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
+    <ProjectReference Include="..\NBench\NBench.csproj" />
     <ProjectReference Include="..\NBench.TestAssembly\NBench.TestAssembly.csproj" />
     <ProjectReference Include="..\NBench.Tests.Performance.WithDependencies\NBench.Tests.Performance.WithDependencies.csproj" />
   </ItemGroup>

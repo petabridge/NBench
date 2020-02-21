@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\src\common.props" />
+  <Import Project="..\common.props" />
   <PropertyGroup>
     <AssemblyTitle>Akka.Tests.Performance</AssemblyTitle>
     <TargetFrameworks>$(NetCoreTestVersion)</TargetFrameworks>
@@ -10,13 +10,8 @@
     <Content Include="App.config" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NBench\NBench.csproj" />
+    <ProjectReference Include="..\NBench\NBench.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,9 +21,4 @@
   <ItemGroup>
     <PackageReference Include="Akka" Version="1.3.8" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
-
 </Project>
