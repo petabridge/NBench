@@ -2,8 +2,10 @@
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using Akka.Tests.Performance.Actor;
 using FluentAssertions;
+using NBench.Reporting;
 using NBench.Sdk;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,16 +17,20 @@ namespace NBench.Tests.End2End
     {
         private readonly ITestOutputHelper _output;
 
+        private readonly IBenchmarkOutput _benchmarkOutput;
+
         public NBenchIntregrationTestWithDependenciesLoadAssembly(ITestOutputHelper output)
         {
             _output = output;
+            _benchmarkOutput = new XunitBenchmarkOutputHelper(output);
         }
 
         [Fact()]
         public void LoadAssemblyCorrect()
         {
-            var package = LoadPackageWithDependencies();
+            var package = LoadPackageWithDependencies().AddOutput(_benchmarkOutput);
             var result = TestRunner.Run(package);
+            
             result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
             result.ExecutedTestsCount.Should().NotBe(0);
             result.IgnoredTestsCount.Should().Be(0);
