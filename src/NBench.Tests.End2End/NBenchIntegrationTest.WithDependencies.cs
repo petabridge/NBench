@@ -1,20 +1,10 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Akka.Tests.Performance.Actor;
 using FluentAssertions;
-using NBench.Reporting;
-using NBench.Reporting.Targets;
 using NBench.Sdk;
-using NBench.Sdk.Compiler;
-using NBench.Tests.Assembly;
 using Xunit;
 using Xunit.Abstractions;
 
