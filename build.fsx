@@ -103,8 +103,8 @@ Target "RunTests" (fun _ ->
     let runSingleProject project =
         let arguments =
             match (hasTeamCity) with
-            | true -> (sprintf "test %s -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none -teamcity" (Path.GetFileName project) outputTests)
-            | false -> (sprintf "test %s -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s" (Path.GetFileName project) outputTests)
+            | true -> (sprintf "test -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none -teamcity" (outputTests))
+            | false -> (sprintf "test -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none" (outputTests))
 
         log (sprintf "Executing command [%s] in PWD %s" arguments (Directory.GetParent project).FullName)
         let result = ExecProcess(fun info ->
