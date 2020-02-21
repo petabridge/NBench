@@ -50,6 +50,7 @@ jobs:
         inputs:
           pathtoPublish: '$(Build.ArtifactStagingDirectory)'
           artifactName: ${{ parameters.artifactName }}
+          continueOnError: true
       - script: 'echo 1>&2'
         failOnStderr: true
         displayName: 'If above is partially succeeded, then fail'
