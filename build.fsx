@@ -90,15 +90,15 @@ module internal ResultHandling =
 Target "RunTests" (fun _ ->
     let projects = 
         match (isWindows) with 
-        | true -> !! "tests/**/*Tests.csproj" 
-                   ++ "tests/**/*Tests*.csproj"
-                   -- "tests/**/*Tests.Performance.csproj" // skip NBench specs
-                   -- "tests/**/*Tests.Performance.**.csproj" // skip NBench specs
-        | _ -> !! "tests/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
-                   ++ "tests/**/*Tests*.csproj"
-                   -- "tests/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
-                   -- "tests/**/*Tests.Performance.csproj" 
-                   -- "tests/**/*Tests.Performance.**.csproj" // skip NBench specs
+        | true -> !! "./src/**/*Tests.csproj" 
+                   ++ "./src/**/*Tests*.csproj"
+                   -- "./src/**/*Tests.Performance.csproj" // skip NBench specs
+                   -- "./src/**/*Tests.Performance.**.csproj" // skip NBench specs
+        | _ -> !! "./src/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
+                   ++ "./src/**/*Tests*.csproj"
+                   -- "./src/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
+                   -- "./src/**/*Tests.Performance.csproj" 
+                   -- "./src/**/*Tests.Performance.**.csproj" // skip NBench specs
 
     let runSingleProject project =
         let arguments =
