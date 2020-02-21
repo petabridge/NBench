@@ -32,14 +32,4 @@
     <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Microsoft.Extensions.DependencyModel">
-      <HintPath>D:\NuGetCache\microsoft.extensions.dependencymodel\1.0.3\lib\netstandard1.6\Microsoft.Extensions.DependencyModel.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Loader">
-      <HintPath>D:\NuGetCache\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1\System.Runtime.Loader.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
