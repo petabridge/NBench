@@ -1,0 +1,34 @@
+# Pull request validation for Windows against the `dev` and `master` branches
+# See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
+trigger:
+  branches:
+    include:
+      - dev
+      - master
+
+pr:
+  autoCancel: true # indicates whether additional pushes to a PR should cancel in-progress runs for the same PR. Defaults to true
+  branches:
+    include: [ dev, master ] # branch names which will trigger a build
+
+name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+jobs:
+  - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'windows_pr'
+      displayName: 'Windows PR Validation'
+      vmImage: 'vs2017-win2016'
+      scriptFileName: build.cmd
+      scriptArgs: all
+      outputDirectory: 'bin/nuget'
+      artifactName: 'nuget_pack-$(Build.BuildId)'
+  - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'linux_pr'
+      displayName: 'Linux PR Validation'
+      vmImage: 'ubuntu-16.04'
+      scriptFileName: ./build.sh
+      scriptArgs: all
+      outputDirectory: 'bin/nuget'
+      artifactName: 'nuget_pack-$(Build.BuildId)'
