@@ -102,15 +102,15 @@ Target "RunTests" (fun _ ->
     let runSingleProject project =
         let arguments =
             match (hasTeamCity) with
-            | true -> (sprintf "xunit -c Release -nobuild -parallel none -teamcity -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))
-            | false -> (sprintf "xunit -c Release -nobuild -parallel none -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))
+            | true -> (sprintf "test -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none -teamcity" (outputTests))
+            | false -> (sprintf "test -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none" (outputTests))
 
         let result = ExecProcess(fun info ->
             info.FileName <- "dotnet"
             info.WorkingDirectory <- (Directory.GetParent project).FullName
             info.Arguments <- arguments) (TimeSpan.FromMinutes 30.0) 
         
-        ResultHandling.failBuildIfXUnitReportedError TestRunnerErrorLevel.DontFailBuild result
+        ResultHandling.failBuildIfXUnitReportedError TestRunnerErrorLevel.Error result  
 
     projects |> Seq.iter (log)
     projects |> Seq.iter (runSingleProject)
