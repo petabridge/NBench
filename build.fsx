@@ -90,24 +90,26 @@ module internal ResultHandling =
 Target "RunTests" (fun _ ->
     let projects = 
         match (isWindows) with 
-        | true -> !! "tests/**/*Tests.csproj" 
-                   ++ "tests/**/*Tests*.csproj"
-                   -- "tests/**/*Tests.Performance.csproj" // skip NBench specs
-                   -- "tests/**/*Tests.Performance.**.csproj" // skip NBench specs
-        | _ -> !! "tests/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
-                   ++ "tests/**/*Tests*.csproj"
-                   -- "tests/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
-                   -- "tests/**/*Tests.Performance.csproj" 
-                   -- "tests/**/*Tests.Performance.**.csproj" // skip NBench specs
+        | true -> !! "./src/**/*Tests.csproj" 
+                   ++ "./src/**/*Tests*.csproj"
+                   -- "./src/**/*Tests.Performance.csproj" // skip NBench specs
+                   -- "./src/**/*Tests.Performance.**.csproj" // skip NBench specs
+        | _ -> !! "./src/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
+                   ++ "./src/**/*Tests*.csproj"
+                   -- "./src/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
+                   -- "./src/**/*Tests.Performance.csproj" 
+                   -- "./src/**/*Tests.Performance.**.csproj" // skip NBench specs
 
     let runSingleProject project =
         let arguments =
             match (hasTeamCity) with
-            | true -> (sprintf "test \"%s\" -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none -teamcity" project outputTests)
-            | false -> (sprintf "test \"%s\" -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none" project outputTests)
+            | true -> (sprintf "test -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none -teamcity" (outputTests))
+            | false -> (sprintf "test -c Release --no-build --logger:trx --logger:\"console;verbosity=normal\" --results-directory %s -- -parallel none" (outputTests))
 
+        log (sprintf "Executing command [%s] in PWD %s" arguments (Directory.GetParent project).FullName)
         let result = ExecProcess(fun info ->
             info.FileName <- "dotnet"
+            info.WorkingDirectory <- (Directory.GetParent project).FullName
             info.Arguments <- arguments) (TimeSpan.FromMinutes 30.0) 
         
         ResultHandling.failBuildIfXUnitReportedError TestRunnerErrorLevel.Error result  
