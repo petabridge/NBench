@@ -16,19 +16,37 @@ name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 jobs:
   - template: azure-pipeline.template.yaml
     parameters:
-      name: 'windows_pr'
-      displayName: 'Windows PR Validation'
+      name: 'windows_tests'
+      displayName: 'Windows Tests'
       vmImage: 'vs2017-win2016'
       scriptFileName: build.cmd
-      scriptArgs: all
+      scriptArgs: RunTests
+      outputDirectory: 'TestResults'
+      artifactName: 'windows_tests-$(Build.BuildId)'
+ - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'windows_integration'
+      displayName: 'Integration Tests'
+      vmImage: 'vs2017-win2016'
+      scriptFileName: build.cmd
+      scriptArgs: NBench
+      outputDirectory: 'PerfResults'
+      artifactName: 'integration_tests-$(Build.BuildId)'
+- template: azure-pipeline.template.yaml
+    parameters:
+      name: 'nuget_pack'
+      displayName: 'NuGet Pack'
+      vmImage: 'vs2017-win2016'
+      scriptFileName: build.cmd
+      scriptArgs: Nuget
       outputDirectory: 'bin/nuget'
-      artifactName: 'nuget_pack-$(Build.BuildId)'
+      artifactName: 'nuget-$(Build.BuildId)'
   - template: azure-pipeline.template.yaml
     parameters:
-      name: 'linux_pr'
-      displayName: 'Linux PR Validation'
+      name: 'linux_tests'
+      displayName: 'Linux Tests'
       vmImage: 'ubuntu-16.04'
       scriptFileName: ./build.sh
-      scriptArgs: all
-      outputDirectory: 'bin/nuget'
-      artifactName: 'nuget_pack-$(Build.BuildId)'
+      scriptArgs: RunTests
+      outputDirectory: 'TestResults'
+      artifactName: 'linux_tests--$(Build.BuildId)'
