@@ -1,8 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\src\common.props" />
-  <Import Project="..\..\src\NBench\build\NBench.targets" />
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp1.0;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFramework>$(NetCoreTestVersion)</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject>NBench.Tests.Performance.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

@@ -23,4 +23,8 @@
     <TestSdkVersion>15.3.0</TestSdkVersion>
     <FluentAssertionsVersion>4.19.4</FluentAssertionsVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <NetCoreTestVersion>netcoreapp2.1</NetCoreTestVersion>
+    <NetStandardLibVersion>netstandard2.0</NetStandardLibVersion>
+  </PropertyGroup>
 </Project>

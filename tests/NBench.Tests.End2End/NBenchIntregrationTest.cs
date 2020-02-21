@@ -10,6 +10,7 @@ using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk;
 using NBench.Sdk.Compiler;
+using NBench.Tests.Assembly;
 using Xunit;
 
 namespace NBench.Tests.End2End
@@ -100,19 +101,20 @@ namespace NBench.Tests.End2End
 
         private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
-#if CORECLR
-		    var assemblySubfolder = "netcoreapp1.1";
-#else
-            var assemblySubfolder = "net452";
-#endif
+            var package = NBenchRunner.CreateTest<ConfigBenchmark>();
 
-#if DEBUG
-            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.TestAssembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.TestAssembly.dll", include, exclude);
-#else
-            var package = new TestPackage(".." + Path.DirectorySeparatorChar + ".."+ Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "NBench.TestAssembly" + Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar + "Release" + Path.DirectorySeparatorChar + assemblySubfolder + Path.DirectorySeparatorChar + "NBench.TestAssembly.dll", include, exclude);
-#endif
+            if (include != null)
+                foreach (var i in include)
+                {
+                    package.AddInclude(i);
+                }
 
-            package.Validate();
+            if (exclude != null)
+                foreach (var e in exclude)
+                {
+                    package.AddExclude(e);
+                }
+
             return package;
         }
     }

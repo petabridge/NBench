@@ -29,7 +29,6 @@ namespace NBench.Tests.Assembly
         {
             _counter = context.GetCounter(CounterName);
 
-#if CORECLR
             // This has to be skipped for now as the App.config isn't being loaded the right way here
 
             //var builder = new ConfigurationBuilder();
@@ -40,10 +39,6 @@ namespace NBench.Tests.Assembly
 
             //if (testKeyValue != "42")
             //    throw new InvalidOperationException(String.Format("TestKey from AppSettings could not be loaded! {0}", testKeyValue));
-#else
-            if (ConfigurationManager.AppSettings["TestKey"] != "42")
-                throw new InvalidOperationException("TestKey from AppSettings could not be loaded!");
-#endif
         }
 
         /// <summary>

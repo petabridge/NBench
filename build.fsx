@@ -13,7 +13,6 @@ open Fake.DocFxHelper
 let configuration = "Release"
 
 // all of the frameworks we target for builds and packing
-let frameworks = ["net452"; "netcoreapp1.0"; "netcoreapp2.0"; "netcoreapp2.1";]
 
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
@@ -118,35 +117,33 @@ Target "RunTests" (fun _ ->
     projects |> Seq.iter (runSingleProject)
 )
 
-Target "NBench" DoNothing
+Target "NBench" (fun _ ->
+    ensureDirectory outputPerfTests
+    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
 
-//Target "NBench" <| fun _ ->
-//    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
-//    let dotnetNBenchDll = findToolInSubPath "dotnet-nbench.dll" "./src/**/bin/Release/netcoreapp2.0"
+    nbenchTestAssemblies |> Seq.iter(fun project -> 
+        let args = new StringBuilder()
+                |> append "run"
+                |> append "--no-build"
+                |> append "-c"
+                |> append configuration
+                |> append " -- "
+                |> append "--output"
+                |> append outputPerfTests
+                |> append "--concurrent" 
+                |> append "true"
+                |> append "--trace"
+                |> append "true"
+                |> append "--diagnostic"               
+                |> toText
 
-//    nbenchTestAssemblies |> Seq.iter(fun project -> 
-//        let args = new StringBuilder()
-//                |> append dotnetNBenchDll // need to unquote this parameter pair or the CLI breaks
-//                |> append "--project"
-//                |> append (filename project)
-//                |> append "--output"
-//                |> append outputPerfTests
-//                |> append "--concurrent" 
-//                |> append "true"
-//                |> append "--trace"
-//                |> append "true"
-//                |> append "--diagnostic"
-//                |> append "--no-build"
-//                |> toText
-
-//        let result = ExecProcess(fun info -> 
-//            info.FileName <- "dotnet"
-//            info.WorkingDirectory <- (Directory.GetParent project).FullName
-//            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-//        if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
-//    )
-
-    
+        let result = ExecProcess(fun info -> 
+            info.FileName <- "dotnet"
+            info.WorkingDirectory <- (Directory.GetParent project).FullName
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
+    )
+)
 
 //--------------------------------------------------------------------------------
 // Nuget targets 
@@ -156,33 +153,6 @@ let overrideVersionSuffix (project:string) =
     match project with
     | _ -> versionSuffix // add additional matches to publish different versions for different projects in solution
 
-Target "CreateNuspecs" (fun _ ->
-    let nuspecs = !! "src/**/*.nuspec.template"
-
-    // For each individual .nuspec.template file, need to inject some credentials
-    let commonPropsVersionPrefix = XMLRead true "./src/common.props" "" "" "//Project/PropertyGroup/VersionPrefix" |> Seq.head
-    let versionReplacement = List.ofSeq [ "@version@", commonPropsVersionPrefix + (if (not (versionSuffix = "")) then ("-" + versionSuffix) else "") ]
-    let releaseNotesReplacement = List.ofSeq ["@release_notes@", (releaseNotes.Notes |> String.concat "\n")]
-
-    nuspecs |> Seq.iter (fun template ->
-        let fileInfo = new FileInfo(template);
-        let nuspec = (Path.Combine(fileInfo.DirectoryName, fileInfo.Name.Replace(".template", "")))
-
-        // Create the temporary .nuspec file
-        CopyFile nuspec template
-
-        TemplateHelper.processTemplates versionReplacement [ nuspec ]
-        TemplateHelper.processTemplates releaseNotesReplacement [ nuspec ]
-    )
-)
-
-Target "CleanupNuspecs" (fun _ ->
-    let nuspecs = !! "src/**/*.nuspec"
-
-    nuspecs |> Seq.iter (fun nuspec ->
-        DeleteFile nuspec
-    )
-)
 
 Target "CreateNuget" (fun _ ->    
     let projects = !! "src/**/*.csproj" 
@@ -201,34 +171,6 @@ Target "CreateNuget" (fun _ ->
                     OutputPath = outputNuGet })
 
     projects |> Seq.iter (runSingleProject)
-)
-
-Target "CreateRunnerNuGet" (fun _ ->
-    let executableProjects = !! "./src/**/NBench.Runner.csproj"
-
-    executableProjects |> Seq.iter (fun project ->
-        frameworks |> Seq.iter (fun framework ->
-            DotNetCli.Publish
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Configuration = configuration
-                        Runtime = "win7-x64"
-                        Framework = framework
-                        VersionSuffix = overrideVersionSuffix project } ) 
-                    )
-                )
-    
-    executableProjects |> Seq.iter (fun project ->  
-        DotNetCli.Pack
-            (fun p -> 
-                { p with
-                    Project = project
-                    Configuration = configuration
-                    AdditionalArgs = ["--include-symbols"]
-                    VersionSuffix = overrideVersionSuffix project
-                    OutputPath = outputNuGet } )
-    )
 )
 
 Target "PublishNuget" (fun _ ->
@@ -275,9 +217,12 @@ Target "DocFx" (fun _ ->
 )
 
 FinalTarget "KillCreatedProcesses" (fun _ ->
-    log "Killing processes started by FAKE:"
-    startedProcesses |> Seq.iter (fun (pid, _) -> logfn "%i" pid)
-    killAllCreatedProcesses()
+    log "Shutting down dotnet build-server"
+    let result = ExecProcess(fun info -> 
+            info.FileName <- "dotnet"
+            info.WorkingDirectory <- __SOURCE_DIRECTORY__
+            info.Arguments <- "build-server shutdown") (System.TimeSpan.FromMinutes 2.0)
+    if result <> 0 then failwithf "dotnet build-server shutdown failed"
 )
 
 //--------------------------------------------------------------------------------
@@ -316,13 +261,13 @@ Target "Nuget" DoNothing
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
-"CreateNuspecs" ==> "CreateRunnerNuGet" ==> "CreateNuget" ==> "CleanupNuspecs" ==> "PublishNuget" ==> "Nuget"
+"CreateNuget" ==> "PublishNuget" ==> "Nuget"
 
 // docs
 "BuildRelease" ==> "Docfx"
 
 // NBench
-"CreateRunnerNuGet" ==> "NBench"
+"BuildRelease" ==> "NBench"
 
 // all
 "BuildRelease" ==> "All"
