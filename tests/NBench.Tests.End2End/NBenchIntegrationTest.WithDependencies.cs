@@ -33,14 +33,11 @@ namespace NBench.Tests.End2End
         [Fact()]
         public void LoadAssemblyCorrect()
         {
-            if (!TestRunner.IsMono) // this test doesn't pass yet on Mono
-            {
-                var package = LoadPackageWithDependencies();
-                var result = TestRunner.Run(package);
-                result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
-                result.ExecutedTestsCount.Should().NotBe(0);
-                result.IgnoredTestsCount.Should().Be(0);
-            }
+            var package = LoadPackageWithDependencies();
+            var result = TestRunner.Run(package);
+            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+            result.ExecutedTestsCount.Should().NotBe(0);
+            result.IgnoredTestsCount.Should().Be(0);
         }
 
         private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)

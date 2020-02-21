@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\src\common.props" />
   <PropertyGroup>
-    <TargetFrameworks>$(NetCoreTestVersion)</TargetFrameworks>
+    <TargetFramework>$(NetCoreTestVersion)</TargetFramework>
     <IsPackable>false</IsPackable>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
