@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreTestVersion)</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject>NBench.Tests.Performance.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
