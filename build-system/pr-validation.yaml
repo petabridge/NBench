@@ -41,12 +41,3 @@ jobs:
       scriptArgs: Nuget
       outputDirectory: 'bin/nuget'
       artifactName: 'nuget-$(Build.BuildId)'
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'linux_tests'
-      displayName: 'Linux Tests'
-      vmImage: 'ubuntu-16.04'
-      scriptFileName: ./build.sh
-      scriptArgs: RunTests
-      outputDirectory: 'TestResults'
-      artifactName: 'linux_tests--$(Build.BuildId)'

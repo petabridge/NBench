@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2015-2018 Petabridge</Copyright>
+    <Copyright>Copyright © 2015-2020 Petabridge</Copyright>
     <Authors>Petabridge</Authors>
     <VersionPrefix>1.2.2</VersionPrefix>
     <PackageReleaseNotes>[Bug: unable to propagate --concurrent setting to .NET Core executables via dotnet nbench](https://github.com/petabridge/NBench/issues/250) - fixed.
