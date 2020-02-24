@@ -33,14 +33,14 @@ jobs:
       outputDirectory: 'PerfResults'
       artifactName: 'integration_tests_windows-$(Build.BuildId)'
   - template: azure-pipeline.template.yaml
-      parameters:
-        name: 'linux_integration'
-        displayName: 'Integration Tests (Linux)'
-        vmImage: 'ubuntu-16.04'
-        scriptFileName: build.sh
-        scriptArgs: NBench
-        outputDirectory: 'PerfResults'
-        artifactName: 'integration_tests_linux-$(Build.BuildId)'
+    parameters:
+      name: 'linux_integration'
+      displayName: 'Integration Tests (Linux)'
+      vmImage: 'ubuntu-16.04'
+      scriptFileName: build.sh
+      scriptArgs: NBench
+      outputDirectory: 'PerfResults'
+      artifactName: 'integration_tests_linux-$(Build.BuildId)'
   - template: azure-pipeline.template.yaml
     parameters:
       name: 'nuget_pack'
