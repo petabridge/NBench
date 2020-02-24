@@ -4,6 +4,7 @@
     <TargetFrameworks>$(NetCoreTestVersion)</TargetFrameworks>
     <AssemblyName>NBench.TestAssembly</AssemblyName>
     <RootNamespace>NBench.TestAssembly</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
