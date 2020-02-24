@@ -1,2 +1,10 @@
-- name: Introduction
+- name: Introduction to NBench
   href: index.md
+- name: Quickstart Tutorial
+  href: quickstart.md
+- name: Creating Benchmarks and Performance Tests
+  href: benchmarks.md
+- name: Measurements and Assertions
+  href: measurements.md
+- name: Running NBench
+  href: running.md

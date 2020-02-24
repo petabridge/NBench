@@ -51,13 +51,15 @@
       }
     ],
      "sitemap": {
-       "baseUrl": "https://yoursite.github.io/"
+       "baseUrl": "https://nbench.io/"
      },
     "dest": "_site",
     "globalMetadata": {
-      "_appTitle": "Petabridge.Library",
-      "_disableContribution": "true",
-      "_appLogoPath": "/images/icon.png",
+      "_appTitle": "NBench",
+      "_disableContribution": "false",
+      "_appLogoPath": "images/NBench_icon.png",
+      "_appFooter": "Copyright © 2015-2020 <a href='https://petabridge.com/'>Petabridge™, LLC</a>",
+      "_enableSearch": "true"
     },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
