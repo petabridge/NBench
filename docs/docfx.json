@@ -58,6 +58,7 @@
       "_appTitle": "NBench",
       "_disableContribution": "false",
       "_appLogoPath": "/images/NBench_logo_square_90.png.png",
+      "_appFooter": "Copyright © 2015-2020 [Petabridge™, LLC](https://petabridge.com/)",
       "_enableSearch": "true"
     },
     "globalMetadataFiles": [],
