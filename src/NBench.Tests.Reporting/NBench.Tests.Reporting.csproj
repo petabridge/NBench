@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreTestVersion)</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
+    <PackageReference Include="xunit" Version="$(XunitVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
+    <PackageReference Include="ApprovalTests" Version="$(ApprovalTestsVersion)" />     
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\NBench\NBench.csproj" />
+  </ItemGroup>
+</Project>

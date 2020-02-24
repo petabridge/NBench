@@ -5,40 +5,31 @@ using NBench.Reporting;
 using NBench.Reporting.Targets;
 using NBench.Sdk.Compiler;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
-#if CORECLR
-using System.Runtime.Loader;
-#endif
 using System.Threading;
-using Microsoft.Win32;
+using IBenchmarkOutput = NBench.Reporting.IBenchmarkOutput;
 
 namespace NBench.Sdk
 {
     /// <summary>
     /// Results collected by the test runner
     /// </summary>
-#if !CORECLR
-    [Serializable]
-#endif
     public class TestRunnerResult
     {
         public bool AllTestsPassed { get; set; }
 
         public int ExecutedTestsCount { get; set; }
         public int IgnoredTestsCount { get; set; }
+
+        public IReadOnlyList<BenchmarkFinalResults> FullResults { get; set; }
     }
     /// <summary>
     /// Executor of tests
     /// </summary>
     /// <remarks>Will be created in separated appDomain therefor it have to be marshaled.</remarks>
     public class TestRunner
-#if !CORECLR
-        : MarshalByRefObject
-#endif
     {
         /// <summary>
         /// Can't apply some of our optimization tricks if running Mono, due to need for elevated permissions
@@ -47,6 +38,10 @@ namespace NBench.Sdk
 
         private readonly TestPackage _package;
 
+        private readonly List<BenchmarkFinalResults> _results = new List<BenchmarkFinalResults>();
+
+        private IBenchmarkOutput _resultsCollector;
+
         /// <summary>
         /// Initializes a new instance of the test runner.
         /// </summary>
@@ -54,58 +49,8 @@ namespace NBench.Sdk
         public TestRunner(TestPackage package)
         {
             _package = package;
+            _resultsCollector = new ActionBenchmarkOutput(benchmarkAction: f => { _results.Add(f); });
         }
-
-
-#if !CORECLR
-        /// <summary>
-        /// Creates a new instance of the test runner in the given app domain.
-        /// </summary>
-        /// <param name="domain">The app domain to create the runner into.</param>
-        /// <param name="package">The test package to execute.</param>
-        /// <returns></returns>
-        public static TestRunner CreateRunner(System.AppDomain domain, TestPackage package)
-        {
-            Contract.Requires(domain != null);
-            var runnerType = typeof(TestRunner);
-            return domain.CreateInstanceAndUnwrap(runnerType.Assembly.FullName, runnerType.FullName, false, 0, null, new object[] { package }, null, null) as TestRunner;
-        }
-#else
-        /// <summary>
-        /// Creates a new instance of the test runner in the given app domain.
-        /// </summary>
-        /// <param name="package">The test package to execute.</param>
-        /// <returns></returns>
-        public static TestRunner CreateRunner(TestPackage package)
-        {
-            return (TestRunner) Activator.CreateInstance(typeof(TestRunner), new object[] {package});
-        }
-#endif
-
-#if !CORECLR
-        /// <summary>
-        /// Executes the test package.
-        /// </summary>
-        /// <param name="package">The test package to execute.</param>
-        /// <returns>True if all tests passed.</returns>
-        /// <remarks>Creates a new AppDomain and executes the tests.</remarks>
-        public static TestRunnerResult Run(TestPackage package)
-        {
-            Contract.Requires(package != null);
-            // create the test app domain
-            var testDomain = DomainManager.CreateDomain(package);
-
-            try
-            {
-                var runner = TestRunner.CreateRunner(testDomain, package);
-                return runner.Execute();
-            }
-            finally
-            {
-                DomainManager.UnloadDomain(testDomain);
-            }
-        }
-#else
 
         /// <summary>
         /// Executes the test package.
@@ -115,17 +60,15 @@ namespace NBench.Sdk
         public static TestRunnerResult Run(TestPackage package)
         {
             Contract.Requires(package != null);
-            var runner = TestRunner.CreateRunner(package);
+            var runner = new TestRunner(package);
             return runner.Execute();
         }
-#endif
 
         /// <summary>
         /// Initializes the process and thread
         /// </summary>
-        public void SetProcessPriority(bool concurrent)
+        public static void SetProcessPriority(bool concurrent)
         {
-#if !CORECLR
             /*
             * Set processor affinity
             */
@@ -149,33 +92,6 @@ namespace NBench.Sdk
                  */
                 Thread.CurrentThread.Priority = ThreadPriority.Highest;
             }
-#else
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {  
-                /*
-                * Set processor affinity
-                */
-                if (!concurrent)
-                {
-                    var proc = Process.GetCurrentProcess();
-                    proc.ProcessorAffinity = new IntPtr(2); // strictly the second processor!
-                }
-
-                /*
-                 * Set priority
-                 */
-                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-                if (!concurrent)
-                {
-                    /*
-                     * If we're running in concurrent mode, don't give the foreground thread higher priority
-                     * over the other threads participating in NBench specs. Treat them all equally with the same
-                     * priority.
-                     */
-                    //Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                }
-            }
-#endif
         }
 
         /// <summary>
@@ -204,37 +120,35 @@ namespace NBench.Sdk
                 runnerSettings);
             var result = new TestRunnerResult()
             {
-                AllTestsPassed = true
+                AllTestsPassed = true,
+                FullResults = _results
             };
 
             try
             {
-                foreach (var testFile in _package.Files)
+                foreach (var assembly in _package.TestAssemblies)
                 {
-                    output.WriteLine($"Executing Benchmarks in {testFile}");
-                    using (var assembly = AssemblyRuntimeLoader.LoadAssembly(testFile, output))
+                    output.WriteLine($"Executing Benchmarks in {assembly}");
+                    var benchmarks = discovery.FindBenchmarks(assembly);
+
+                    foreach (var benchmark in benchmarks)
                     {
-                        var benchmarks = discovery.FindBenchmarks(assembly.Assembly);
-
-                        foreach (var benchmark in benchmarks)
+                        // verify if the benchmark should be included/excluded from the list of benchmarks to be run
+                        if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
                         {
-                            // verify if the benchmark should be included/excluded from the list of benchmarks to be run
-                            if (_package.ShouldRunBenchmark(benchmark.BenchmarkName))
-                            {
-                                output.StartBenchmark(benchmark.BenchmarkName);
-                                benchmark.Run();
-                                benchmark.Finish();
+                            output.StartBenchmark(benchmark.BenchmarkName);
+                            benchmark.Run();
+                            benchmark.Finish();
 
-                                // if one assert fails, all fail
-                                result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
-                                output.FinishBenchmark(benchmark.BenchmarkName);
-                                result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
-                            }
-                            else
-                            {
-                                output.SkipBenchmark(benchmark.BenchmarkName);
-                                result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
-                            }
+                            // if one assert fails, all fail
+                            result.AllTestsPassed = result.AllTestsPassed && benchmark.AllAssertsPassed;
+                            output.FinishBenchmark(benchmark.BenchmarkName);
+                            result.ExecutedTestsCount = result.ExecutedTestsCount + 1;
+                        }
+                        else
+                        {
+                            output.SkipBenchmark(benchmark.BenchmarkName);
+                            result.IgnoredTestsCount = result.IgnoredTestsCount + 1;
                         }
                     }
                 }
@@ -248,30 +162,23 @@ namespace NBench.Sdk
             return result;
         }
 
-#if !CORECLR
-        /// <summary>
-        /// Control the lifetime policy for this instance
-        /// </summary>
-        public override object InitializeLifetimeService()
-        {
-            // Live forever
-            return null;
-        }
-#endif
-
         /// <summary>
         /// Creates the benchmark output writer
         /// </summary>
         /// <returns></returns>
         protected virtual IBenchmarkOutput CreateOutput()
         {
-            var consoleOutput = _package.TeamCity ? 
-                new TeamCityBenchmarkOutput() 
-                : (IBenchmarkOutput)new ConsoleBenchmarkOutput(); 
-            if (string.IsNullOrEmpty(_package.OutputDirectory))
-                return consoleOutput;
-            else
-                return new CompositeBenchmarkOutput(consoleOutput, new MarkdownBenchmarkOutput(_package.OutputDirectory));
+            var outputs = new List<IBenchmarkOutput>() { _resultsCollector };
+            var consoleOutput = _package.TeamCity ?
+                new TeamCityBenchmarkOutput()
+                : (IBenchmarkOutput)new ConsoleBenchmarkOutput();
+            outputs.Add(consoleOutput);
+            if (!string.IsNullOrEmpty(_package.OutputDirectory))
+            {
+                outputs.Add(new MarkdownBenchmarkOutput(_package.OutputDirectory));
+            }
+
+            return new CompositeBenchmarkOutput(outputs.ToArray());
         }
     }
 }

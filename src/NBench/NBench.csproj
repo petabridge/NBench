@@ -3,58 +3,10 @@
   <PropertyGroup>
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <AssemblyTitle>NBench</AssemblyTitle>
-    <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>$(NetStandardLibVersion)</TargetFrameworks>
     <AssemblyName>NBench</AssemblyName>
     <PackageId>NBench</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <DefineConstants>$(DefineConstants);</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);CORECLR</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="build\NBench.props" />
-    <None Remove="build\NBench.targets" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\NBench.Execution\AssemblyHelperExtensions.cs" Link="Sdk\Compiler\Assemblies\AssemblyHelperExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="build\NBench.props">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
-    </Content>
-    <Content Include="build\NBench.targets">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <PackagePath>build\;buildMultiTargeting\;</PackagePath>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Sdk\Compiler\Assemblies\" />
-  </ItemGroup>
-
 </Project>

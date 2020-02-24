@@ -1,0 +1,43 @@
+# Pull request validation for Windows against the `dev` and `master` branches
+# See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
+trigger:
+  branches:
+    include:
+      - dev
+      - master
+
+pr:
+  autoCancel: true # indicates whether additional pushes to a PR should cancel in-progress runs for the same PR. Defaults to true
+  branches:
+    include: [ dev, master ] # branch names which will trigger a build
+
+name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+jobs:
+  - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'windows_tests'
+      displayName: 'Windows Tests'
+      vmImage: 'vs2017-win2016'
+      scriptFileName: build.cmd
+      scriptArgs: RunTests
+      outputDirectory: 'TestResults'
+      artifactName: 'windows_tests-$(Build.BuildId)'
+  - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'windows_integration'
+      displayName: 'Integration Tests'
+      vmImage: 'vs2017-win2016'
+      scriptFileName: build.cmd
+      scriptArgs: NBench
+      outputDirectory: 'PerfResults'
+      artifactName: 'integration_tests-$(Build.BuildId)'
+  - template: azure-pipeline.template.yaml
+    parameters:
+      name: 'nuget_pack'
+      displayName: 'NuGet Pack'
+      vmImage: 'vs2017-win2016'
+      scriptFileName: build.cmd
+      scriptArgs: Nuget
+      outputDirectory: 'bin/nuget'
+      artifactName: 'nuget-$(Build.BuildId)'

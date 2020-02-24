@@ -41,7 +41,8 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "web.config",
         ],
         "exclude": [
           "obj/**",
@@ -49,11 +50,16 @@
         ]
       }
     ],
+     "sitemap": {
+       "baseUrl": "https://nbench.io/"
+     },
     "dest": "_site",
     "globalMetadata": {
       "_appTitle": "NBench",
-      "_disableContribution": "true",
-      "_appLogoPath": "/images/icon.png",
+      "_disableContribution": "false",
+      "_appLogoPath": "images/NBench_icon.png",
+      "_appFooter": "Copyright © 2015-2020 <a href='https://petabridge.com/'>Petabridge™, LLC</a>",
+      "_enableSearch": "true"
     },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
@@ -61,7 +67,7 @@
       "default",
       "template"
     ],
-    "postProcessors": [],
+    "postProcessors": ["ExtractSearchIndex"],
     "noLangKeyword": false
   }
 }
