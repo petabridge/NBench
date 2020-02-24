@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == '$(NetCoreTestVersion)' ">
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="1.1.0" />
   </ItemGroup>
   
