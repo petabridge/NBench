@@ -1,2 +1,6 @@
-- name: Introduction
+- name: Introduction to NBench
   href: index.md
+- name: Quickstart Tutorial
+  href: quickstart.md
+- name: Installation
+  href: install.md
