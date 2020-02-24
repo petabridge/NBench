@@ -26,7 +26,7 @@ If you have any one of these cases, then NBench is for you.
 ### Does NBench Support .NET Core / .NET Framework Version {x}?
 Given that NBench users are often on the edge of performance, NBench doesn't ship with any kind of external runner as of NBench 2.0. Instead, NBench is delivered as a [.NET Standard 2.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) - so it can be used in any version of .NET Framework 4.6.1 or higher and any version of .NET Core 2.0 or higher.
 
-Users install NBench into a stand-alone Console Application and run that application to generate their benchmarks. To learn more, see [Installing NBench](install.md) or  [NBench Quickstart Tutorial](quickstart.md).
+Users install NBench into a stand-alone Console Application and run that application to generate their benchmarks. To learn more, see [NBench Quickstart Tutorial](quickstart.md).
 
 ### What sorts of things can NBench help me measure?
 NBench is highly extensible, but out of the box we support assertions and benchmarking measurements for:

@@ -2,7 +2,7 @@
   href: index.md
 - name: Quickstart Tutorial
   href: quickstart.md
-- name: Installation
-  href: install.md
 - name: Measurements and Assertions
   href: measurements.md
+- name: Running NBench
+  href: running.md
