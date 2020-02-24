@@ -13,9 +13,9 @@ open Fake.DocFxHelper
 let configuration = "Release"
 
 // Metadata used when signing packages and DLLs
-let signingName = "My Library"
-let signingDescription = "My REALLY COOL Library"
-let signingUrl = "https://signing.is.cool/"
+let signingName = "NBench"
+let signingDescription = "NBench - performance testing library for .NET"
+let signingUrl = "https://nbench.io/"
 
 // Read release notes and version
 let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
@@ -94,8 +94,15 @@ module internal ResultHandling =
 Target "RunTests" (fun _ ->
     let projects = 
         match (isWindows) with 
-        | true -> !! "./src/**/*.Tests.csproj"
-        | _ -> !! "./src/**/*.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
+        | true -> !! "./src/**/*Tests.csproj" 
+                   ++ "./src/**/*Tests*.csproj"
+                   -- "./src/**/*Tests.Performance.csproj" // skip NBench specs
+                   -- "./src/**/*Tests.Performance.**.csproj" // skip NBench specs
+        | _ -> !! "./src/**/*Tests.csproj" // skip NBench specs // if you need to filter specs for Linux vs. Windows, do it here
+                   ++ "./src/**/*Tests*.csproj"
+                   -- "./src/**/*PerformanceCounters.Tests*.csproj" // skip performance counter specs on Linux
+                   -- "./src/**/*Tests.Performance.csproj" 
+                   -- "./src/**/*Tests.Performance.**.csproj" // skip NBench specs
 
     let runSingleProject project =
         let arguments =
@@ -114,28 +121,33 @@ Target "RunTests" (fun _ ->
     projects |> Seq.iter (runSingleProject)
 )
 
-Target "NBench" <| fun _ ->
-    let projects = 
-        match (isWindows) with 
-        | true -> !! "./src/**/*.Tests.Performance.csproj"
-        | _ -> !! "./src/**/*.Tests.Performance.csproj" // if you need to filter specs for Linux vs. Windows, do it here
+Target "NBench" (fun _ ->
+    ensureDirectory outputPerfTests
+    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
 
+    nbenchTestAssemblies |> Seq.iter(fun project -> 
+        let args = new StringBuilder()
+                |> append "run"
+                |> append "--no-build"
+                |> append "-c"
+                |> append configuration
+                |> append " -- "
+                |> append "--output"
+                |> append outputPerfTests
+                |> append "--concurrent" 
+                |> append "true"
+                |> append "--trace"
+                |> append "true"
+                |> append "--diagnostic"               
+                |> toText
 
-    let runSingleProject project =
-        let arguments =
-            match (hasTeamCity) with
-            | true -> (sprintf "nbench --nobuild --teamcity --concurrent true --trace true --output %s" (outputPerfTests))
-            | false -> (sprintf "nbench --nobuild --concurrent true --trace true --output %s" (outputPerfTests))
-
-        let result = ExecProcess(fun info ->
+        let result = ExecProcess(fun info -> 
             info.FileName <- "dotnet"
             info.WorkingDirectory <- (Directory.GetParent project).FullName
-            info.Arguments <- arguments) (TimeSpan.FromMinutes 30.0) 
-        
-        ResultHandling.failBuildIfXUnitReportedError TestRunnerErrorLevel.Error result
-    
-    projects |> Seq.iter runSingleProject
-
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" "dotnet" args
+    )
+)
 
 //--------------------------------------------------------------------------------
 // Code signing targets
