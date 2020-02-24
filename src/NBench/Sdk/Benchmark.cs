@@ -43,7 +43,7 @@ namespace NBench.Sdk
         /// <param name="invoker">The invoker used to execute benchmark and setup / cleanup methods.</param>
         /// <param name="writer">The output target this benchmark will write to.</param>
         /// <remarks>Uses the <see cref="DefaultBenchmarkAssertionRunner"/> to assert benchmark data.</remarks>
-        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer) 
+        public Benchmark(BenchmarkSettings settings, IBenchmarkInvoker invoker, IBenchmarkOutput writer)
             : this(settings, invoker, writer, DefaultBenchmarkAssertionRunner.Instance) { }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace NBench.Sdk
             var runTime = 0L;
 
             /* Pre-Warmup */
-           
+
 
             Trace.Debug("----- BEGIN PRE-WARMUP -----");
             /* Estimate */
@@ -128,7 +128,7 @@ namespace NBench.Sdk
                         {
                             runEstimates[i - 1] = runCount;
                             timeEstimates[i - 1] = warmupStopWatch.ElapsedTicks;
-                            
+
                         }
 
                         runCount = 0;
@@ -136,8 +136,8 @@ namespace NBench.Sdk
                     }
 
                     runCount = (long)Math.Ceiling(runEstimates.Average());
-                    runTime = (long) Math.Ceiling(timeEstimates.Average());
-                       
+                    runTime = (long)Math.Ceiling(timeEstimates.Average());
+
                     Trace.Debug(
                         $"Throughput mode: executed {runCount} instances of {BenchmarkName} in roughly {targetTime.TotalSeconds}s. Using that figure for benchmark.");
                 }
@@ -225,7 +225,7 @@ namespace NBench.Sdk
             {
                 Output.Warning($"Error during previous run of {BenchmarkName}. Aborting run...");
             }
-            
+
         }
 
         public void Shutdown()
@@ -262,12 +262,12 @@ namespace NBench.Sdk
                     // the invoker with an inlined loop
                     Invoker.InvokePerfSetup(WarmupData.EstimatedRunsPerSecond, _currentRun.Context);
                 }
-                    else
+                else
                 {
                     // Invoke user-defined setup method, if any
                     Invoker.InvokePerfSetup(_currentRun.Context);
                 }
-                
+
 
                 PrepareForRun();
             }
@@ -344,7 +344,7 @@ namespace NBench.Sdk
             _currentRun.Dispose();
             Trace.Info($"Generating report for {PrintWarmupOrRun(_isWarmup)} {1 + Settings.NumberOfIterations - _pendingIterations} of {BenchmarkName}");
             var report = _currentRun.ToReport(StopWatch.Elapsed);
-            if(!isEstimate)
+            if (!isEstimate)
                 Output.WriteRun(report, _isWarmup);
 
             // Change runs, but not on warmup

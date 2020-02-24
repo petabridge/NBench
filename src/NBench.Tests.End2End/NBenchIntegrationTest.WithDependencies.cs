@@ -65,6 +65,9 @@ namespace NBench.Tests.End2End
                     package.AddExclude(e);
                 }
 
+            // need to set this to true in order to resolve https://github.com/petabridge/NBench/issues/314
+            package.Concurrent = true;
+
             return package;
         }
     }
