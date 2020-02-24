@@ -303,6 +303,7 @@ Target "Nuget" DoNothing
 
 // tests dependencies
 "Build" ==> "RunTests"
+"Build" ==> "NBench"
 
 // nuget dependencies
 "Clean" ==> "Build" ==> "CreateNuget"
