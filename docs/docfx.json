@@ -41,7 +41,8 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "web.config",
         ],
         "exclude": [
           "obj/**",
@@ -49,9 +50,12 @@
         ]
       }
     ],
+     "sitemap": {
+       "baseUrl": "https://yoursite.github.io/"
+     },
     "dest": "_site",
     "globalMetadata": {
-      "_appTitle": "NBench",
+      "_appTitle": "Petabridge.Library",
       "_disableContribution": "true",
       "_appLogoPath": "/images/icon.png",
     },
@@ -61,7 +65,7 @@
       "default",
       "template"
     ],
-    "postProcessors": [],
+    "postProcessors": ["ExtractSearchIndex"],
     "noLangKeyword": false
   }
 }
