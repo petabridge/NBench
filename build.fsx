@@ -123,7 +123,7 @@ Target "RunTests" (fun _ ->
 
 Target "NBench" (fun _ ->
     ensureDirectory outputPerfTests
-    let nbenchTestAssemblies = !! "./tests/**/*Tests.Performance.csproj" 
+    let nbenchTestAssemblies = !! "./src/**/*Tests.Performance.csproj" 
 
     nbenchTestAssemblies |> Seq.iter(fun project -> 
         let args = new StringBuilder()
