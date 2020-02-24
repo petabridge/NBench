@@ -14,11 +14,11 @@ variables:
   - group: signingSecrets #create this group with SECRET variables `signingUsername` and `signingPassword`
   - group: nugetKeys #create this group with SECRET variables `nugetKey`
   - name: githubConnectionName
-    value: yourConnection #replace this
+    value: PbReleaseNotes
   - name: projectName
-    value: yourProjectName #replace this
+    value: NBench
   - name: githubRepositoryName
-    value: yourOrganization/yourRepo #replace this
+    value: petabridge/NBench
 
 steps:
 - task: BatchScript@1
