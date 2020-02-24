@@ -2,8 +2,8 @@
   href: index.md
 - name: Quickstart Tutorial
   href: quickstart.md
-- href: Creating Benchmarks and Performance Tests
-  href: creating-benchmarks.md
+- name: Creating Benchmarks and Performance Tests
+  href: benchmarks.md
 - name: Measurements and Assertions
   href: measurements.md
 - name: Running NBench

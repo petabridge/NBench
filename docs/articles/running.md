@@ -3,7 +3,9 @@ NBench is always installed into your own console application and run from there,
 
 Despite that, NBench has specific command line arguments it listens for and uses despite being hosted inside your own application:
 
+```
 dotnet run [YourNBench.dll] [--output {dir-path}] [--configuration {file-path}] [--include MyTest*.Perf*,Other*Spec] [--exclude *Long*] [--concurrent {true|false}] [--trace {true|false}] [--teamcity] [--diagnostic]
+```
 
 ## Commandline Arguments
 

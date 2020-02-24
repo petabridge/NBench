@@ -1,6 +1,7 @@
 # Introduction to NBench
 
-[![Join the chat at https://gitter.im/petabridge/NBench](https://badges.gitter.im/petabridge/NBench.svg)](https://gitter.im/petabridge/NBench?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![NBench Logo](/images/NBench_logo_square_280.png)
+
 Cross-platform performance benchmarking and testing framework for .NET applications.
 
 NBench is designed for .NET developers who need to care about performance and want the ability to "unit test" their application's performance just like [XUnit](https://github.com/xunit/xunit) or [NUnit](http://nunit.org/) tests their application code.
