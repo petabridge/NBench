@@ -13,7 +13,7 @@ You can declare a `PerfBenchmark` attribute on multiple methods within a single 
 
 A `PerfBenchmark`, `PerfSetup`, or `PerfCleanup` method can either take no arguments, or it can take an `NBench.BenchmarkContext` object. 
 
-#### Benchmark modes
+#### Benchmark Modes
 There are two important modes that you can use in the design of your benchmarks - the `RunMode` and the `TestMode`.
 
 `RunMode` indicates how the benchmark will be run. `RunMode.Throughput` is designed for *very* small benchmarks, like single-line methods, and is meant for scenarios where you really need to measure the throughput of a given operation. 
