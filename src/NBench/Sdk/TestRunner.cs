@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Runtime.InteropServices;
 using System.Threading;
 using IBenchmarkOutput = NBench.Reporting.IBenchmarkOutput;
 
@@ -81,7 +82,7 @@ namespace NBench.Sdk
             /*
              * Set priority
              */
-            if (!IsMono)
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !IsMono)
                 Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
             if (!concurrent)
             {
