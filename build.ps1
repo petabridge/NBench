@@ -36,7 +36,7 @@ $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
 $NugetVersion = "4.1.0";
 $NugetUrl = "https://dist.nuget.org/win-x86-commandline/v$NugetVersion/nuget.exe"
 $ProtobufVersion = "3.4.0"
-$DocfxVersion = "2.40.5"
+$DocfxVersion = "2.49.0"
 
 # Make sure tools folder exists
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
