@@ -58,6 +58,7 @@
       "_appTitle": "NBench",
       "_disableContribution": "false",
       "_appLogoPath": "/images/NBench_logo_square_90.png.png",
+      "_enableSearch": "true"
     },
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
