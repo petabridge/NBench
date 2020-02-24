@@ -7,5 +7,6 @@
     <AssemblyName>NBench</AssemblyName>
     <PackageId>NBench</PackageId>
     <PackageTags>performance;benchmarking;benchmark;perf;testing;NBench</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
