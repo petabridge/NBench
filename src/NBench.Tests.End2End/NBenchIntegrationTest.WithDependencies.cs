@@ -30,10 +30,23 @@ namespace NBench.Tests.End2End
         {
             var package = LoadPackageWithDependencies().AddOutput(_benchmarkOutput);
             var result = TestRunner.Run(package);
-            
-            result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
-            result.ExecutedTestsCount.Should().NotBe(0);
-            result.IgnoredTestsCount.Should().Be(0);
+
+            try
+            {
+                result.AllTestsPassed.Should().BeTrue("Expected all tests to pass, but did not.");
+                result.ExecutedTestsCount.Should().NotBe(0);
+                result.IgnoredTestsCount.Should().Be(0);
+            }
+            catch
+            {
+                foreach (var test in result.FullResults)
+                {
+                    _output.WriteLine($"DEBUG: Checking output for {test.BenchmarkName}");
+                    foreach(var a in test.AssertionResults)
+                        _output.WriteLine($"ASSERT: {a.MetricName} - Passed? {a.Passed}");
+                }
+                throw;
+            }
         }
 
         private static TestPackage LoadPackageWithDependencies(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
@@ -51,6 +64,9 @@ namespace NBench.Tests.End2End
                 {
                     package.AddExclude(e);
                 }
+
+            // need to set this to true in order to resolve https://github.com/petabridge/NBench/issues/314
+            package.Concurrent = true;
 
             return package;
         }
