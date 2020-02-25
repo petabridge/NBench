@@ -22,7 +22,7 @@ For a full set of changes, [please see the NBench 2.0.0 milestone on Github](htt
     <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <ApprovalTestsVersion>4.5.0</ApprovalTestsVersion>
+    <ApprovalTestsVersion>4.5.1</ApprovalTestsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <TestSdkVersion>16.5.0</TestSdkVersion>
     <FluentAssertionsVersion>5.10.2</FluentAssertionsVersion>
