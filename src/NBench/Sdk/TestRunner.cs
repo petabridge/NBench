@@ -179,6 +179,8 @@ namespace NBench.Sdk
                 outputs.Add(new MarkdownBenchmarkOutput(_package.OutputDirectory));
             }
 
+            outputs.AddRange(_package.OutputTargets);
+
             return new CompositeBenchmarkOutput(outputs.ToArray());
         }
     }

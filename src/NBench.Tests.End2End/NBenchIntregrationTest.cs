@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Petabridge <https://petabridge.com/>. All rights reserved.
 // Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -99,6 +100,19 @@ namespace NBench.Tests.End2End
             result.IgnoredTestsCount.Should().NotBe(0);
         }
 
+        [Fact]
+        public void RunnerShouldIncludeAdditionalOutputTargets()
+        {
+            var testOutput = new TestBenchmarkOutput();
+
+            var package = LoadPackage();
+            package.Tracing = true;
+            package.AddOutput(testOutput);
+
+            TestRunner.Run(package);
+            testOutput.AdditionalOutputWasIncluded.Should().BeTrue("Expected inclusion of additional benchmark output, but was ignored.");
+        }
+
         private static TestPackage LoadPackage(IEnumerable<string> include = null, IEnumerable<string> exclude = null)
         {
             var package = NBenchRunner.CreateTest<ConfigBenchmark>();
@@ -116,6 +130,23 @@ namespace NBench.Tests.End2End
                 }
 
             return package;
+        }
+
+        private class TestBenchmarkOutput : IBenchmarkOutput
+        {
+            public bool AdditionalOutputWasIncluded { get; set; } = false;
+
+            public TestBenchmarkOutput() { }
+
+            public void Error(Exception ex, string message) => AdditionalOutputWasIncluded = true;
+            public void Error(string message) => AdditionalOutputWasIncluded = true;
+            public void FinishBenchmark(string benchmarkName) => AdditionalOutputWasIncluded = true;
+            public void SkipBenchmark(string benchmarkName) => AdditionalOutputWasIncluded = true;
+            public void StartBenchmark(string benchmarkName) => AdditionalOutputWasIncluded = true;
+            public void Warning(string message) => AdditionalOutputWasIncluded = true;
+            public void WriteBenchmark(BenchmarkFinalResults results) => AdditionalOutputWasIncluded = true;
+            public void WriteLine(string message) => AdditionalOutputWasIncluded = true;
+            public void WriteRun(BenchmarkRunReport report, bool isWarmup = false) => AdditionalOutputWasIncluded = true;
         }
     }
 }
