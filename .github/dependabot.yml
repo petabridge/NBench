@@ -1,0 +1,21 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: Akka
+    versions:
+    - 1.4.16
+    - 1.4.17
+  - dependency-name: ApprovalTests
+    versions:
+    - 5.4.5
+    - 5.4.6
+  - dependency-name: Microsoft.NET.Test.Sdk
+    versions:
+    - 16.8.3
+    - 16.9.1
