@@ -18,7 +18,7 @@ jobs:
     parameters:
       name: 'windows_tests'
       displayName: 'Windows Tests'
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-latest'
       scriptFileName: build.cmd
       scriptArgs: RunTests
       outputDirectory: 'TestResults'
@@ -27,7 +27,7 @@ jobs:
     parameters:
       name: 'windows_integration'
       displayName: 'Integration Tests'
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-latest'
       scriptFileName: build.cmd
       scriptArgs: NBench
       outputDirectory: 'PerfResults'
@@ -36,7 +36,7 @@ jobs:
     parameters:
       name: 'linux_integration'
       displayName: 'Integration Tests (Linux)'
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
       scriptFileName: build.sh
       scriptArgs: NBench
       outputDirectory: 'PerfResults'
@@ -45,7 +45,7 @@ jobs:
     parameters:
       name: 'nuget_pack'
       displayName: 'NuGet Pack'
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-latest'
       scriptFileName: build.cmd
       scriptArgs: Nuget
       outputDirectory: 'bin/nuget'
