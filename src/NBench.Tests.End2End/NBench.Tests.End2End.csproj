@@ -19,7 +19,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
     <PackageReference Include="ApprovalTests" Version="$(ApprovalTestsVersion)" /> 
-    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="5.0.0" />           
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="6.0.0" />           
   </ItemGroup>
   
   <ItemGroup>
