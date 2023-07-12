@@ -29,7 +29,7 @@ For a full set of changes, [please see the NBench 2.0.1 milestone on Github](htt
   </PropertyGroup>
   <PropertyGroup>
     <ApprovalTestsVersion>5.4.2</ApprovalTestsVersion>
-    <XunitVersion>2.4.1</XunitVersion>
+    <XunitVersion>2.5.0</XunitVersion>
     <TestSdkVersion>16.8.0</TestSdkVersion>
     <FluentAssertionsVersion>6.10.0</FluentAssertionsVersion>
   </PropertyGroup>
