@@ -31,7 +31,7 @@ For a full set of changes, [please see the NBench 2.0.1 milestone on Github](htt
     <ApprovalTestsVersion>5.4.2</ApprovalTestsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <TestSdkVersion>16.8.0</TestSdkVersion>
-    <FluentAssertionsVersion>6.10.0</FluentAssertionsVersion>
+    <FluentAssertionsVersion>6.11.0</FluentAssertionsVersion>
   </PropertyGroup>
   <PropertyGroup>
     <NetCoreTestVersion>netcoreapp3.1</NetCoreTestVersion>
