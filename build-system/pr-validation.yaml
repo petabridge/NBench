@@ -33,7 +33,7 @@ jobs:
   - script: ./build.ps1
     displayName: 'Update release notes'
     condition: always()
-    pwsh: true
+    shell: pwsh
 
   - script: dotnet build -c Release
     displayName: 'dotnet build'
@@ -79,7 +79,7 @@ jobs:
   - script: ./build.ps1
     displayName: 'Update release notes'
     condition: always()
-    pwsh: true
+    shell: pwsh
 
   - script: dotnet build -c Release
     displayName: 'dotnet build'
@@ -111,7 +111,7 @@ jobs:
   - script: pwsh ./scripts/execNBenchProjects.ps1
     displayName: 'Run NBench Projects'
     condition: always()
-    pwsh: true
+    shell: pwsh
 
 - job: WindowsNBench
   displayName: 'NBench on Windows'
@@ -134,4 +134,4 @@ jobs:
   - script: pwsh ./scripts/execNBenchProjects.ps1
     displayName: 'Run NBench Projects'
     condition: always()
-    pwsh: true
+    shell: pwsh
