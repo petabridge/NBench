@@ -45,13 +45,6 @@ jobs:
       testRunTitle: 'Test Results'
       mergeTestResults: true
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Upload Test Result Files'
-    inputs:
-      PathtoPublish: '$(Build.SourcesDirectory)/**/TestResults/**/*'
-      ArtifactName: 'test-results'
-      retentionDays: 5
-
 - job: WindowsTest
   displayName: 'Test on Windows'
   pool:
