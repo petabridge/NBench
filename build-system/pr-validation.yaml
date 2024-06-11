@@ -19,7 +19,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   steps:
   - checkout: self
-  
+
   - task: UseDotNet@2
     displayName: 'Install .NET SDK'
     inputs:
@@ -39,12 +39,11 @@ jobs:
     displayName: 'dotnet test (Linux)'
 
   - task: PublishTestResults@2
-    displayName: 'Publish Test Results'
     inputs:
-      testResultsFiles: '**/*.trx'
-      testRunTitle: 'Test Results'
-    condition: always()
-    continueOnError: true
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx' #TestResults folder usually
+      testRunTitle: ${{ parameters.name }}
+      mergeTestResults: true
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Result Files'
@@ -77,6 +76,13 @@ jobs:
 
   - script: dotnet test --configuration Release --verbosity normal --logger trx --collect:"XPlat Code Coverage"
     displayName: 'dotnet test (Windows)'
+
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx' #TestResults folder usually
+      testRunTitle: ${{ parameters.name }}
+      mergeTestResults: true
 
 - job: LinuxNBench
   displayName: 'NBench on Linux'
