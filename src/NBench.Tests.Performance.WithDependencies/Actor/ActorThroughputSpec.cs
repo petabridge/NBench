@@ -31,22 +31,22 @@ namespace Akka.Tests.Performance.Actor
 
             protected override bool Receive(object message)
             {
-                return message.Match()
-                    .With<string>(IncrementAndCheck)
-                    .With<int>(IncrementAndCheck)
-                    .With<SimpleData>(simpleDataMessage =>
-                    {
-                        if (simpleDataMessage.Age > 20)
-                        {
-                            IncrementAndCheck();
-                        }
-                        else
-                        {
-                            IncrementAndCheck();
-                        }
-                    })
-                    .Default(o => IncrementAndCheck())
-                    .WasHandled;
+                switch (message)
+                {
+                    case string str:
+                        IncrementAndCheck();
+                        break;
+                    case int i:
+                        IncrementAndCheck();
+                        break;
+                    case SimpleData simpleDataMessage:
+                        IncrementAndCheck();
+                        break;
+                    default: IncrementAndCheck();
+                        break;
+                }
+
+                return true;
             }
 
             private void IncrementAndCheck()
