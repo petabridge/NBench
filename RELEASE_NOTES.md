@@ -1,4 +1,4 @@
-#### v2.0.1 February 25 2020 ####
+#### 2.0.1 February 25 2020 ####
 
 NBench 2.0.0 is a major departure from NBench 1.2 and preceding versions, and these changes were done in order to support NBench's future as a cutting-edge, cross-platform performance testing and macro benchmarking framework:
 
