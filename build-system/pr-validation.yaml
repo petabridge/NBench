@@ -18,12 +18,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - task: Checkout@2
-    displayName: 'Checkout'
-    inputs:
-      lfs: true
-      fetchDepth: 0
-
+  - checkout: self
+  
   - task: UseDotNet@2
     displayName: 'Install .NET SDK'
     inputs:
@@ -62,11 +58,7 @@ jobs:
   pool:
     vmImage: 'windows-latest'
   steps:
-  - task: Checkout@2
-    displayName: 'Checkout'
-    inputs:
-      lfs: true
-      fetchDepth: 0
+  - checkout: self
 
   - task: UseDotNet@2
     displayName: 'Install .NET SDK'
@@ -91,11 +83,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   steps:
-  - task: Checkout@2
-    displayName: 'Checkout'
-    inputs:
-      lfs: true
-      fetchDepth: 0
+  - checkout: self
 
   - task: UseDotNet@2
     displayName: 'Install .NET SDK'
@@ -112,12 +100,7 @@ jobs:
   pool:
     vmImage: 'windows-latest'
   steps:
-  - task: Checkout@2
-    displayName: 'Checkout'
-    inputs:
-      lfs: true
-      fetchDepth: 0
-
+  - checkout: self
   - task: UseDotNet@2
     displayName: 'Install .NET SDK'
     inputs:
