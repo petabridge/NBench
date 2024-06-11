@@ -18,4 +18,4 @@ NBench is designed for .NET developers who need to care about performance and wa
 ## Documentation
 To learn more, please read [the official NBench documentation](https://nbench.io).
 
-Copyright (c) [Petabridge™, LLC](https://petabridge.com/) 2015-2020
+Copyright (c) [Petabridge™, LLC](https://petabridge.com/) 2015-2024

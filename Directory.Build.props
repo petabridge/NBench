@@ -55,4 +55,9 @@ For a full set of changes, [please see the NBench 2.0.1 milestone on Github](htt
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" Visible="false" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)\LICENSE" Pack="true" Visible="false" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)\docs\images\NBench_logo_square_90.png" Pack="true" Visible="false" PackagePath="\" />
+  </ItemGroup>
 </Project>
