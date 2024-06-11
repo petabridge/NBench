@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\common.props" />
+  
   <PropertyGroup>
     <Description>Cross-platform performance benchmarking and testing framework for .NET applications.</Description>
     <AssemblyTitle>NBench</AssemblyTitle>
