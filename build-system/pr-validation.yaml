@@ -1,52 +1,137 @@
-# Pull request validation for Windows against the `dev` and `master` branches
-# See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
 trigger:
   branches:
     include:
-      - dev
       - master
+      - dev
+      - main
 
 pr:
-  autoCancel: true # indicates whether additional pushes to a PR should cancel in-progress runs for the same PR. Defaults to true
   branches:
-    include: [ dev, master ] # branch names which will trigger a build
-
-name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+    include:
+      - master
+      - dev
+      - main
 
 jobs:
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'windows_tests'
-      displayName: 'Windows Tests'
-      vmImage: 'windows-latest'
-      scriptFileName: build.cmd
-      scriptArgs: RunTests
-      outputDirectory: 'TestResults'
-      artifactName: 'windows_tests-$(Build.BuildId)'
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'windows_integration'
-      displayName: 'Integration Tests'
-      vmImage: 'windows-latest'
-      scriptFileName: build.cmd
-      scriptArgs: NBench
-      outputDirectory: 'PerfResults'
-      artifactName: 'integration_tests_windows-$(Build.BuildId)'
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'linux_integration'
-      displayName: 'Integration Tests (Linux)'
-      vmImage: 'ubuntu-latest'
-      scriptFileName: build.sh
-      scriptArgs: NBench
-      outputDirectory: 'PerfResults'
-      artifactName: 'integration_tests_linux-$(Build.BuildId)'
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'nuget_pack'
-      displayName: 'NuGet Pack'
-      vmImage: 'windows-latest'
-      scriptFileName: build.cmd
-      scriptArgs: Nuget
-      outputDirectory: 'bin/nuget'
-      artifactName: 'nuget-$(Build.BuildId)'
+- job: LinuxTest
+  displayName: 'Test on Linux'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: Checkout@2
+    displayName: 'Checkout'
+    inputs:
+      lfs: true
+      fetchDepth: 0
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+
+  - script: ./build.ps1
+    displayName: 'Update release notes'
+    condition: always()
+    pwsh: true
+
+  - script: dotnet build -c Release
+    displayName: 'dotnet build'
+
+  - script: dotnet pack -c Release
+    displayName: 'dotnet pack'
+
+  - script: dotnet test --configuration Release --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+    displayName: 'dotnet test (Linux)'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
+    inputs:
+      testResultsFiles: '**/*.trx'
+      testRunTitle: 'Test Results'
+    condition: always()
+    continueOnError: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Upload Test Result Files'
+    inputs:
+      PathtoPublish: '$(Build.SourcesDirectory)/**/TestResults/**/*'
+      ArtifactName: 'test-results'
+      retentionDays: 5
+
+- job: WindowsTest
+  displayName: 'Test on Windows'
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: Checkout@2
+    displayName: 'Checkout'
+    inputs:
+      lfs: true
+      fetchDepth: 0
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+
+  - script: ./build.ps1
+    displayName: 'Update release notes'
+    condition: always()
+    pwsh: true
+
+  - script: dotnet build -c Release
+    displayName: 'dotnet build'
+
+  - script: dotnet pack -c Release
+    displayName: 'dotnet pack'
+
+  - script: dotnet test --configuration Release --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+    displayName: 'dotnet test (Windows)'
+
+- job: LinuxNBench
+  displayName: 'NBench on Linux'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: Checkout@2
+    displayName: 'Checkout'
+    inputs:
+      lfs: true
+      fetchDepth: 0
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+      useGlobalJson: true
+
+  - script: pwsh ./scripts/execNBenchProjects.ps1
+    displayName: 'Run NBench Projects'
+    condition: always()
+    pwsh: true
+
+- job: WindowsNBench
+  displayName: 'NBench on Windows'
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: Checkout@2
+    displayName: 'Checkout'
+    inputs:
+      lfs: true
+      fetchDepth: 0
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+      useGlobalJson: true
+
+  - script: pwsh ./scripts/execNBenchProjects.ps1
+    displayName: 'Run NBench Projects'
+    condition: always()
+    pwsh: true
