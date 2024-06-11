@@ -14,4 +14,9 @@
   <ItemGroup>
     <ProjectReference Include="..\NBench\NBench.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Define the condition for Windows OS -->
+    <DefineConstants Condition="'$(OS)' == 'Windows_NT'">WINDOWS;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
 </Project>
