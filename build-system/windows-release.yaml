@@ -1,16 +1,11 @@
-# Release task for PbLib projects
-# See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
-
-pool:
-  vmImage: vs2017-win2016
-  demands: Cmd
-
 trigger:
   branches:
     include:
       - refs/tags/*
-
 pr: none
+
+pool:
+  vmImage: 'windows-latest'
 
 variables:
   - group: signingSecrets #create this group with SECRET variables `signingUsername` and `signingPassword`
@@ -22,19 +17,54 @@ variables:
   - name: githubRepositoryName
     value: petabridge/NBench
 
-steps:
-- task: BatchScript@1
-  displayName: 'FAKE Build'
-  inputs:
-    filename: build.cmd
-    arguments: 'nuget SignClientUser=$(signingUsername) SignClientSecret=$(signingPassword) nugetpublishurl=https://www.nuget.org/api/v2/package nugetkey=$(nugetKey)'
+stages:
+  - stage: BuildAndSign
+    displayName: 'Build and Sign'
+    jobs:
+      - job: Sign
+        displayName: 'Sign and Push Packages'
+        steps:
+          - checkout: self
+          - task: UseDotNet@2
+            displayName: 'Install .NET SDK'
+            inputs:
+              packageType: 'sdk'
+              useGlobalJson: true
 
-- task: GitHubRelease@0
-  displayName: 'GitHub release (create)'
-  inputs:
-    gitHubConnection: $(githubConnectionName)
-    repositoryName: $(githubRepositoryName)
-    title: '$(projectName) v$(Build.SourceBranchName)'
-    releaseNotesFile: 'RELEASE_NOTES.md'
-    assets: |
-     bin\nuget\*.nupkg
+          - powershell: ./build.ps1
+            displayName: 'Update Release Notes'
+          
+          - script: 'dotnet pack --configuration $(buildConfiguration) -o ./bin/nuget'
+            displayName: 'Build Package'
+          
+          - script: 'dotnet tool install -g SignClient --version 1.2.109'
+            displayName: 'Install SignClient'
+
+          - powershell: |
+              echo "Starting the signing process..."
+              ./scripts/signPackages.ps1 -ConfigPath "./scripts/signsettings.json" `
+                -UserName "$(signingUsername)" `
+                -Password "$(signingPassword)" `
+                -ProductName "NBench" `
+                -ProductDescription "NBench - performance testing library for .NET" `
+                -ProductUrl "https://nbench.io/" `
+                -DirectoryPath "./bin/nuget"
+            displayName: 'Sign Artifacts'
+
+          # PowerShell script to push all NuGet packages to NuGet.org
+          - powershell: |
+              $ErrorActionPreference = "Stop"  # Makes the script stop on errors
+              Get-ChildItem "bin\nuget\*.nupkg" -Recurse | ForEach-Object {
+                dotnet nuget push $_.FullName --api-key $(nugetKey) --source https://api.nuget.org/v3/index.json
+              }
+            displayName: 'Push to NuGet.org'
+
+          - task: GitHubRelease@0
+            displayName: 'GitHub release (create)'
+            inputs:
+              gitHubConnection: $(githubConnectionName)
+              repositoryName: $(githubRepositoryName)
+              title: '$(projectName) v$(Build.SourceBranchName)'
+              releaseNotesFile: 'RELEASE_NOTES.md'
+              assets: |
+               bin\nuget\*.nupkg

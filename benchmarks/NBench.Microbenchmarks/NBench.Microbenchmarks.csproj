@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\src\common.props" />
+  
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreTestVersion)</TargetFrameworks>
   </PropertyGroup>

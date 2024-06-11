@@ -1,19 +1,25 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2015-2020 Petabridge</Copyright>
+    <Copyright>Copyright © 2015-2024 Petabridge</Copyright>
     <Authors>Petabridge</Authors>
     <VersionPrefix>2.0.1</VersionPrefix>
     <PackageReleaseNotes>NBench 2.0.0 is a major departure from NBench 1.2 and preceding versions, and these changes were done in order to support NBench's future as a cutting-edge, cross-platform performance testing and macro benchmarking framework:
+
 - `dotnet nbench` and `NBench.Runner` are both now deprecated - [NBench is now run from directly inside a console application created by end-users](https://nbench.io/articles/quickstart.html). This makes it easier to configure, debug, and create benchmarks on new .NET Core platforms without having to wait for additional instrumentation or tooling from NBench itself.
 - NBench no longer supports .NET Framework explicitly; moving forward NBench will only support .NET Standard 2.0 and later (.NET Framework 4.6.1 and greater or .NET Core 2.0 and greater.)
 - We've added a new documentation website for NBench: https://nbench.io/
 - NBench now supports configuration as code through the [`TestPackage` class](https://nbench.io/api/NBench.Sdk.TestPackage.html).
+
 For a full set of changes, [please see the NBench 2.0.0 milestone on Github](https://github.com/petabridge/NBench/milestone/3).
+
 ---
+
 2.0.1 Notes:
-Fixed error with setting thread priority on Linux;
-Fixed NuGet symbol publication;
-And more.
+
+* Fixed error with setting thread priority on Linux;
+* Fixed NuGet symbol publication;
+* And more.
+
 For a full set of changes, [please see the NBench 2.0.1 milestone on Github](https://github.com/petabridge/NBench/milestone/8).</PackageReleaseNotes>
     <PackageProjectUrl>
       https://nbench.io/
@@ -28,13 +34,13 @@ For a full set of changes, [please see the NBench 2.0.1 milestone on Github](htt
     <RepositoryUrl>https://github.com/petabridge/NBench</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <ApprovalTestsVersion>5.4.2</ApprovalTestsVersion>
+    <ApprovalTestsVersion>5.9.0</ApprovalTestsVersion>
     <XunitVersion>2.5.1</XunitVersion>
     <TestSdkVersion>16.8.0</TestSdkVersion>
     <FluentAssertionsVersion>6.10.0</FluentAssertionsVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <NetCoreTestVersion>netcoreapp3.1</NetCoreTestVersion>
+    <NetCoreTestVersion>net8.0</NetCoreTestVersion>
     <NetStandardLibVersion>netstandard2.0</NetStandardLibVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -48,5 +54,10 @@ For a full set of changes, [please see the NBench 2.0.1 milestone on Github](htt
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" Visible="false" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)\LICENSE" Pack="true" Visible="false" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)\docs\images\NBench_logo_square_90.png" Pack="true" Visible="false" PackagePath="\" />
   </ItemGroup>
 </Project>
