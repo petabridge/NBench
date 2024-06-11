@@ -17,7 +17,7 @@ using NBench.Metrics.GarbageCollection;
 using NBench.Metrics.Memory;
 using NBench.Reporting;
 using NBench.Reporting.Targets;
-#if !WINDOWS
+#if WINDOWS
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using ApprovalTests.Scrubber;
@@ -29,7 +29,7 @@ using Xunit.Abstractions;
 
 namespace NBench.Tests.End2End.Reporting
 {
-#if !WINDOWS
+#if WINDOWS
     [UseReporter(typeof(DiffReporter))]
     public class MarkdownBenchmarkOutputSpec
     {
