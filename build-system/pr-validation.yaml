@@ -30,10 +30,10 @@ jobs:
       packageType: 'sdk'
       useGlobalJson: true
 
-  - script: ./build.ps1
-    displayName: 'Update release notes'
-    condition: always()
+  - name: 'Update release notes'
     shell: pwsh
+    run: |
+      ./build.ps1
 
   - script: dotnet build -c Release
     displayName: 'dotnet build'
@@ -76,10 +76,11 @@ jobs:
       packageType: 'sdk'
       useGlobalJson: true
 
-  - script: ./build.ps1
-    displayName: 'Update release notes'
-    condition: always()
+  - name: 'Update release notes'
     shell: pwsh
+    run: |
+      ./build.ps1
+    
 
   - script: dotnet build -c Release
     displayName: 'dotnet build'
@@ -108,7 +109,7 @@ jobs:
       installationPath: $(Agent.ToolsDirectory)/dotnet
       useGlobalJson: true
 
-  - script: pwsh ./scripts/execNBenchProjects.ps1
+  - script: ./scripts/execNBenchProjects.ps1
     displayName: 'Run NBench Projects'
     condition: always()
     shell: pwsh
@@ -131,7 +132,7 @@ jobs:
       installationPath: $(Agent.ToolsDirectory)/dotnet
       useGlobalJson: true
 
-  - script: pwsh ./scripts/execNBenchProjects.ps1
+  - script: ./scripts/execNBenchProjects.ps1
     displayName: 'Run NBench Projects'
     condition: always()
     shell: pwsh
