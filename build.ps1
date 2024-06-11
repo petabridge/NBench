@@ -14,8 +14,8 @@ function AssemblyInfo {
     $releaseNotes = Get-Content "RELEASE_NOTES.md" -Raw
     $version = $releaseNotes -match "## \[(\d+\.\d+\.\d+)\]" | Out-Null; $Matches[1]
     $notes = $releaseNotes -split "## \[" | Select-Object -Skip 1
-    Set-Content -Path "./src/Directory.Build.props" -Value $version -Force
-    Set-Content -Path "./src/Directory.Build.props" -Value $notes -Force
+    Set-Content -Path "./Directory.Build.props" -Value $version -Force
+    Set-Content -Path "./Directory.Build.props" -Value $notes -Force
 }
 
 function Build {
@@ -50,10 +50,7 @@ function SignPackages {
 }
 
 function CreateNuget {
-    $projects = Get-ChildItem -Recurse -Filter "*.csproj" | Where-Object { $_.Name -notmatch "Tests" }
-    foreach ($project in $projects) {
-        dotnet pack $project.FullName -c Release --include-symbols --no-build -o "bin/nuget"
-    }
+    dotnet pack -c Release --include-symbols --no-build -o "bin/nuget"
 }
 
 function PublishNuget {
