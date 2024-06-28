@@ -11,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Akka" Version="1.5.24" />
+    <PackageReference Include="Akka" Version="1.5.26" />
   </ItemGroup>
 </Project>
